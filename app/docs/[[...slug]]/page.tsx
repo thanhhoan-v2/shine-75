@@ -41,7 +41,7 @@ export default async function Page(props: {
 			breadcrumb={{ includeSeparator: true }}
 		>
 			<DocsTitle className="flex justify-between items-center">
-				<div className="font-bold text-4xl">{page.data.title}</div>
+				<div className="font-bold text-3xl md:text-4xl lg:text-5xl">{page.data.title}</div>
 				<Link
 					href={routes.github.edit(page.path)}
 					rel="noreferrer noopener"
