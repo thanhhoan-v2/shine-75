@@ -4,6 +4,7 @@ import {
   DocsPage,
   DocsTitle,
 } from '@/components/layouts/page';
+import { getDifficultyFromPathname } from '@/lib/db';
 import { source } from '@/lib/source';
 import { getMDXComponents } from '@/mdx-components';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
@@ -17,6 +18,8 @@ export default async function Page(props: {
   const params = await props.params;
   const page = source.getPage(params.slug);
   if (!page) notFound();
+
+  const difficulty = getDifficultyFromPathname(page.path);
 
   const MDXContent = page.data.body;
 
@@ -48,7 +51,9 @@ export default async function Page(props: {
           path: `content/docs/${page.path}`,
         }}
       >
-        <DocsTitle className="font-bold text-4xl">{page.data.title}</DocsTitle>
+        <DocsTitle className="font-bold text-4xl">
+          {page.data.title}
+        </DocsTitle>
         <DocsDescription>{page.data.description}</DocsDescription>
         <DocsBody>
           <MDXContent
