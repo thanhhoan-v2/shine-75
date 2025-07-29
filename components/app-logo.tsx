@@ -2,11 +2,11 @@ import { SVGProps } from "react";
 
 const AppLogo = (props: SVGProps<SVGSVGElement>) => {
 	return (
-		<div className="flex items-center gap-2">
+		<div className="flex items-center gap-1">
 			<svg
-				aria-label="Logo"
-				width="24"
-				height="24"
+				aria-label="App Logo"
+				width="30"
+				height="30"
 				viewBox="0 0 24 24"
 				fill="none"
 				xmlns="http://www.w3.org/2000/svg"
@@ -20,7 +20,7 @@ const AppLogo = (props: SVGProps<SVGSVGElement>) => {
 					strokeLinejoin="round"
 				/>
 			</svg>
-			<span className="font-bold text-2xl">Shine75</span>
+			<span className="px-2 rounded-md font-bold text-xl">Shine75</span>
 		</div>
 	);
 };

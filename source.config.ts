@@ -1,8 +1,8 @@
 import {
-  defineConfig,
-  defineDocs,
-  frontmatterSchema,
-  metaSchema,
+	defineConfig,
+	defineDocs,
+	frontmatterSchema,
+	metaSchema,
 } from "fumadocs-mdx/config";
 
 // You can customise Zod schemas for frontmatter and `meta.json` here
@@ -17,6 +17,7 @@ export const docs = defineDocs({
 });
 
 export default defineConfig({
+	lastModifiedTime: "git",
 	mdxOptions: {
 		// MDX options
 		remarkCodeTabOptions: {
