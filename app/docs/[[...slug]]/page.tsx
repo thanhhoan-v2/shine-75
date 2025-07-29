@@ -1,12 +1,11 @@
 import {
-	DocsBody,
-	DocsDescription,
-	DocsPage,
-	DocsTitle,
+  DocsBody,
+  DocsDescription,
+  DocsPage,
+  DocsTitle,
 } from '@/components/layouts/page';
 import { source } from '@/lib/source';
 import { getMDXComponents } from '@/mdx-components';
-import { getGithubLastEdit } from 'fumadocs-core/server';
 import { createRelativeLink } from 'fumadocs-ui/mdx';
 import Head from 'next/head';
 import { notFound } from 'next/navigation';
@@ -20,13 +19,13 @@ export default async function Page(props: {
 
   const MDXContent = page.data.body;
 
-  let time = await getGithubLastEdit({
-    owner: 'thanhhoan-v2',
-    repo: 'shine-75',
-    path: `content/docs/${page.path}`,
-  });
+  // let time = await getGithubLastEdit({
+  //   owner: 'thanhhoan-v2',
+  //   repo: 'shine-75',
+  //   path: `content/docs/${page.path}`,
+  // });
 
-  if (!time) time = new Date();
+  // if (!time) time = new Date();
 
   return (
     <>
@@ -39,7 +38,7 @@ export default async function Page(props: {
         // tableOfContent={{
         // 	style: "clerk",
         // }}
-        lastUpdate={new Date(time)}
+        // lastUpdate={new Date(time)}
         full={page.data.full}
         breadcrumb={{ includeSeparator: true }}
         editOnGithub={{

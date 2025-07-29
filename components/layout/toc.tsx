@@ -1,4 +1,5 @@
 'use client';
+import { cn } from '@/lib/utils';
 import type { TOCItemType } from 'fumadocs-core/server';
 import * as Primitive from 'fumadocs-core/toc';
 import { useI18n } from 'fumadocs-ui/contexts/i18n';
@@ -38,7 +39,7 @@ export function TOCScrollArea({
       ref={mergeRefs(viewRef, ref)}
       className={cn(
         'relative min-h-0 text-sm ms-px overflow-auto [scrollbar-width:none] [mask-image:linear-gradient(to_bottom,transparent,white_16px,white_calc(100%-16px),transparent)] py-3',
-        className,
+        className
       )}
       {...props}
     >
@@ -71,7 +72,7 @@ export function TOCItems({ ref, className, ...props }: ComponentProps<'div'>) {
         ref={mergeRefs(ref, containerRef)}
         className={cn(
           'flex flex-col border-s border-fd-foreground/10',
-          className,
+          className
         )}
         {...props}
       >
@@ -91,7 +92,7 @@ function TOCItem({ item }: { item: TOCItemType }) {
         'prose py-1.5 text-sm text-fd-muted-foreground transition-colors [overflow-wrap:anywhere] first:pt-0 last:pb-0 data-[active=true]:text-fd-primary',
         item.depth <= 2 && 'ps-3',
         item.depth === 3 && 'ps-6',
-        item.depth >= 4 && 'ps-8',
+        item.depth >= 4 && 'ps-8'
       )}
     >
       {item.title}
