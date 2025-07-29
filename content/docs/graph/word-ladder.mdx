@@ -1,9 +1,109 @@
 ---
 title: Word Ladder
-description: Word Ladder
+description: A transformation sequence from word beginWord to word endWord using a dictionary wordList is a sequence of words beginWord -> s1 -> s2 -> ... -> sk such that - Every adjacent pair of words differs by a single character.
 difficulty: Hard
 timeLimit: 45 mins
 week: 4
 tags:
   - Graph
 ---
+
+```js title="Example"
+Input: beginWord = "hit", endWord = "cog", wordList = ["hot","dot","dog","lot","log","cog"]
+Output: 5
+Explanation: One shortest transformation sequence is "hit" -> "hot" -> "dot" -> "dog" -> "cog", which is 5 words long.
+```
+
+## Approach
+
+1. **Breadth-First Search**: Use BFS to find the shortest transformation sequence
+2. **Word Set**: Convert wordList to a set for O(1) lookup
+3. **Queue Initialization**: Start with beginWord and distance 1
+4. **Character Replacement**: For each word, try replacing each character with 'a' to 'z'
+5. **Valid Word Check**: Check if the new word exists in the word set
+6. **Return Result**: Return the distance when endWord is reached
+
+## Solution
+
+- Time Complexity: `O(26 * n * m)`
+  > Where n is word length and m is number of words
+- Space Complexity: `O(m)`
+  > We store the word set and queue
+
+```js tab="JavaScript"
+/**
+ * @param {string} beginWord
+ * @param {string} endWord
+ * @param {string[]} wordList
+ * @return {number}
+ */
+var ladderLength = function(beginWord, endWord, wordList) {
+    const wordSet = new Set(wordList);
+    if (!wordSet.has(endWord)) return 0;
+    
+    const queue = [[beginWord, 1]];
+    const visited = new Set();
+    visited.add(beginWord);
+    
+    while (queue.length > 0) {
+        const [word, distance] = queue.shift();
+        
+        if (word === endWord) {
+            return distance;
+        }
+        
+        // Try replacing each character
+        for (let i = 0; i < word.length; i++) {
+            for (let c = 97; c <= 122; c++) { // 'a' to 'z'
+                const newWord = word.substring(0, i) + String.fromCharCode(c) + word.substring(i + 1);
+                
+                if (wordSet.has(newWord) && !visited.has(newWord)) {
+                    visited.add(newWord);
+                    queue.push([newWord, distance + 1]);
+                }
+            }
+        }
+    }
+    
+    return 0;
+};
+```
+
+```java tab="Java"
+class Solution {
+    public int ladderLength(String beginWord, String endWord, List<String> wordList) {
+        Set<String> wordSet = new HashSet<>(wordList);
+        if (!wordSet.contains(endWord)) return 0;
+        
+        Queue<String[]> queue = new LinkedList<>();
+        Set<String> visited = new HashSet<>();
+        
+        queue.offer(new String[]{beginWord, "1"});
+        visited.add(beginWord);
+        
+        while (!queue.isEmpty()) {
+            String[] curr = queue.poll();
+            String word = curr[0];
+            int distance = Integer.parseInt(curr[1]);
+            
+            if (word.equals(endWord)) {
+                return distance;
+            }
+            
+            // Try replacing each character
+            for (int i = 0; i < word.length(); i++) {
+                for (char c = 'a'; c <= 'z'; c++) {
+                    String newWord = word.substring(0, i) + c + word.substring(i + 1);
+                    
+                    if (wordSet.contains(newWord) && !visited.contains(newWord)) {
+                        visited.add(newWord);
+                        queue.offer(new String[]{newWord, String.valueOf(distance + 1)});
+                    }
+                }
+            }
+        }
+        
+        return 0;
+    }
+}
+```

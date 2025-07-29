@@ -1,9 +1,115 @@
 ---
 title: Clone Graph
-description: Clone Graph
+description: Given a reference of a node in a connected undirected graph. Return a deep copy (clone) of the graph.
 difficulty: Medium
 timeLimit: 25 mins
 week: 1
 tags:
   - Graph
 ---
+
+```js title="Example"
+Input: adjList = [[2,4],[1,3],[2,4],[1,3]]
+Output: [[2,4],[1,3],[2,4],[1,3]]
+```
+
+## Approach
+
+1. **Breadth-First Search**: Use BFS to traverse the original graph
+2. **Hash Map**: Use a hash map to track original nodes to cloned nodes
+3. **Queue Initialization**: Start with the given node
+4. **Clone Process**: For each node, create a clone and add its neighbors to the queue
+5. **Neighbor Cloning**: Clone all neighbors and establish connections
+6. **Return Result**: Return the cloned starting node
+
+## Solution
+
+- Time Complexity: `O(n)`
+  > Where n is the number of nodes in the graph
+- Space Complexity: `O(n)`
+  > We store all nodes in the hash map
+
+```js tab="JavaScript"
+/**
+ * // Definition for a Node.
+ * function Node(val, neighbors) {
+ *    this.val = val === undefined ? 0 : val;
+ *    this.neighbors = neighbors === undefined ? [] : neighbors;
+ * };
+ */
+
+/**
+ * @param {Node} node
+ * @return {Node}
+ */
+var cloneGraph = function(node) {
+    if (!node) return null;
+    
+    const visited = new Map();
+    const queue = [node];
+    visited.set(node, new Node(node.val));
+    
+    while (queue.length > 0) {
+        const originalNode = queue.shift();
+        const clonedNode = visited.get(originalNode);
+        
+        for (const neighbor of originalNode.neighbors) {
+            if (!visited.has(neighbor)) {
+                visited.set(neighbor, new Node(neighbor.val));
+                queue.push(neighbor);
+            }
+            clonedNode.neighbors.push(visited.get(neighbor));
+        }
+    }
+    
+    return visited.get(node);
+};
+```
+
+```java tab="Java"
+/*
+// Definition for a Node.
+class Node {
+    public int val;
+    public List<Node> neighbors;
+    public Node() {
+        val = 0;
+        neighbors = new ArrayList<Node>();
+    }
+    public Node(int _val) {
+        val = _val;
+        neighbors = new ArrayList<Node>();
+    }
+    public Node(int _val, ArrayList<Node> _neighbors) {
+        val = _val;
+        neighbors = _neighbors;
+    }
+}
+*/
+
+class Solution {
+    public Node cloneGraph(Node node) {
+        if (node == null) return null;
+        
+        Map<Node, Node> visited = new HashMap<>();
+        Queue<Node> queue = new LinkedList<>();
+        queue.offer(node);
+        visited.put(node, new Node(node.val));
+        
+        while (!queue.isEmpty()) {
+            Node originalNode = queue.poll();
+            Node clonedNode = visited.get(originalNode);
+            
+            for (Node neighbor : originalNode.neighbors) {
+                if (!visited.containsKey(neighbor)) {
+                    visited.put(neighbor, new Node(neighbor.val));
+                    queue.offer(neighbor);
+                }
+                clonedNode.neighbors.add(visited.get(neighbor));
+            }
+        }
+        
+        return visited.get(node);
+    }
+}
+```

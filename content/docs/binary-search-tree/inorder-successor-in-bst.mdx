@@ -1,9 +1,80 @@
 ---
 title: Inorder Successor in BST
-description: Inorder Successor in BST
+description: Given a binary search tree and a node in it, find the in-order successor of that node in the BST. If the given node has no in-order successor in the tree, return null.
 difficulty: Medium
 timeLimit: 30 mins
 week: 3
 tags:
   - Binary Search Tree
+  - Tree
+  - Binary Search
 ---
+
+```js title="Example"
+Input: root = [2, 1, 3], p = 1
+Output: 2
+Explanation: 1's in-order successor is 2.
+
+Input: root = [5, 3, 6, 2, 4, null, null, 1], p = 6
+Output: null
+Explanation: 6 has no in-order successor.
+```
+
+## Approach
+
+1. **Binary Search**: Use binary search to find the successor.
+2. **Initialize Successor**: Set successor to null initially.
+3. **Traverse Tree**: Start from root and traverse the tree.
+4. **Compare Values**: If current node value > p value, update successor and go left.
+5. **Go Right**: If current node value less than or equal to p value, go right.
+6. **Return Successor**: Return the successor when traversal is complete.
+
+## Solution
+
+- Time Complexity: `O(h)`
+  > Where h is the height of the tree. In the worst case, we traverse the height of the tree.
+- Space Complexity: `O(1)`
+  > We only use a constant amount of extra space for variables.
+
+```js tab="JavaScript"
+/**
+ * @param {TreeNode} root
+ * @param {TreeNode} p
+ * @return {TreeNode}
+ */
+var inorderSuccessor = function(root, p) {
+    let successor = null;
+    let current = root;
+    
+    while (current !== null) {
+        if (current.val > p.val) {
+            successor = current;
+            current = current.left;
+        } else {
+            current = current.right;
+        }
+    }
+    
+    return successor;
+};
+```
+
+```java tab="Java"
+class Solution {
+    public TreeNode inorderSuccessor(TreeNode root, TreeNode p) {
+        TreeNode successor = null;
+        TreeNode current = root;
+        
+        while (current != null) {
+            if (current.val > p.val) {
+                successor = current;
+                current = current.left;
+            } else {
+                current = current.right;
+            }
+        }
+        
+        return successor;
+    }
+}
+```

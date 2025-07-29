@@ -1,9 +1,109 @@
 ---
 title: Longest Increasing Path in a Matrix
-description: Longest Increasing Path in a Matrix
+description: Given an m x n integers matrix, return the length of the longest increasing path in matrix. From each cell, you can either move in four directions - left, right, up, or down.
 difficulty: Hard
 timeLimit: 40 mins
 week: 4
 tags:
   - Graph
 ---
+
+```js title="Example"
+Input: matrix = [[9,9,4],[6,6,8],[2,1,1]]
+Output: 4
+Explanation: The longest increasing path is [1, 2, 6, 9].
+```
+
+## Approach
+
+1. **Dynamic Programming with DFS**: Use DFS with memoization to find longest increasing paths
+2. **Memoization Array**: Create a dp array to store the longest path length from each cell
+3. **DFS Traversal**: For each cell, explore all four directions if the neighbor has a larger value
+4. **Recursive Calculation**: Calculate the longest path recursively and memoize results
+5. **Return Result**: Return the maximum value in the dp array
+
+## Solution
+
+- Time Complexity: `O(m*n)`
+  > We visit each cell once due to memoization
+- Space Complexity: `O(m*n)`
+  > We use a dp array and recursion stack
+
+```js tab="JavaScript"
+/**
+ * @param {number[][]} matrix
+ * @return {number}
+ */
+var longestIncreasingPath = function(matrix) {
+    const m = matrix.length;
+    const n = matrix[0].length;
+    const dp = Array(m).fill().map(() => Array(n).fill(0));
+    const directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+    
+    const dfs = (i, j) => {
+        if (dp[i][j] !== 0) return dp[i][j];
+        
+        let maxLength = 1;
+        
+        for (const [di, dj] of directions) {
+            const ni = i + di;
+            const nj = j + dj;
+            
+            if (ni >= 0 && ni < m && nj >= 0 && nj < n && matrix[ni][nj] > matrix[i][j]) {
+                maxLength = Math.max(maxLength, 1 + dfs(ni, nj));
+            }
+        }
+        
+        dp[i][j] = maxLength;
+        return maxLength;
+    };
+    
+    let result = 0;
+    for (let i = 0; i < m; i++) {
+        for (let j = 0; j < n; j++) {
+            result = Math.max(result, dfs(i, j));
+        }
+    }
+    
+    return result;
+};
+```
+
+```java tab="Java"
+class Solution {
+    private static final int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+    
+    public int longestIncreasingPath(int[][] matrix) {
+        int m = matrix.length;
+        int n = matrix[0].length;
+        int[][] dp = new int[m][n];
+        
+        int result = 0;
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                result = Math.max(result, dfs(matrix, dp, i, j, m, n));
+            }
+        }
+        
+        return result;
+    }
+    
+    private int dfs(int[][] matrix, int[][] dp, int i, int j, int m, int n) {
+        if (dp[i][j] != 0) return dp[i][j];
+        
+        int maxLength = 1;
+        
+        for (int[] dir : directions) {
+            int ni = i + dir[0];
+            int nj = j + dir[1];
+            
+            if (ni >= 0 && ni < m && nj >= 0 && nj < n && matrix[ni][nj] > matrix[i][j]) {
+                maxLength = Math.max(maxLength, 1 + dfs(matrix, dp, ni, nj, m, n));
+            }
+        }
+        
+        dp[i][j] = maxLength;
+        return maxLength;
+    }
+}
+```

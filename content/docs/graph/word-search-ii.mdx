@@ -1,9 +1,160 @@
 ---
 title: Word Search II
-description: Word Search II
+description: Given an m x n board of characters and a list of strings words, return all words on the board. Each word must be constructed from letters of sequentially adjacent cells, where adjacent cells are horizontally or vertically neighboring.
 difficulty: Hard
 timeLimit: 40 mins
 week: 4
 tags:
   - Graph
 ---
+
+```js title="Example"
+Input: board = [["o","a","a","n"],["e","t","a","e"],["i","h","k","r"],["i","f","l","v"]], words = ["oath","pea","eat","rain"]
+Output: ["eat","oath"]
+```
+
+## Approach
+
+1. **Trie Data Structure**: Build a trie from all words for efficient prefix matching
+2. **Depth-First Search**: Use DFS to explore all possible paths on the board
+3. **Trie Traversal**: For each cell, traverse the trie to find matching words
+4. **Backtracking**: Mark visited cells and restore them after exploration
+5. **Result Collection**: Collect all found words in a set to avoid duplicates
+6. **Return Result**: Return the list of found words
+
+## Solution
+
+- Time Complexity: `O(m*n*4^L)`
+  > Where m*n is board size and L is average word length
+- Space Complexity: `O(k*L)`
+  > Where k is number of words and L is average word length
+
+```js tab="JavaScript"
+/**
+ * @param {character[][]} board
+ * @param {string[]} words
+ * @return {string[]}
+ */
+var findWords = function(board, words) {
+    const trie = buildTrie(words);
+    const m = board.length;
+    const n = board[0].length;
+    const result = new Set();
+    
+    const dfs = (i, j, node, word) => {
+        if (i < 0 || i >= m || j < 0 || j >= n || board[i][j] === '#') {
+            return;
+        }
+        
+        const char = board[i][j];
+        const nextNode = node.children[char];
+        
+        if (!nextNode) return;
+        
+        word += char;
+        
+        if (nextNode.isEnd) {
+            result.add(word);
+        }
+        
+        board[i][j] = '#';
+        
+        dfs(i - 1, j, nextNode, word);
+        dfs(i + 1, j, nextNode, word);
+        dfs(i, j - 1, nextNode, word);
+        dfs(i, j + 1, nextNode, word);
+        
+        board[i][j] = char;
+    };
+    
+    for (let i = 0; i < m; i++) {
+        for (let j = 0; j < n; j++) {
+            dfs(i, j, trie, '');
+        }
+    }
+    
+    return Array.from(result);
+};
+
+function buildTrie(words) {
+    const root = { children: {}, isEnd: false };
+    
+    for (const word of words) {
+        let node = root;
+        for (const char of word) {
+            if (!node.children[char]) {
+                node.children[char] = { children: {}, isEnd: false };
+            }
+            node = node.children[char];
+        }
+        node.isEnd = true;
+    }
+    
+    return root;
+}
+```
+
+```java tab="Java"
+class Solution {
+    private static class TrieNode {
+        Map<Character, TrieNode> children = new HashMap<>();
+        boolean isEnd = false;
+    }
+    
+    public List<String> findWords(char[][] board, String[] words) {
+        TrieNode root = buildTrie(words);
+        int m = board.length;
+        int n = board[0].length;
+        Set<String> result = new HashSet<>();
+        
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                dfs(board, i, j, root, "", result, m, n);
+            }
+        }
+        
+        return new ArrayList<>(result);
+    }
+    
+    private void dfs(char[][] board, int i, int j, TrieNode node, String word, Set<String> result, int m, int n) {
+        if (i < 0 || i >= m || j < 0 || j >= n || board[i][j] == '#') {
+            return;
+        }
+        
+        char c = board[i][j];
+        TrieNode nextNode = node.children.get(c);
+        
+        if (nextNode == null) return;
+        
+        word += c;
+        
+        if (nextNode.isEnd) {
+            result.add(word);
+        }
+        
+        board[i][j] = '#';
+        
+        dfs(board, i - 1, j, nextNode, word, result, m, n);
+        dfs(board, i + 1, j, nextNode, word, result, m, n);
+        dfs(board, i, j - 1, nextNode, word, result, m, n);
+        dfs(board, i, j + 1, nextNode, word, result, m, n);
+        
+        board[i][j] = c;
+    }
+    
+    private TrieNode buildTrie(String[] words) {
+        TrieNode root = new TrieNode();
+        
+        for (String word : words) {
+            TrieNode node = root;
+            for (char c : word.toCharArray()) {
+                node.children.putIfAbsent(c, new TrieNode());
+                node = node.children.get(c);
+            }
+            node.isEnd = true;
+        }
+        
+        return root;
+    }
+}
+```

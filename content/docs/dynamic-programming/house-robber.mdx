@@ -1,9 +1,74 @@
 ---
 title: House Robber
-description: House Robber
+description: You are a professional robber planning to rob houses along a street. Each house has a certain amount of money stashed, the only constraint stopping you from robbing each of them is that adjacent houses have security systems connected and it will automatically contact the police if two adjacent houses were broken into on the same night.
 difficulty: Medium
 timeLimit: 25 mins
 week: 2
 tags:
   - Dynamic Programming
 ---
+
+```js title="Example"
+Input: nums = [1,2,3,1]
+Output: 4
+Explanation: Rob house 1 (money = 1) and then rob house 3 (money = 3).
+Total amount you can rob = 1 + 3 = 4.
+```
+
+## Approach
+
+1. **Dynamic Programming**: Use two variables to track the maximum money that can be robbed up to the previous and current house
+2. **Decision at Each House**: For each house, decide whether to rob it or skip it
+3. **Rob Current House**: If we rob current house, we add current money to the money from two houses back
+4. **Skip Current House**: If we skip current house, we keep the maximum from the previous house
+5. **Update Variables**: At each step, update the two variables to move forward
+6. **Return Result**: Return the maximum of the two variables
+
+## Solution
+
+- Time Complexity: `O(n)`
+  > We iterate through the array once
+- Space Complexity: `O(1)`
+  > We only use two variables regardless of input size
+
+```js tab="JavaScript"
+/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var rob = function(nums) {
+    if (nums.length === 0) return 0;
+    if (nums.length === 1) return nums[0];
+    
+    let prev1 = nums[0];
+    let prev2 = Math.max(nums[0], nums[1]);
+    
+    for (let i = 2; i < nums.length; i++) {
+        const current = Math.max(prev1 + nums[i], prev2);
+        prev1 = prev2;
+        prev2 = current;
+    }
+    
+    return prev2;
+};
+```
+
+```java tab="Java"
+class Solution {
+    public int rob(int[] nums) {
+        if (nums.length == 0) return 0;
+        if (nums.length == 1) return nums[0];
+        
+        int prev1 = nums[0];
+        int prev2 = Math.max(nums[0], nums[1]);
+        
+        for (int i = 2; i < nums.length; i++) {
+            int current = Math.max(prev1 + nums[i], prev2);
+            prev1 = prev2;
+            prev2 = current;
+        }
+        
+        return prev2;
+    }
+}
+```

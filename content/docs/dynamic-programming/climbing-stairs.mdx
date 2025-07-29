@@ -1,6 +1,6 @@
 ---
 title: Climbing Stairs
-description: Climbing Stairs
+description: You are climbing a staircase. It takes n steps to reach the top. Each time you can either climb 1 or 2 steps. In how many distinct ways can you climb to the top?
 difficulty: Easy
 timeLimit: 20 mins
 week: 1
@@ -8,4 +8,63 @@ tags:
   - Dynamic Programming
 ---
 
-climbing stairs
+```js title="Example"
+Input: n = 3
+Output: 3
+Explanation: There are three ways to climb to the top.
+1. 1 step + 1 step + 1 step
+2. 1 step + 2 steps
+3. 2 steps + 1 step
+```
+
+## Approach
+
+1. **Base Cases**: If n ≤ 2, return n directly since there are n ways to climb n steps
+2. **Dynamic Programming**: Use a bottom-up approach with two variables to track previous two values
+3. **Fibonacci Pattern**: The number of ways to reach step i is the sum of ways to reach step (i-1) and step (i-2)
+4. **Iteration**: Iterate from 3 to n, updating the two variables at each step
+
+## Solution
+
+- Time Complexity: `O(n)`
+  > We iterate through each step from 3 to n once
+- Space Complexity: `O(1)`
+  > We only use two variables regardless of input size
+
+```js tab="JavaScript"
+/**
+ * @param {number} n
+ * @return {number}
+ */
+var climbStairs = function(n) {
+    if (n <= 2) return n;
+    
+    let prev1 = 1, prev2 = 2;
+    
+    for (let i = 3; i <= n; i++) {
+        let current = prev1 + prev2;
+        prev1 = prev2;
+        prev2 = current;
+    }
+    
+    return prev2;
+};
+```
+
+```java tab="Java"
+class Solution {
+    public int climbStairs(int n) {
+        if (n <= 2) return n;
+        
+        int prev1 = 1, prev2 = 2;
+        
+        for (int i = 3; i <= n; i++) {
+            int current = prev1 + prev2;
+            prev1 = prev2;
+            prev2 = current;
+        }
+        
+        return prev2;
+    }
+}
+```

@@ -1,9 +1,134 @@
 ---
 title: Minimum Height Trees
-description: Minimum Height Trees
+description: A tree is an undirected graph in which any two vertices are connected by exactly one path. In other words, any connected graph without simple cycles is a tree.
 difficulty: Medium
 timeLimit: 30 mins
 week: 2
 tags:
   - Graph
 ---
+
+```js title="Example"
+Input: n = 4, edges = [[1,0],[1,2],[1,3]]
+Output: [1]
+Explanation: As shown, the height of the tree is 1 when the root is the vertex with label 1 which is the only MHT.
+```
+
+## Approach
+
+1. **Topological Sort**: Use a topological sort approach to find the center nodes
+2. **Leaf Removal**: Repeatedly remove leaves (nodes with degree 1) until 1 or 2 nodes remain
+3. **Queue Initialization**: Start with all leaf nodes (degree 1)
+4. **Iterative Removal**: Remove leaves and update degrees of their neighbors
+5. **Return Result**: Return the remaining nodes as they form the center of the tree
+
+## Solution
+
+- Time Complexity: `O(n)`
+  > Where n is the number of nodes
+- Space Complexity: `O(n)`
+  > We store the graph and queue
+
+```js tab="JavaScript"
+/**
+ * @param {number} n
+ * @param {number[][]} edges
+ * @return {number[]}
+ */
+var findMinHeightTrees = function(n, edges) {
+    if (n === 1) return [0];
+    if (n === 2) return [0, 1];
+    
+    // Build graph and calculate degrees
+    const graph = Array(n).fill().map(() => []);
+    const degree = Array(n).fill(0);
+    
+    for (const [u, v] of edges) {
+        graph[u].push(v);
+        graph[v].push(u);
+        degree[u]++;
+        degree[v]++;
+    }
+    
+    // Find leaves
+    const queue = [];
+    for (let i = 0; i < n; i++) {
+        if (degree[i] === 1) {
+            queue.push(i);
+        }
+    }
+    
+    let remainingNodes = n;
+    
+    while (remainingNodes > 2) {
+        const size = queue.length;
+        remainingNodes -= size;
+        
+        for (let i = 0; i < size; i++) {
+            const leaf = queue.shift();
+            
+            for (const neighbor of graph[leaf]) {
+                degree[neighbor]--;
+                if (degree[neighbor] === 1) {
+                    queue.push(neighbor);
+                }
+            }
+        }
+    }
+    
+    return queue;
+};
+```
+
+```java tab="Java"
+class Solution {
+    public List<Integer> findMinHeightTrees(int n, int[][] edges) {
+        if (n == 1) return Arrays.asList(0);
+        if (n == 2) return Arrays.asList(0, 1);
+        
+        // Build graph and calculate degrees
+        List<List<Integer>> graph = new ArrayList<>();
+        int[] degree = new int[n];
+        
+        for (int i = 0; i < n; i++) {
+            graph.add(new ArrayList<>());
+        }
+        
+        for (int[] edge : edges) {
+            int u = edge[0], v = edge[1];
+            graph.get(u).add(v);
+            graph.get(v).add(u);
+            degree[u]++;
+            degree[v]++;
+        }
+        
+        // Find leaves
+        Queue<Integer> queue = new LinkedList<>();
+        for (int i = 0; i < n; i++) {
+            if (degree[i] == 1) {
+                queue.offer(i);
+            }
+        }
+        
+        int remainingNodes = n;
+        
+        while (remainingNodes > 2) {
+            int size = queue.size();
+            remainingNodes -= size;
+            
+            for (int i = 0; i < size; i++) {
+                int leaf = queue.poll();
+                
+                for (int neighbor : graph.get(leaf)) {
+                    degree[neighbor]--;
+                    if (degree[neighbor] == 1) {
+                        queue.offer(neighbor);
+                    }
+                }
+            }
+        }
+        
+        return new ArrayList<>(queue);
+    }
+}
+```

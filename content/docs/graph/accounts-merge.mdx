@@ -1,9 +1,149 @@
 ---
 title: Accounts Merge
-description: Accounts Merge
+description: Given a list of accounts where each element accounts[i] is a list of strings, where the first element accounts[i][0] is a name, and the rest of the elements are emails representing emails of the account.
 difficulty: Medium
 timeLimit: 30 mins
 week: 2
 tags:
   - Graph
 ---
+
+```js title="Example"
+Input: accounts = [["John","johnsmith@mail.com","john_newyork@mail.com"],["John","johnsmith@mail.com","john00@mail.com"],["Mary","mary@mail.com"],["John","johnnybravo@mail.com"]]
+Output: [["John","john00@mail.com","john_newyork@mail.com","johnsmith@mail.com"],["John","johnnybravo@mail.com"],["Mary","mary@mail.com"]]
+```
+
+## Approach
+
+1. **Build Graph**: Create a graph where emails are nodes and accounts are edges
+2. **Union Find**: Use Union-Find data structure to group connected emails
+3. **Process Accounts**: For each account, union all emails in that account
+4. **Group by Root**: Group emails by their root parent in the Union-Find structure
+5. **Format Result**: For each group, sort emails and add the name
+
+## Solution
+
+- Time Complexity: `O(n * m * log(n*m))`
+  > Where n is number of accounts and m is average emails per account
+- Space Complexity: `O(n * m)`
+  > We store all emails and the Union-Find structure
+
+```js tab="JavaScript"
+/**
+ * @param {string[][]} accounts
+ * @return {string[][]}
+ */
+var accountsMerge = function(accounts) {
+    const parent = new Map();
+    const emailToName = new Map();
+    
+    // Initialize Union-Find
+    const find = (x) => {
+        if (!parent.has(x)) {
+            parent.set(x, x);
+        }
+        if (parent.get(x) !== x) {
+            parent.set(x, find(parent.get(x)));
+        }
+        return parent.get(x);
+    };
+    
+    const union = (x, y) => {
+        const px = find(x);
+        const py = find(y);
+        if (px !== py) {
+            parent.set(px, py);
+        }
+    };
+    
+    // Process accounts
+    for (const account of accounts) {
+        const name = account[0];
+        const firstEmail = account[1];
+        emailToName.set(firstEmail, name);
+        
+        for (let i = 1; i < account.length; i++) {
+            emailToName.set(account[i], name);
+            union(firstEmail, account[i]);
+        }
+    }
+    
+    // Group emails by root
+    const groups = new Map();
+    for (const email of emailToName.keys()) {
+        const root = find(email);
+        if (!groups.has(root)) {
+            groups.set(root, []);
+        }
+        groups.get(root).push(email);
+    }
+    
+    // Format result
+    const result = [];
+    for (const [root, emails] of groups) {
+        const name = emailToName.get(root);
+        emails.sort();
+        result.push([name, ...emails]);
+    }
+    
+    return result;
+};
+```
+
+```java tab="Java"
+class Solution {
+    public List<List<String>> accountsMerge(List<List<String>> accounts) {
+        Map<String, String> parent = new HashMap<>();
+        Map<String, String> emailToName = new HashMap<>();
+        
+        // Initialize Union-Find
+        for (List<String> account : accounts) {
+            String name = account.get(0);
+            String firstEmail = account.get(1);
+            emailToName.put(firstEmail, name);
+            
+            for (int i = 1; i < account.size(); i++) {
+                emailToName.put(account.get(i), name);
+                union(parent, firstEmail, account.get(i));
+            }
+        }
+        
+        // Group emails by root
+        Map<String, Set<String>> groups = new HashMap<>();
+        for (String email : emailToName.keySet()) {
+            String root = find(parent, email);
+            groups.computeIfAbsent(root, k -> new HashSet<>()).add(email);
+        }
+        
+        // Format result
+        List<List<String>> result = new ArrayList<>();
+        for (Map.Entry<String, Set<String>> entry : groups.entrySet()) {
+            String name = emailToName.get(entry.getKey());
+            List<String> emails = new ArrayList<>(entry.getValue());
+            Collections.sort(emails);
+            emails.add(0, name);
+            result.add(emails);
+        }
+        
+        return result;
+    }
+    
+    private String find(Map<String, String> parent, String x) {
+        if (!parent.containsKey(x)) {
+            parent.put(x, x);
+        }
+        if (!parent.get(x).equals(x)) {
+            parent.put(x, find(parent, parent.get(x)));
+        }
+        return parent.get(x);
+    }
+    
+    private void union(Map<String, String> parent, String x, String y) {
+        String px = find(parent, x);
+        String py = find(parent, y);
+        if (!px.equals(py)) {
+            parent.put(px, py);
+        }
+    }
+}
+```

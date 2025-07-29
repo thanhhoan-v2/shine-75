@@ -1,9 +1,125 @@
 ---
 title: Rotting Oranges
-description: Rotting Oranges
+description: You are given an m x n grid where each cell can have one of three values - 0 representing an empty cell, 1 representing a fresh orange, or 2 representing a rotten orange.
 difficulty: Medium
 timeLimit: 30 mins
 week: 1
 tags:
   - Graph
 ---
+
+```js title="Example"
+Input: grid = [[2,1,1],[1,1,0],[0,1,1]]
+Output: 4
+```
+
+## Approach
+
+1. **Breadth-First Search**: Use BFS to simulate the rotting process
+2. **Queue Initialization**: Add all rotten oranges to the queue with time 0
+3. **BFS Traversal**: For each rotten orange, infect its neighbors
+4. **Time Tracking**: Track the time it takes for each orange to rot
+5. **Fresh Orange Check**: After BFS, check if any fresh oranges remain
+6. **Return Result**: Return the maximum time or -1 if impossible
+
+## Solution
+
+- Time Complexity: `O(m*n)`
+  > We visit each cell at most once
+- Space Complexity: `O(m*n)`
+  > We use a queue and visited matrix
+
+```js tab="JavaScript"
+/**
+ * @param {number[][]} grid
+ * @return {number}
+ */
+var orangesRotting = function(grid) {
+    const m = grid.length;
+    const n = grid[0].length;
+    const queue = [];
+    let freshCount = 0;
+    
+    // Find all rotten oranges and count fresh ones
+    for (let i = 0; i < m; i++) {
+        for (let j = 0; j < n; j++) {
+            if (grid[i][j] === 2) {
+                queue.push([i, j, 0]);
+            } else if (grid[i][j] === 1) {
+                freshCount++;
+            }
+        }
+    }
+    
+    if (freshCount === 0) return 0;
+    if (queue.length === 0) return -1;
+    
+    const directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+    let maxTime = 0;
+    
+    while (queue.length > 0) {
+        const [i, j, time] = queue.shift();
+        maxTime = Math.max(maxTime, time);
+        
+        for (const [di, dj] of directions) {
+            const ni = i + di;
+            const nj = j + dj;
+            
+            if (ni >= 0 && ni < m && nj >= 0 && nj < n && grid[ni][nj] === 1) {
+                grid[ni][nj] = 2;
+                freshCount--;
+                queue.push([ni, nj, time + 1]);
+            }
+        }
+    }
+    
+    return freshCount === 0 ? maxTime : -1;
+};
+```
+
+```java tab="Java"
+class Solution {
+    public int orangesRotting(int[][] grid) {
+        int m = grid.length;
+        int n = grid[0].length;
+        Queue<int[]> queue = new LinkedList<>();
+        int freshCount = 0;
+        
+        // Find all rotten oranges and count fresh ones
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (grid[i][j] == 2) {
+                    queue.offer(new int[]{i, j, 0});
+                } else if (grid[i][j] == 1) {
+                    freshCount++;
+                }
+            }
+        }
+        
+        if (freshCount == 0) return 0;
+        if (queue.isEmpty()) return -1;
+        
+        int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+        int maxTime = 0;
+        
+        while (!queue.isEmpty()) {
+            int[] curr = queue.poll();
+            int i = curr[0], j = curr[1], time = curr[2];
+            maxTime = Math.max(maxTime, time);
+            
+            for (int[] dir : directions) {
+                int ni = i + dir[0];
+                int nj = j + dir[1];
+                
+                if (ni >= 0 && ni < m && nj >= 0 && nj < n && grid[ni][nj] == 1) {
+                    grid[ni][nj] = 2;
+                    freshCount--;
+                    queue.offer(new int[]{ni, nj, time + 1});
+                }
+            }
+        }
+        
+        return freshCount == 0 ? maxTime : -1;
+    }
+}
+```

@@ -1,9 +1,80 @@
 ---
 title: Validate Binary Search Tree
-description: Validate Binary Search Tree
+description: Given the root of a binary tree, determine if it is a valid binary search tree (BST).
 difficulty: Medium
 timeLimit: 20 mins
 week: 1
 tags:
   - Binary Search Tree
+  - Tree
+  - Depth-First Search
 ---
+
+```js title="Example"
+Input: root = [2, 1, 3]
+Output: true
+Explanation: The tree is a valid BST.
+
+Input: root = [5, 1, 4, null, null, 3, 6]
+Output: false
+Explanation: The root node's value is 5 but its right child's value is 4.
+```
+
+## Approach
+
+1. **Inorder Traversal**: Use inorder traversal to check if values are in ascending order.
+2. **Global Variable**: Use a global variable to track the previous value.
+3. **Recursive Traversal**: Traverse left subtree, check current node, then traverse right subtree.
+4. **Check Order**: If current value less than or equal to previous value, the tree is not a valid BST.
+5. **Update Previous**: Update the previous value after checking each node.
+
+## Solution
+
+- Time Complexity: `O(n)`
+  > Where n is the number of nodes in the tree. We visit each node once.
+- Space Complexity: `O(h)`
+  > The recursion stack depth is at most the height of the tree.
+
+```js tab="JavaScript"
+/**
+ * @param {TreeNode} root
+ * @return {boolean}
+ */
+var isValidBST = function(root) {
+    let prev = null;
+    
+    const inorder = (node) => {
+        if (node === null) return true;
+        
+        if (!inorder(node.left)) return false;
+        
+        if (prev !== null && node.val <= prev) return false;
+        prev = node.val;
+        
+        return inorder(node.right);
+    };
+    
+    return inorder(root);
+};
+```
+
+```java tab="Java"
+class Solution {
+    private Integer prev = null;
+    
+    public boolean isValidBST(TreeNode root) {
+        return inorder(root);
+    }
+    
+    private boolean inorder(TreeNode node) {
+        if (node == null) return true;
+        
+        if (!inorder(node.left)) return false;
+        
+        if (prev != null && node.val <= prev) return false;
+        prev = node.val;
+        
+        return inorder(node.right);
+    }
+}
+```

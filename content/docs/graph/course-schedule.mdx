@@ -1,9 +1,114 @@
 ---
 title: Course Schedule
-description: Course Schedule
+description: There are a total of numCourses courses you have to take, labeled from 0 to numCourses - 1. You are given an array prerequisites where prerequisites[i] = [ai, bi] indicates that you must take course bi first if you want to take course ai.
 difficulty: Medium
 timeLimit: 30 mins
 week: 1
 tags:
   - Graph
 ---
+
+```js title="Example"
+Input: numCourses = 2, prerequisites = [[1,0]]
+Output: true
+Explanation: There are a total of 2 courses to take. To take course 1 you should have finished course 0. So it is possible.
+```
+
+## Approach
+
+1. **Build Graph**: Create an adjacency list representation of the course dependencies
+2. **Depth-First Search**: Use DFS to detect cycles in the graph
+3. **Visited States**: Track three states: unvisited (0), visiting (1), visited (2)
+4. **Cycle Detection**: If we encounter a node that is currently being visited, we have a cycle
+5. **Return Result**: Return true if no cycles are found, false otherwise
+
+## Solution
+
+- Time Complexity: `O(n + m)`
+  > Where n is number of courses and m is number of prerequisites
+- Space Complexity: `O(n + m)`
+  > We store the graph and visited states
+
+```js tab="JavaScript"
+/**
+ * @param {number} numCourses
+ * @param {number[][]} prerequisites
+ * @return {boolean}
+ */
+var canFinish = function(numCourses, prerequisites) {
+    const graph = Array(numCourses).fill().map(() => []);
+    const visited = Array(numCourses).fill(0); // 0: unvisited, 1: visiting, 2: visited
+    
+    // Build graph
+    for (const [course, prereq] of prerequisites) {
+        graph[prereq].push(course);
+    }
+    
+    const hasCycle = (node) => {
+        if (visited[node] === 1) return true; // Cycle detected
+        if (visited[node] === 2) return false; // Already processed
+        
+        visited[node] = 1; // Mark as visiting
+        
+        for (const neighbor of graph[node]) {
+            if (hasCycle(neighbor)) return true;
+        }
+        
+        visited[node] = 2; // Mark as visited
+        return false;
+    };
+    
+    // Check for cycles starting from each unvisited node
+    for (let i = 0; i < numCourses; i++) {
+        if (visited[i] === 0 && hasCycle(i)) {
+            return false;
+        }
+    }
+    
+    return true;
+};
+```
+
+```java tab="Java"
+class Solution {
+    public boolean canFinish(int numCourses, int[][] prerequisites) {
+        List<List<Integer>> graph = new ArrayList<>();
+        int[] visited = new int[numCourses]; // 0: unvisited, 1: visiting, 2: visited
+        
+        // Initialize graph
+        for (int i = 0; i < numCourses; i++) {
+            graph.add(new ArrayList<>());
+        }
+        
+        // Build graph
+        for (int[] prereq : prerequisites) {
+            int course = prereq[0];
+            int prereqCourse = prereq[1];
+            graph.get(prereqCourse).add(course);
+        }
+        
+        // Check for cycles starting from each unvisited node
+        for (int i = 0; i < numCourses; i++) {
+            if (visited[i] == 0 && hasCycle(graph, visited, i)) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
+    private boolean hasCycle(List<List<Integer>> graph, int[] visited, int node) {
+        if (visited[node] == 1) return true; // Cycle detected
+        if (visited[node] == 2) return false; // Already processed
+        
+        visited[node] = 1; // Mark as visiting
+        
+        for (int neighbor : graph.get(node)) {
+            if (hasCycle(graph, visited, neighbor)) return true;
+        }
+        
+        visited[node] = 2; // Mark as visited
+        return false;
+    }
+}
+```

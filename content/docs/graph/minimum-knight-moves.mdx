@@ -1,9 +1,109 @@
 ---
 title: Minimum Knight Moves
-description: Minimum Knight Moves
+description: In an infinite chess board with coordinates from -infinity to +infinity, you have a knight at square [0, 0]. A knight has 8 possible moves it can make, as illustrated below.
 difficulty: Medium
 timeLimit: 35 mins
 week: 3
 tags:
   - Graph
 ---
+
+```js title="Example"
+Input: x = 5, y = 5
+Output: 4
+Explanation: [0, 0] → [2, 1] → [4, 2] → [3, 4] → [5, 5]
+```
+
+## Approach
+
+1. **Breadth-First Search**: Use BFS to find the shortest path from origin to target
+2. **Knight Moves**: Define all 8 possible knight moves
+3. **Queue Initialization**: Start from origin (0, 0) with distance 0
+4. **BFS Traversal**: For each position, try all 8 knight moves
+5. **Visited Tracking**: Use a set to track visited positions
+6. **Return Result**: Return the distance when target is reached
+
+## Solution
+
+- Time Complexity: `O(x*y)`
+  > In worst case, we visit all positions in the bounded area
+- Space Complexity: `O(x*y)`
+  > We store visited positions in a set
+
+```js tab="JavaScript"
+/**
+ * @param {number} x
+ * @param {number} y
+ * @return {number}
+ */
+var minKnightMoves = function(x, y) {
+    const directions = [
+        [-2, -1], [-2, 1], [-1, -2], [-1, 2],
+        [1, -2], [1, 2], [2, -1], [2, 1]
+    ];
+    
+    const queue = [[0, 0, 0]]; // [x, y, distance]
+    const visited = new Set();
+    visited.add('0,0');
+    
+    while (queue.length > 0) {
+        const [currX, currY, distance] = queue.shift();
+        
+        if (currX === x && currY === y) {
+            return distance;
+        }
+        
+        for (const [dx, dy] of directions) {
+            const newX = currX + dx;
+            const newY = currY + dy;
+            const key = `${newX},${newY}`;
+            
+            if (!visited.has(key)) {
+                visited.add(key);
+                queue.push([newX, newY, distance + 1]);
+            }
+        }
+    }
+    
+    return -1;
+};
+```
+
+```java tab="Java"
+class Solution {
+    public int minKnightMoves(int x, int y) {
+        int[][] directions = {
+            {-2, -1}, {-2, 1}, {-1, -2}, {-1, 2},
+            {1, -2}, {1, 2}, {2, -1}, {2, 1}
+        };
+        
+        Queue<int[]> queue = new LinkedList<>();
+        Set<String> visited = new HashSet<>();
+        
+        queue.offer(new int[]{0, 0, 0}); // [x, y, distance]
+        visited.add("0,0");
+        
+        while (!queue.isEmpty()) {
+            int[] curr = queue.poll();
+            int currX = curr[0], currY = curr[1], distance = curr[2];
+            
+            if (currX == x && currY == y) {
+                return distance;
+            }
+            
+            for (int[] dir : directions) {
+                int newX = currX + dir[0];
+                int newY = currY + dir[1];
+                String key = newX + "," + newY;
+                
+                if (!visited.contains(key)) {
+                    visited.add(key);
+                    queue.offer(new int[]{newX, newY, distance + 1});
+                }
+            }
+        }
+        
+        return -1;
+    }
+}
+```

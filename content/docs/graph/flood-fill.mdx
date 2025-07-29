@@ -1,9 +1,93 @@
 ---
 title: Flood Fill
-description: Flood Fill
+description: An image is represented by an m x n integer grid image where image[i][j] represents the pixel value of the image. You are also given three integers sr, sc, and color. You should perform a flood fill, starting from the pixel image[sr][sc].
 difficulty: Easy
 timeLimit: 20 mins
 week: 1
 tags:
   - Graph
 ---
+
+```js title="Example"
+Input: image = [[1,1,1],[1,1,0],[1,0,1]], sr = 1, sc = 1, color = 2
+Output: [[2,2,2],[2,2,0],[2,0,1]]
+Explanation: From the center of the image with position (sr, sc) = (1, 1) (i.e., the red pixel), all pixels connected by a path of the same color as the starting pixel (i.e., the blue pixels) are colored with the new color.
+```
+
+## Approach
+
+1. **Depth-First Search**: Use DFS to traverse connected pixels with the same color
+2. **Boundary Check**: Ensure we stay within the image boundaries
+3. **Color Check**: Only fill pixels that have the same color as the starting pixel
+4. **Recursive Fill**: Recursively fill all four adjacent pixels (up, down, left, right)
+5. **Return Result**: Return the modified image
+
+## Solution
+
+- Time Complexity: `O(m*n)`
+  > Where m and n are the dimensions of the image
+- Space Complexity: `O(m*n)`
+  > In worst case, the recursion stack can be as deep as the image size
+
+```js tab="JavaScript"
+/**
+ * @param {number[][]} image
+ * @param {number} sr
+ * @param {number} sc
+ * @param {number} color
+ * @return {number[][]}
+ */
+var floodFill = function(image, sr, sc, color) {
+    const m = image.length;
+    const n = image[0].length;
+    const originalColor = image[sr][sc];
+    
+    if (originalColor === color) return image; // No change needed
+    
+    const dfs = (r, c) => {
+        if (r < 0 || r >= m || c < 0 || c >= n || image[r][c] !== originalColor) {
+            return;
+        }
+        
+        image[r][c] = color;
+        
+        // Fill all four directions
+        dfs(r - 1, c); // up
+        dfs(r + 1, c); // down
+        dfs(r, c - 1); // left
+        dfs(r, c + 1); // right
+    };
+    
+    dfs(sr, sc);
+    return image;
+};
+```
+
+```java tab="Java"
+class Solution {
+    public int[][] floodFill(int[][] image, int sr, int sc, int color) {
+        int m = image.length;
+        int n = image[0].length;
+        int originalColor = image[sr][sc];
+        
+        if (originalColor == color) return image; // No change needed
+        
+        dfs(image, sr, sc, originalColor, color, m, n);
+        return image;
+    }
+    
+    private void dfs(int[][] image, int r, int c, int originalColor, int color, int m, int n) {
+        if (r < 0 || r >= m || c < 0 || c >= n || image[r][c] != originalColor) {
+            return;
+        }
+        
+        image[r][c] = color;
+        
+        // Fill all four directions
+        dfs(image, r - 1, c, originalColor, color, m, n); // up
+        dfs(image, r + 1, c, originalColor, color, m, n); // down
+        dfs(image, r, c - 1, originalColor, color, m, n); // left
+        dfs(image, r, c + 1, originalColor, color, m, n); // right
+    }
+}
+```

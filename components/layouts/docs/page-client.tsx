@@ -381,10 +381,11 @@ export function PageBreadcrumb({
 	if (items.length === 0) return null;
 
 	return (
+		// On top of the title of the docs page
 		<div
 			{...props}
 			className={cn(
-				"flex items-center gap-1.5 text-lg text-fd-muted-foreground bg-accent w-fit px-2 py-1 rounded-md",
+				"flex items-center gap-1.5 text-lg text-fd-muted-foreground underline underline-offset-2 decoration-wavy decoration-pink-300 w-fit",
 				props.className
 			)}
 		>

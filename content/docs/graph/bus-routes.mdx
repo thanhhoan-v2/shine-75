@@ -1,9 +1,145 @@
 ---
 title: Bus Routes
-description: Bus Routes
+description: You are given an array routes representing bus routes where routes[i] is a bus route that the ith bus repeats forever. You start at the bus stop source (You are not on any bus initially), and you want to go to the bus stop target. You can travel between bus stops only by buses.
 difficulty: Hard
 timeLimit: 45 mins
 week: 4
 tags:
   - Graph
 ---
+
+```js title="Example"
+Input: routes = [[1,2,7],[3,6,7]], source = 1, target = 6
+Output: 2
+Explanation: The best strategy is take the first bus to the bus stop 7, then take the second bus to the bus stop 6.
+```
+
+## Approach
+
+1. **Build Graph**: Create a graph where nodes are bus stops and edges represent bus routes
+2. **Breadth-First Search**: Use BFS to find the minimum number of buses needed
+3. **Queue Initialization**: Start with all buses that serve the source stop
+4. **BFS Traversal**: For each bus, explore all stops it serves
+5. **Track Visited**: Keep track of visited stops and buses to avoid cycles
+6. **Return Result**: Return the minimum number of buses or -1 if not reachable
+
+## Solution
+
+- Time Complexity: `O(n * m)`
+  > Where n is number of routes and m is average stops per route
+- Space Complexity: `O(n * m)`
+  > We store the graph and visited sets
+
+```js tab="JavaScript"
+/**
+ * @param {number[][]} routes
+ * @param {number} source
+ * @param {number} target
+ * @return {number}
+ */
+var numBusesToDestination = function(routes, source, target) {
+    if (source === target) return 0;
+    
+    // Build graph: stop -> [bus indices]
+    const stopToBuses = new Map();
+    for (let i = 0; i < routes.length; i++) {
+        for (const stop of routes[i]) {
+            if (!stopToBuses.has(stop)) {
+                stopToBuses.set(stop, []);
+            }
+            stopToBuses.get(stop).push(i);
+        }
+    }
+    
+    // BFS
+    const queue = [];
+    const visitedBuses = new Set();
+    const visitedStops = new Set();
+    
+    // Add all buses that serve source
+    for (const bus of stopToBuses.get(source) || []) {
+        queue.push([bus, 1]);
+        visitedBuses.add(bus);
+    }
+    
+    while (queue.length > 0) {
+        const [bus, count] = queue.shift();
+        
+        // Check if this bus serves target
+        if (routes[bus].includes(target)) {
+            return count;
+        }
+        
+        // Explore all stops this bus serves
+        for (const stop of routes[bus]) {
+            if (visitedStops.has(stop)) continue;
+            visitedStops.add(stop);
+            
+            // Add all buses that serve this stop
+            for (const nextBus of stopToBuses.get(stop) || []) {
+                if (!visitedBuses.has(nextBus)) {
+                    visitedBuses.add(nextBus);
+                    queue.push([nextBus, count + 1]);
+                }
+            }
+        }
+    }
+    
+    return -1;
+};
+```
+
+```java tab="Java"
+class Solution {
+    public int numBusesToDestination(int[][] routes, int source, int target) {
+        if (source == target) return 0;
+        
+        // Build graph: stop -> [bus indices]
+        Map<Integer, List<Integer>> stopToBuses = new HashMap<>();
+        for (int i = 0; i < routes.length; i++) {
+            for (int stop : routes[i]) {
+                stopToBuses.computeIfAbsent(stop, k -> new ArrayList<>()).add(i);
+            }
+        }
+        
+        // BFS
+        Queue<int[]> queue = new LinkedList<>();
+        Set<Integer> visitedBuses = new HashSet<>();
+        Set<Integer> visitedStops = new HashSet<>();
+        
+        // Add all buses that serve source
+        for (int bus : stopToBuses.getOrDefault(source, new ArrayList<>())) {
+            queue.offer(new int[]{bus, 1});
+            visitedBuses.add(bus);
+        }
+        
+        while (!queue.isEmpty()) {
+            int[] curr = queue.poll();
+            int bus = curr[0], count = curr[1];
+            
+            // Check if this bus serves target
+            for (int stop : routes[bus]) {
+                if (stop == target) {
+                    return count;
+                }
+            }
+            
+            // Explore all stops this bus serves
+            for (int stop : routes[bus]) {
+                if (visitedStops.contains(stop)) continue;
+                visitedStops.add(stop);
+                
+                // Add all buses that serve this stop
+                for (int nextBus : stopToBuses.getOrDefault(stop, new ArrayList<>())) {
+                    if (!visitedBuses.contains(nextBus)) {
+                        visitedBuses.add(nextBus);
+                        queue.offer(new int[]{nextBus, count + 1});
+                    }
+                }
+            }
+        }
+        
+        return -1;
+    }
+}
+```

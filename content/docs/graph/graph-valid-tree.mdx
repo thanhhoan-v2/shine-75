@@ -1,9 +1,120 @@
 ---
 title: Graph Valid Tree
-description: Graph Valid Tree
+description: Given n nodes labeled from 0 to n-1 and a list of undirected edges (each edge is a pair of nodes), write a function to check whether these edges make up a valid tree.
 difficulty: Medium
 timeLimit: 30 mins
 week: 2
 tags:
   - Graph
 ---
+
+```js title="Example"
+Input: n = 5, edges = [[0,1],[0,2],[0,3],[1,4]]
+Output: true
+```
+
+## Approach
+
+1. **Union-Find Data Structure**: Use Union-Find to detect cycles and ensure connectivity
+2. **Initialize**: Create parent array where each node is its own parent initially
+3. **Process Edges**: For each edge, try to union the two nodes
+4. **Cycle Detection**: If two nodes are already in the same set, we have a cycle
+5. **Connectivity Check**: Ensure all nodes are connected (same root)
+6. **Return Result**: Return true if no cycles and all nodes connected
+
+## Solution
+
+- Time Complexity: `O(n + m)`
+  > Where n is number of nodes and m is number of edges
+- Space Complexity: `O(n)`
+  > We use parent array for Union-Find
+
+```js tab="JavaScript"
+/**
+ * @param {number} n
+ * @param {number[][]} edges
+ * @return {boolean}
+ */
+var validTree = function(n, edges) {
+    if (edges.length !== n - 1) return false; // Tree must have n-1 edges
+    
+    const parent = Array(n).fill().map((_, i) => i);
+    
+    const find = (x) => {
+        if (parent[x] !== x) {
+            parent[x] = find(parent[x]);
+        }
+        return parent[x];
+    };
+    
+    const union = (x, y) => {
+        const px = find(x);
+        const py = find(y);
+        if (px === py) return false; // Cycle detected
+        parent[px] = py;
+        return true;
+    };
+    
+    // Process all edges
+    for (const [u, v] of edges) {
+        if (!union(u, v)) {
+            return false; // Cycle found
+        }
+    }
+    
+    // Check connectivity
+    const root = find(0);
+    for (let i = 1; i < n; i++) {
+        if (find(i) !== root) {
+            return false; // Not connected
+        }
+    }
+    
+    return true;
+};
+```
+
+```java tab="Java"
+class Solution {
+    public boolean validTree(int n, int[][] edges) {
+        if (edges.length != n - 1) return false; // Tree must have n-1 edges
+        
+        int[] parent = new int[n];
+        for (int i = 0; i < n; i++) {
+            parent[i] = i;
+        }
+        
+        for (int[] edge : edges) {
+            int u = edge[0], v = edge[1];
+            if (!union(parent, u, v)) {
+                return false; // Cycle found
+            }
+        }
+        
+        // Check connectivity
+        int root = find(parent, 0);
+        for (int i = 1; i < n; i++) {
+            if (find(parent, i) != root) {
+                return false; // Not connected
+            }
+        }
+        
+        return true;
+    }
+    
+    private int find(int[] parent, int x) {
+        if (parent[x] != x) {
+            parent[x] = find(parent, parent[x]);
+        }
+        return parent[x];
+    }
+    
+    private boolean union(int[] parent, int x, int y) {
+        int px = find(parent, x);
+        int py = find(parent, y);
+        if (px == py) return false; // Cycle detected
+        parent[px] = py;
+        return true;
+    }
+}
+```

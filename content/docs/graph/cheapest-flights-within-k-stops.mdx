@@ -1,9 +1,90 @@
 ---
 title: Cheapest Flights Within K Stops
-description: Cheapest Flights Within K Stops
+description: There are n cities connected by some number of flights. You are given an array flights where flights[i] = [fromi, toi, pricei] indicates that there is a flight from city fromi to city toi with cost pricei.
 difficulty: Medium
 timeLimit: 45 mins
 week: 3
 tags:
   - Graph
 ---
+
+```js title="Example"
+Input: n = 4, flights = [[0,1,100],[1,2,100],[2,0,100],[1,3,600],[2,3,200]], src = 0, dst = 3, k = 1
+Output: 700
+Explanation: The optimal path with at most 1 stop from city 0 to 3 is marked in red and costs 100 + 600 = 700.
+```
+
+## Approach
+
+1. **Bellman-Ford Algorithm**: Use a modified Bellman-Ford algorithm to find shortest paths with at most k stops
+2. **Dynamic Programming**: Use a 2D dp array where dp[i][j] represents the minimum cost to reach city j with at most i stops
+3. **Initialize**: Set dp[0][src] = 0, all others to infinity
+4. **Relaxation**: For each stop count, try all flights to update minimum costs
+5. **Return Result**: Return the minimum cost to reach destination with at most k stops
+
+## Solution
+
+- Time Complexity: `O(k * m)`
+  > Where k is the number of stops and m is the number of flights
+- Space Complexity: `O(k * n)`
+  > We use a 2D dp array
+
+```js tab="JavaScript"
+/**
+ * @param {number} n
+ * @param {number[][]} flights
+ * @param {number} src
+ * @param {number} dst
+ * @param {number} k
+ * @return {number}
+ */
+var findCheapestPrice = function(n, flights, src, dst, k) {
+    const dp = Array(k + 2).fill().map(() => Array(n).fill(Infinity));
+    dp[0][src] = 0;
+    
+    for (let stops = 0; stops <= k; stops++) {
+        // Copy previous state
+        for (let city = 0; city < n; city++) {
+            dp[stops + 1][city] = dp[stops][city];
+        }
+        
+        // Try all flights
+        for (const [from, to, price] of flights) {
+            if (dp[stops][from] !== Infinity) {
+                dp[stops + 1][to] = Math.min(dp[stops + 1][to], dp[stops][from] + price);
+            }
+        }
+    }
+    
+    return dp[k + 1][dst] === Infinity ? -1 : dp[k + 1][dst];
+};
+```
+
+```java tab="Java"
+class Solution {
+    public int findCheapestPrice(int n, int[][] flights, int src, int dst, int k) {
+        int[][] dp = new int[k + 2][n];
+        for (int[] row : dp) {
+            Arrays.fill(row, Integer.MAX_VALUE);
+        }
+        dp[0][src] = 0;
+        
+        for (int stops = 0; stops <= k; stops++) {
+            // Copy previous state
+            for (int city = 0; city < n; city++) {
+                dp[stops + 1][city] = dp[stops][city];
+            }
+            
+            // Try all flights
+            for (int[] flight : flights) {
+                int from = flight[0], to = flight[1], price = flight[2];
+                if (dp[stops][from] != Integer.MAX_VALUE) {
+                    dp[stops + 1][to] = Math.min(dp[stops + 1][to], dp[stops][from] + price);
+                }
+            }
+        }
+        
+        return dp[k + 1][dst] == Integer.MAX_VALUE ? -1 : dp[k + 1][dst];
+    }
+}
+```

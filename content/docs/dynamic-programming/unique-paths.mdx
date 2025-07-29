@@ -1,9 +1,86 @@
 ---
 title: Unique Paths
-description: Unique Paths
+description: There is a robot on an m x n grid. The robot is initially located at the top-left corner (i.e., grid[0][0]). The robot tries to move to the bottom-right corner (i.e., grid[m - 1][n - 1]). The robot can only move either down or right at any point in time.
 difficulty: Medium
 timeLimit: 20 mins
 week: 2
 tags:
   - Dynamic Programming
 ---
+
+```js title="Example"
+Input: m = 3, n = 7
+Output: 28
+Explanation: There are 28 unique paths from the top-left corner to the bottom-right corner.
+```
+
+## Approach
+
+1. **Dynamic Programming Matrix**: Create a dp matrix where dp[i][j] represents the number of unique paths to reach (i,j)
+2. **Initialize**: Set dp[0][j] = 1 and dp[i][0] = 1 for all valid i,j (only one way to reach first row/column)
+3. **Fill DP Matrix**: For each cell (i,j), dp[i][j] = dp[i-1][j] + dp[i][j-1] (sum of paths from above and left)
+4. **Return Result**: Return dp[m-1][n-1]
+
+## Solution
+
+- Time Complexity: `O(m*n)`
+  > We fill the entire dp matrix
+- Space Complexity: `O(m*n)`
+  > We use a dp matrix of size m*n
+
+```js tab="JavaScript"
+/**
+ * @param {number} m
+ * @param {number} n
+ * @return {number}
+ */
+var uniquePaths = function(m, n) {
+    const dp = Array(m).fill().map(() => Array(n).fill(0));
+    
+    // Fill first row
+    for (let j = 0; j < n; j++) {
+        dp[0][j] = 1;
+    }
+    
+    // Fill first column
+    for (let i = 0; i < m; i++) {
+        dp[i][0] = 1;
+    }
+    
+    // Fill rest of the matrix
+    for (let i = 1; i < m; i++) {
+        for (let j = 1; j < n; j++) {
+            dp[i][j] = dp[i-1][j] + dp[i][j-1];
+        }
+    }
+    
+    return dp[m-1][n-1];
+};
+```
+
+```java tab="Java"
+class Solution {
+    public int uniquePaths(int m, int n) {
+        int[][] dp = new int[m][n];
+        
+        // Fill first row
+        for (int j = 0; j < n; j++) {
+            dp[0][j] = 1;
+        }
+        
+        // Fill first column
+        for (int i = 0; i < m; i++) {
+            dp[i][0] = 1;
+        }
+        
+        // Fill rest of the matrix
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
+                dp[i][j] = dp[i-1][j] + dp[i][j-1];
+            }
+        }
+        
+        return dp[m-1][n-1];
+    }
+}
+```

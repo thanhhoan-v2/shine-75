@@ -1,9 +1,87 @@
 ---
 title: Decode Ways
-description: Decode Ways
+description: A message containing letters from A-Z can be encoded into numbers using the following mapping - A -> 1, B -> 2, ..., Z -> 26. Given a string s containing only digits, return the number of ways to decode it.
 difficulty: Medium
 timeLimit: 25 mins
 week: 3
 tags:
   - Dynamic Programming
 ---
+
+```js title="Example"
+Input: s = "12"
+Output: 2
+Explanation: "12" could be decoded as "AB" (1 2) or "L" (12).
+```
+
+## Approach
+
+1. **Dynamic Programming Array**: Create a dp array where dp[i] represents the number of ways to decode the string up to index i
+2. **Initialize**: Set dp[0] = 1 (one way to decode empty string)
+3. **Single Digit Check**: For each position, check if current digit is valid (1-9)
+4. **Double Digit Check**: Check if current digit and previous digit form a valid two-digit number (10-26)
+5. **Update DP**: Add the ways from single digit and double digit checks
+6. **Return Result**: Return dp[n] where n is the length of the string
+
+## Solution
+
+- Time Complexity: `O(n)`
+  > We iterate through the string once, checking each position
+- Space Complexity: `O(n)`
+  > We use a dp array of size n + 1
+
+```js tab="JavaScript"
+/**
+ * @param {string} s
+ * @return {number}
+ */
+var numDecodings = function(s) {
+    const n = s.length;
+    const dp = new Array(n + 1).fill(0);
+    dp[0] = 1;
+    
+    for (let i = 1; i <= n; i++) {
+        // Check single digit
+        if (s[i - 1] !== '0') {
+            dp[i] += dp[i - 1];
+        }
+        
+        // Check two digits
+        if (i >= 2) {
+            const twoDigit = parseInt(s.substring(i - 2, i));
+            if (twoDigit >= 10 && twoDigit <= 26) {
+                dp[i] += dp[i - 2];
+            }
+        }
+    }
+    
+    return dp[n];
+};
+```
+
+```java tab="Java"
+class Solution {
+    public int numDecodings(String s) {
+        int n = s.length();
+        int[] dp = new int[n + 1];
+        dp[0] = 1;
+        
+        for (int i = 1; i <= n; i++) {
+            // Check single digit
+            if (s.charAt(i - 1) != '0') {
+                dp[i] += dp[i - 1];
+            }
+            
+            // Check two digits
+            if (i >= 2) {
+                int twoDigit = Integer.parseInt(s.substring(i - 2, i));
+                if (twoDigit >= 10 && twoDigit <= 26) {
+                    dp[i] += dp[i - 2];
+                }
+            }
+        }
+        
+        return dp[n];
+    }
+}
+```

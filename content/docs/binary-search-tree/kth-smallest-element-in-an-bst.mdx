@@ -1,9 +1,86 @@
 ---
 title: Kth Smallest Element in a BST
-description: Kth Smallest Element in a BST
+description: Given the root of a binary search tree, and an integer k, return the kth smallest value (1-indexed) of all the values of the nodes in the tree.
 difficulty: Medium
 timeLimit: 25 mins
 week: 2
 tags:
   - Binary Search Tree
+  - Tree
+  - Depth-First Search
 ---
+
+```js title="Example"
+Input: root = [3, 1, 4, null, 2], k = 1
+Output: 1
+Explanation: The 1st smallest element is 1.
+
+Input: root = [5, 3, 6, 2, 4, null, null, 1], k = 3
+Output: 3
+```
+
+## Approach
+
+1. **Inorder Traversal**: Use inorder traversal to visit nodes in ascending order.
+2. **Global Counter**: Use a global counter to track the current position.
+3. **Recursive Traversal**: Traverse left subtree, process current node, then traverse right subtree.
+4. **Check Kth Element**: When counter reaches k, return the current node's value.
+5. **Early Termination**: Return early when the kth element is found.
+
+## Solution
+
+- Time Complexity: `O(h + k)`
+  > Where h is the height of the tree and k is the input parameter. We traverse to the kth smallest element.
+- Space Complexity: `O(h)`
+  > The recursion stack depth is at most the height of the tree.
+
+```js tab="JavaScript"
+/**
+ * @param {TreeNode} root
+ * @param {number} k
+ * @return {number}
+ */
+var kthSmallest = function(root, k) {
+    let count = 0;
+    let result = null;
+    
+    const inorder = (node) => {
+        if (node === null || result !== null) return;
+        
+        inorder(node.left);
+        count++;
+        if (count === k) {
+            result = node.val;
+            return;
+        }
+        inorder(node.right);
+    };
+    
+    inorder(root);
+    return result;
+};
+```
+
+```java tab="Java"
+class Solution {
+    private int count = 0;
+    private int result = 0;
+    
+    public int kthSmallest(TreeNode root, int k) {
+        inorder(root, k);
+        return result;
+    }
+    
+    private void inorder(TreeNode node, int k) {
+        if (node == null || count >= k) return;
+        
+        inorder(node.left, k);
+        count++;
+        if (count == k) {
+            result = node.val;
+            return;
+        }
+        inorder(node.right, k);
+    }
+}
+```

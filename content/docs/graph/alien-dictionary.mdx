@@ -1,9 +1,165 @@
 ---
 title: Alien Dictionary
-description: Alien Dictionary
+description: There is a new alien language that uses the English alphabet. However, the order among the letters is unknown to you. You are given a list of strings words from the alien language's dictionary, where the strings in words are sorted lexicographically by the rules of this new language.
 difficulty: Hard
 timeLimit: 45 mins
 week: 4
 tags:
   - Graph
 ---
+
+```js title="Example"
+Input: words = ["wrt","wrf","er","ett","rftt"]
+Output: "wertf"
+```
+
+## Approach
+
+1. **Build Graph**: Create a graph where nodes are characters and edges represent ordering relationships
+2. **Extract Ordering**: Compare adjacent words to find character ordering relationships
+3. **Topological Sort**: Use Kahn's algorithm to perform topological sorting
+4. **Detect Cycles**: Check for cycles during topological sort (invalid ordering)
+5. **Return Result**: Return the topological order as a string
+
+## Solution
+
+- Time Complexity: `O(n * m)`
+  > Where n is number of words and m is average word length
+- Space Complexity: `O(1)`
+  > Since we have at most 26 characters
+
+```js tab="JavaScript"
+/**
+ * @param {string[]} words
+ * @return {string}
+ */
+var alienOrder = function(words) {
+    const graph = new Map();
+    const inDegree = new Map();
+    
+    // Initialize graph and inDegree
+    for (const word of words) {
+        for (const char of word) {
+            if (!graph.has(char)) {
+                graph.set(char, new Set());
+                inDegree.set(char, 0);
+            }
+        }
+    }
+    
+    // Build graph
+    for (let i = 0; i < words.length - 1; i++) {
+        const word1 = words[i];
+        const word2 = words[i + 1];
+        
+        // Check if word2 is a prefix of word1
+        if (word1.length > word2.length && word1.startsWith(word2)) {
+            return "";
+        }
+        
+        for (let j = 0; j < Math.min(word1.length, word2.length); j++) {
+            if (word1[j] !== word2[j]) {
+                if (!graph.get(word1[j]).has(word2[j])) {
+                    graph.get(word1[j]).add(word2[j]);
+                    inDegree.set(word2[j], inDegree.get(word2[j]) + 1);
+                }
+                break;
+            }
+        }
+    }
+    
+    // Topological sort
+    const queue = [];
+    for (const [char, degree] of inDegree) {
+        if (degree === 0) {
+            queue.push(char);
+        }
+    }
+    
+    const result = [];
+    while (queue.length > 0) {
+        const char = queue.shift();
+        result.push(char);
+        
+        for (const neighbor of graph.get(char)) {
+            inDegree.set(neighbor, inDegree.get(neighbor) - 1);
+            if (inDegree.get(neighbor) === 0) {
+                queue.push(neighbor);
+            }
+        }
+    }
+    
+    // Check for cycles
+    if (result.length !== graph.size) {
+        return "";
+    }
+    
+    return result.join('');
+};
+```
+
+```java tab="Java"
+class Solution {
+    public String alienOrder(String[] words) {
+        Map<Character, Set<Character>> graph = new HashMap<>();
+        Map<Character, Integer> inDegree = new HashMap<>();
+        
+        // Initialize graph and inDegree
+        for (String word : words) {
+            for (char c : word.toCharArray()) {
+                graph.putIfAbsent(c, new HashSet<>());
+                inDegree.putIfAbsent(c, 0);
+            }
+        }
+        
+        // Build graph
+        for (int i = 0; i < words.length - 1; i++) {
+            String word1 = words[i];
+            String word2 = words[i + 1];
+            
+            // Check if word2 is a prefix of word1
+            if (word1.length() > word2.length() && word1.startsWith(word2)) {
+                return "";
+            }
+            
+            for (int j = 0; j < Math.min(word1.length(), word2.length()); j++) {
+                if (word1.charAt(j) != word2.charAt(j)) {
+                    if (!graph.get(word1.charAt(j)).contains(word2.charAt(j))) {
+                        graph.get(word1.charAt(j)).add(word2.charAt(j));
+                        inDegree.put(word2.charAt(j), inDegree.get(word2.charAt(j)) + 1);
+                    }
+                    break;
+                }
+            }
+        }
+        
+        // Topological sort
+        Queue<Character> queue = new LinkedList<>();
+        for (Map.Entry<Character, Integer> entry : inDegree.entrySet()) {
+            if (entry.getValue() == 0) {
+                queue.offer(entry.getKey());
+            }
+        }
+        
+        StringBuilder result = new StringBuilder();
+        while (!queue.isEmpty()) {
+            char c = queue.poll();
+            result.append(c);
+            
+            for (char neighbor : graph.get(c)) {
+                inDegree.put(neighbor, inDegree.get(neighbor) - 1);
+                if (inDegree.get(neighbor) == 0) {
+                    queue.offer(neighbor);
+                }
+            }
+        }
+        
+        // Check for cycles
+        if (result.length() != graph.size()) {
+            return "";
+        }
+        
+        return result.toString();
+    }
+}
+```

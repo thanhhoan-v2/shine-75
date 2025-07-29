@@ -1,9 +1,112 @@
 ---
 title: 01 Matrix
-description: 01 Matrix
+description: Given an m x n binary matrix mat, return the distance of the nearest 0 for each cell. The distance between two adjacent cells is 1.
 difficulty: Medium
 timeLimit: 30 mins
 week: 1
 tags:
   - Graph
 ---
+
+```js title="Example"
+Input: mat = [[0,0,0],[0,1,0],[0,0,0]]
+Output: [[0,0,0],[0,1,0],[0,0,0]]
+```
+
+## Approach
+
+1. **Breadth-First Search**: Use BFS starting from all 0 cells to find distances to all other cells
+2. **Queue Initialization**: Add all 0 cells to the queue with distance 0
+3. **BFS Traversal**: For each cell, explore its four neighbors (up, down, left, right)
+4. **Update Distances**: If a neighbor hasn't been visited, update its distance and add to queue
+5. **Return Result**: Return the distance matrix
+
+## Solution
+
+- Time Complexity: `O(m*n)`
+  > We visit each cell at most once
+- Space Complexity: `O(m*n)`
+  > We use a queue and visited matrix
+
+```js tab="JavaScript"
+/**
+ * @param {number[][]} mat
+ * @return {number[][]}
+ */
+var updateMatrix = function(mat) {
+    const m = mat.length;
+    const n = mat[0].length;
+    const queue = [];
+    const visited = Array(m).fill().map(() => Array(n).fill(false));
+    
+    // Add all 0 cells to queue
+    for (let i = 0; i < m; i++) {
+        for (let j = 0; j < n; j++) {
+            if (mat[i][j] === 0) {
+                queue.push([i, j, 0]);
+                visited[i][j] = true;
+            }
+        }
+    }
+    
+    const directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+    
+    while (queue.length > 0) {
+        const [i, j, dist] = queue.shift();
+        mat[i][j] = dist;
+        
+        for (const [di, dj] of directions) {
+            const ni = i + di;
+            const nj = j + dj;
+            
+            if (ni >= 0 && ni < m && nj >= 0 && nj < n && !visited[ni][nj]) {
+                visited[ni][nj] = true;
+                queue.push([ni, nj, dist + 1]);
+            }
+        }
+    }
+    
+    return mat;
+};
+```
+
+```java tab="Java"
+class Solution {
+    public int[][] updateMatrix(int[][] mat) {
+        int m = mat.length;
+        int n = mat[0].length;
+        Queue<int[]> queue = new LinkedList<>();
+        boolean[][] visited = new boolean[m][n];
+        
+        // Add all 0 cells to queue
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (mat[i][j] == 0) {
+                    queue.offer(new int[]{i, j, 0});
+                    visited[i][j] = true;
+                }
+            }
+        }
+        
+        int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+        
+        while (!queue.isEmpty()) {
+            int[] cell = queue.poll();
+            int i = cell[0], j = cell[1], dist = cell[2];
+            mat[i][j] = dist;
+            
+            for (int[] dir : directions) {
+                int ni = i + dir[0];
+                int nj = j + dir[1];
+                
+                if (ni >= 0 && ni < m && nj >= 0 && nj < n && !visited[ni][nj]) {
+                    visited[ni][nj] = true;
+                    queue.offer(new int[]{ni, nj, dist + 1});
+                }
+            }
+        }
+        
+        return mat;
+    }
+}
+```

@@ -1,9 +1,75 @@
 ---
 title: Lowest Common Ancestor of a Binary Search Tree
-description: Lowest Common Ancestor of a Binary Search Tree
+description: Given a binary search tree (BST), find the lowest common ancestor (LCA) of two given nodes in the BST.
 difficulty: Easy
 timeLimit: 20 mins
 week: 1
 tags:
   - Binary Search Tree
+  - Tree
+  - Depth-First Search
 ---
+
+```js title="Example"
+Input: root = [6, 2, 8, 0, 4, 7, 9, null, null, 3, 5], p = 2, q = 8
+Output: 6
+Explanation: The LCA of nodes 2 and 8 is 6.
+
+Input: root = [6, 2, 8, 0, 4, 7, 9, null, null, 3, 5], p = 2, q = 4
+Output: 2
+```
+
+## Approach
+
+1. **BST Property**: Use the BST property that left subtree values < root < right subtree values.
+2. **Compare Values**: If both p and q are less than root, LCA is in left subtree.
+3. **Right Subtree**: If both p and q are greater than root, LCA is in right subtree.
+4. **Current Root**: If one is less and one is greater, current root is the LCA.
+5. **Recursive Search**: Recursively search the appropriate subtree.
+
+## Solution
+
+- Time Complexity: `O(h)`
+  > Where h is the height of the tree. In the worst case, we traverse the height of the tree.
+- Space Complexity: `O(h)`
+  > The recursion stack depth is at most the height of the tree.
+
+```js tab="JavaScript"
+/**
+ * @param {TreeNode} root
+ * @param {TreeNode} p
+ * @param {TreeNode} q
+ * @return {TreeNode}
+ */
+var lowestCommonAncestor = function(root, p, q) {
+    if (root === null) return null;
+    
+    if (p.val < root.val && q.val < root.val) {
+        return lowestCommonAncestor(root.left, p, q);
+    }
+    
+    if (p.val > root.val && q.val > root.val) {
+        return lowestCommonAncestor(root.right, p, q);
+    }
+    
+    return root;
+};
+```
+
+```java tab="Java"
+class Solution {
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        if (root == null) return null;
+        
+        if (p.val < root.val && q.val < root.val) {
+            return lowestCommonAncestor(root.left, p, q);
+        }
+        
+        if (p.val > root.val && q.val > root.val) {
+            return lowestCommonAncestor(root.right, p, q);
+        }
+        
+        return root;
+    }
+}
+```

@@ -1,9 +1,89 @@
 ---
 title: Add Binary
-description: Add Binary
+description: Given two binary strings a and b, return their sum as a binary string.
 difficulty: Easy
 timeLimit: 15 mins
 week: 1
 tags:
   - Binary
+  - String
+  - Math
 ---
+
+```js title="Example"
+Input: a = "11", b = "1"
+Output: "100"
+Explanation: 11 + 1 = 100 in binary.
+
+Input: a = "1010", b = "1011"
+Output: "10101"
+```
+
+## Approach
+
+1. **Reverse Strings**: Reverse both strings to process from least significant bit to most significant bit.
+2. **Initialize Variables**: Set carry to 0 and result to empty string.
+3. **Iterate Through Strings**: Process each digit from both strings and carry.
+4. **Calculate Sum**: For each position, calculate sum = a[i] + b[i] + carry.
+5. **Update Result**: Append sum % 2 to result and update carry = sum / 2.
+6. **Handle Remaining Carry**: If carry is 1 after processing all digits, append it to result.
+
+## Solution
+
+- Time Complexity: `O(max(m, n))`
+  > Where m and n are the lengths of strings a and b respectively. We iterate through the longer string.
+- Space Complexity: `O(max(m, n))`
+  > We create a result string that can be as long as the longer input string plus one.
+
+```js tab="JavaScript"
+/**
+ * @param {string} a
+ * @param {string} b
+ * @return {string}
+ */
+var addBinary = function(a, b) {
+    let result = "";
+    let carry = 0;
+    let i = a.length - 1;
+    let j = b.length - 1;
+    
+    while (i >= 0 || j >= 0 || carry > 0) {
+        const sum = carry + 
+                   (i >= 0 ? parseInt(a[i]) : 0) + 
+                   (j >= 0 ? parseInt(b[j]) : 0);
+        
+        result = (sum % 2) + result;
+        carry = Math.floor(sum / 2);
+        
+        i--;
+        j--;
+    }
+    
+    return result;
+};
+```
+
+```java tab="Java"
+class Solution {
+    public String addBinary(String a, String b) {
+        StringBuilder result = new StringBuilder();
+        int carry = 0;
+        int i = a.length() - 1;
+        int j = b.length() - 1;
+        
+        while (i >= 0 || j >= 0 || carry > 0) {
+            int sum = carry;
+            if (i >= 0) sum += a.charAt(i) - '0';
+            if (j >= 0) sum += b.charAt(j) - '0';
+            
+            result.insert(0, sum % 2);
+            carry = sum / 2;
+            
+            i--;
+            j--;
+        }
+        
+        return result.toString();
+    }
+}
+```

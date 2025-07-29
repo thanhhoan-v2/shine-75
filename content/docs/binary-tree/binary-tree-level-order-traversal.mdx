@@ -1,9 +1,94 @@
 ---
 title: Binary Tree Level Order Traversal
-description: Binary Tree Level Order Traversal
+description: Given the root of a binary tree, return the level order traversal of its nodes' values. (i.e., from left to right, level by level).
 difficulty: Medium
 timeLimit: 20 mins
 week: 1
 tags:
   - Binary Tree
+  - Tree
+  - Breadth-First Search
 ---
+
+```js title="Example"
+Input: root = [3, 9, 20, null, null, 15, 7]
+Output: [[3], [9, 20], [15, 7]]
+Explanation: Level order traversal: level 1: [3], level 2: [9, 20], level 3: [15, 7]
+
+Input: root = [1]
+Output: [[1]]
+```
+
+## Approach
+
+1. **Breadth-First Search**: Use BFS with a queue to traverse the tree level by level.
+2. **Queue Initialization**: Start with the root node in the queue.
+3. **Level Processing**: For each level, process all nodes at that level.
+4. **Add Children**: Add left and right children to the queue for the next level.
+5. **Build Result**: Add each level's values to the result array.
+
+## Solution
+
+- Time Complexity: `O(n)`
+  > Where n is the number of nodes in the tree. We visit each node once.
+- Space Complexity: `O(n)`
+  > The queue can contain at most n/2 nodes at the last level.
+
+```js tab="JavaScript"
+/**
+ * @param {TreeNode} root
+ * @return {number[][]}
+ */
+var levelOrder = function(root) {
+    if (root === null) return [];
+    
+    const result = [];
+    const queue = [root];
+    
+    while (queue.length > 0) {
+        const levelSize = queue.length;
+        const currentLevel = [];
+        
+        for (let i = 0; i < levelSize; i++) {
+            const node = queue.shift();
+            currentLevel.push(node.val);
+            
+            if (node.left) queue.push(node.left);
+            if (node.right) queue.push(node.right);
+        }
+        
+        result.push(currentLevel);
+    }
+    
+    return result;
+};
+```
+
+```java tab="Java"
+class Solution {
+    public List<List<Integer>> levelOrder(TreeNode root) {
+        List<List<Integer>> result = new ArrayList<>();
+        if (root == null) return result;
+        
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        
+        while (!queue.isEmpty()) {
+            int levelSize = queue.size();
+            List<Integer> currentLevel = new ArrayList<>();
+            
+            for (int i = 0; i < levelSize; i++) {
+                TreeNode node = queue.poll();
+                currentLevel.add(node.val);
+                
+                if (node.left != null) queue.offer(node.left);
+                if (node.right != null) queue.offer(node.right);
+            }
+            
+            result.add(currentLevel);
+        }
+        
+        return result;
+    }
+}
+```

@@ -1,9 +1,80 @@
 ---
 title: Partition Equal Subset Sum
-description: Partition Equal Subset Sum
+description: Given a non-empty array nums containing only positive integers, find if the array can be partitioned into two subsets such that the sum of elements in both subsets is equal.
 difficulty: Medium
 timeLimit: 30 mins
 week: 2
 tags:
   - Dynamic Programming
 ---
+
+```js title="Example"
+Input: nums = [1,5,11,5]
+Output: true
+Explanation: The array can be partitioned as [1, 5, 5] and [11].
+```
+
+## Approach
+
+1. **Check Total Sum**: First check if the total sum is even (if not, return false)
+2. **Target Sum**: Calculate target sum as total sum / 2
+3. **Dynamic Programming Array**: Create a dp array where dp[i] represents if sum i can be achieved
+4. **Initialize**: Set dp[0] = true (sum 0 can always be achieved with empty subset)
+5. **Fill DP Array**: For each number, try to achieve all possible sums up to target
+6. **Return Result**: Return dp[target]
+
+## Solution
+
+- Time Complexity: `O(n * target)`
+  > We iterate through each number and for each number, we try all possible sums up to target
+- Space Complexity: `O(target)`
+  > We use a dp array of size target + 1
+
+```js tab="JavaScript"
+/**
+ * @param {number[]} nums
+ * @return {boolean}
+ */
+var canPartition = function(nums) {
+    const totalSum = nums.reduce((sum, num) => sum + num, 0);
+    
+    if (totalSum % 2 !== 0) return false;
+    
+    const target = totalSum / 2;
+    const dp = new Array(target + 1).fill(false);
+    dp[0] = true;
+    
+    for (const num of nums) {
+        for (let i = target; i >= num; i--) {
+            dp[i] = dp[i] || dp[i - num];
+        }
+    }
+    
+    return dp[target];
+};
+```
+
+```java tab="Java"
+class Solution {
+    public boolean canPartition(int[] nums) {
+        int totalSum = 0;
+        for (int num : nums) {
+            totalSum += num;
+        }
+        
+        if (totalSum % 2 != 0) return false;
+        
+        int target = totalSum / 2;
+        boolean[] dp = new boolean[target + 1];
+        dp[0] = true;
+        
+        for (int num : nums) {
+            for (int i = target; i >= num; i--) {
+                dp[i] = dp[i] || dp[i - num];
+            }
+        }
+        
+        return dp[target];
+    }
+}
+```
