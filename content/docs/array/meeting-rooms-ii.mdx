@@ -1,0 +1,90 @@
+---
+title: Meeting Rooms II
+description: Given an array of meeting time intervals intervals where intervals[i] = [starti, endi], return the minimum number of conference rooms required.
+difficulty: Medium
+timeLimit: 25 mins
+tags:
+  - Array
+  - Sorting
+  - Heap
+  - Greedy
+---
+
+```js title="Example"
+minMeetingRooms([[0, 30], [5, 10], [15, 20]]); // 2
+minMeetingRooms([[7, 10], [2, 4]]); // 1
+minMeetingRooms([[0, 30], [5, 10], [15, 20], [25, 30]]); // 2
+```
+
+## Approach
+
+- Sort all start and end times separately
+- Use two pointers to track start and end times
+- When we encounter a start time, increment room count
+- When we encounter an end time, decrement room count
+- Keep track of the maximum number of rooms needed
+
+## Solution
+
+- Time Complexity: `O(n log n)`
+  - We need to sort the start and end times, which takes O(n log n)
+- Space Complexity: `O(n)`
+  - We create arrays to store start and end times
+
+```js tab="JavaScript"
+const minMeetingRooms = (intervals) => {
+  const starts = intervals.map(interval => interval[0]).sort((a, b) => a - b);
+  const ends = intervals.map(interval => interval[1]).sort((a, b) => a - b);
+  
+  let rooms = 0;
+  let maxRooms = 0;
+  let startIndex = 0;
+  let endIndex = 0;
+  
+  while (startIndex < starts.length) {
+    if (starts[startIndex] < ends[endIndex]) {
+      rooms++;
+      maxRooms = Math.max(maxRooms, rooms);
+      startIndex++;
+    } else {
+      rooms--;
+      endIndex++;
+    }
+  }
+  
+  return maxRooms;
+};
+```
+
+```java tab="Java"
+public int minMeetingRooms(int[][] intervals) {
+    int[] starts = new int[intervals.length];
+    int[] ends = new int[intervals.length];
+    
+    for (int i = 0; i < intervals.length; i++) {
+        starts[i] = intervals[i][0];
+        ends[i] = intervals[i][1];
+    }
+    
+    Arrays.sort(starts);
+    Arrays.sort(ends);
+    
+    int rooms = 0;
+    int maxRooms = 0;
+    int startIndex = 0;
+    int endIndex = 0;
+    
+    while (startIndex < starts.length) {
+        if (starts[startIndex] < ends[endIndex]) {
+            rooms++;
+            maxRooms = Math.max(maxRooms, rooms);
+            startIndex++;
+        } else {
+            rooms--;
+            endIndex++;
+        }
+    }
+    
+    return maxRooms;
+}
+```

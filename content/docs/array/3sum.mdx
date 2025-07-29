@@ -1,0 +1,95 @@
+---
+title: 3Sum
+description: Given an integer array nums, return all the triplets [nums[i], nums[j], nums[k]] such that i != j, i != k, and j != k, and nums[i] + nums[j] + nums[k] == 0. Notice that the solution set must not contain duplicate triplets.
+difficulty: Medium
+timeLimit: 30 mins
+tags:
+  - Array
+  - Two Pointers
+  - Sorting
+---
+
+```js title="Example"
+threeSum([-1, 0, 1, 2, -1, -4]); // [[-1,-1,2], [-1,0,1]]
+threeSum([0, 1, 1]); // []
+threeSum([0, 0, 0]); // [[0,0,0]]
+```
+
+## Approach
+
+- Sort the array to enable two-pointer technique
+- Use three pointers: i (outer loop), left, and right
+- For each i, use two pointers to find pairs that sum to -nums[i]
+- Skip duplicates to avoid duplicate triplets
+- Time complexity: O(n²) where n is the length of the array
+
+## Solution
+
+- Time Complexity: `O(n²)`
+  - We have an outer loop that iterates through the array once, and for each iteration, we use two pointers that can traverse the remaining array, giving us O(n²)
+- Space Complexity: `O(1)` (excluding the output array)
+  - We only use a constant amount of extra space for the pointers and variables
+
+```js tab="JavaScript"
+const threeSum = (nums) => {
+  const result = [];
+  nums.sort((a, b) => a - b);
+  
+  for (let i = 0; i < nums.length - 2; i++) {
+    if (i > 0 && nums[i] === nums[i - 1]) continue;
+    
+    let left = i + 1;
+    let right = nums.length - 1;
+    
+    while (left < right) {
+      const sum = nums[i] + nums[left] + nums[right];
+      
+      if (sum === 0) {
+        result.push([nums[i], nums[left], nums[right]]);
+        while (left < right && nums[left] === nums[left + 1]) left++;
+        while (left < right && nums[right] === nums[right - 1]) right--;
+        left++;
+        right--;
+      } else if (sum < 0) {
+        left++;
+      } else {
+        right--;
+      }
+    }
+  }
+  
+  return result;
+};
+```
+
+```java tab="Java"
+public List<List<Integer>> threeSum(int[] nums) {
+    List<List<Integer>> result = new ArrayList<>();
+    Arrays.sort(nums);
+    
+    for (int i = 0; i < nums.length - 2; i++) {
+        if (i > 0 && nums[i] == nums[i - 1]) continue;
+        
+        int left = i + 1;
+        int right = nums.length - 1;
+        
+        while (left < right) {
+            int sum = nums[i] + nums[left] + nums[right];
+            
+            if (sum == 0) {
+                result.add(Arrays.asList(nums[i], nums[left], nums[right]));
+                while (left < right && nums[left] == nums[left + 1]) left++;
+                while (left < right && nums[right] == nums[right - 1]) right--;
+                left++;
+                right--;
+            } else if (sum < 0) {
+                left++;
+            } else {
+                right--;
+            }
+        }
+    }
+    
+    return result;
+}
+```

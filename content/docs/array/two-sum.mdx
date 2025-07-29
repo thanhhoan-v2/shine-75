@@ -1,24 +1,62 @@
 ---
 title: Two Sum
+description: Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target. You may assume that each input would have exactly one solution, and you may not use the same element twice.
 difficulty: Easy
 timeLimit: 15 mins
-week: 1
 tags:
   - Array
   - Hash Table
   - Two Pointers
 ---
 
-Given an array of integers `nums` and an integer `target`, return indices of the two numbers such that they add up to `target`.
+```js title="Example"
+twoSum([2, 7, 11, 15], 9); // [0, 1]
+twoSum([3, 2, 4], 6); // [1, 2]
+twoSum([3, 3], 6); // [0, 1]
+```
 
-You may assume that each input would have exactly one solution, and you may not use the same element twice.
+## Approach
+
+- Initialize an empty hash map to store `{current_num: index}` pairs
+- For each element in the array:
+  - Calculate its complement (what number we need to reach the target)
+  - Check if the complement exists in our map
+    - If found: return `[complement_index, current_index]`
+    - If not found: store `current_num: current_index` in the map
+- Return empty array if no solution exists
 
 ## Solution
 
-```python
-def two_sum(nums: List[int], target: int) -> List[int]:
-    for i in range(len(nums)):
-        for j in range(i + 1, len(nums)):
-            if nums[i] + nums[j] == target:
-                return [i, j]
+- Time Complexity: `O(n)`
+  - We iterate through the array once, so the time complexity is `O(n)`
+- Space Complexity: `O(n)`
+  - We use a hash map to store the numbers and their indices, so the space complexity is `O(n)`
+
+```js title="JavaScript"
+const twoSum = (nums, target) => {
+  const map = new Map();
+  for (let i = 0; i < nums.length; i++) {
+    const complement = target - nums[i];
+    if (map.has(complement)) {
+      return [map.get(complement), i];
+    }
+    map.set(nums[i], i);
+  }
+};
+```
+
+```java title="Java"
+class TwoSum {
+    public int[] twoSum(int[] nums, int target) {
+        Map<Integer, Integer> map = new HashMap<>();
+        for (int i = 0; i < nums.length; i++) {
+            int complement = target - nums[i];
+            if (map.containsKey(complement)) {
+                return new int[] { map.get(complement), i };
+            }
+            map.put(nums[i], i);
+        }
+        return null;
+    }
+}
 ```

@@ -1,0 +1,60 @@
+---
+title: Best Time to Buy and Sell Stock
+description: You are given an array prices where prices[i] is the price of a given stock on the ith day. You want to maximize your profit by choosing a single day to buy one stock and choosing a different day in the future to sell that stock. Return the maximum profit you can achieve from this transaction. If you cannot achieve any profit, return 0.
+difficulty: Easy
+timeLimit: 15 mins
+tags:
+  - Array
+  - Dynamic Programming
+  - Greedy
+---
+
+```js title="Example"
+maxProfit([7, 1, 5, 3, 6, 4]); // 5
+maxProfit([7, 6, 4, 3, 1]); // 0
+maxProfit([1, 2, 3, 4, 5]); // 4
+```
+
+## Approach
+
+- Keep track of the minimum price seen so far
+- For each price, calculate the potential profit if we sell at current price
+- Update the maximum profit if current profit is greater
+- Update the minimum price if current price is smaller
+
+## Solution
+
+- Time Complexity: `O(n)`
+  - We iterate through the array once, so the time complexity is O(n)
+- Space Complexity: `O(1)`
+  - We only use a constant amount of extra space for variables
+
+---
+
+```js tab="JavaScript"
+const maxProfit = (prices) => {
+  let minPrice = Infinity;
+  let maxProfit = 0;
+  
+  for (let price of prices) {
+    minPrice = Math.min(minPrice, price);
+    maxProfit = Math.max(maxProfit, price - minPrice);
+  }
+  
+  return maxProfit;
+};
+```
+
+```java tab="Java"
+public int maxProfit(int[] prices) {
+    int minPrice = Integer.MAX_VALUE;
+    int maxProfit = 0;
+    
+    for (int price : prices) {
+        minPrice = Math.min(minPrice, price);
+        maxProfit = Math.max(maxProfit, price - minPrice);
+    }
+    
+    return maxProfit;
+}
+```

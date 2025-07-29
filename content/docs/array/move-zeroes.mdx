@@ -1,0 +1,57 @@
+---
+title: Move Zeroes
+description: Given an integer array nums, move all 0's to the end of it while maintaining the relative order of the non-zero elements. Note that you must do this in-place without making a copy of the array.
+difficulty: Easy
+timeLimit: 15 mins
+tags:
+  - Array
+  - Two Pointers
+---
+
+```js title="Example"
+moveZeroes([0, 1, 0, 3, 12]); // [1, 3, 12, 0, 0]
+moveZeroes([0]); // [0]
+moveZeroes([1, 2, 3, 4, 5]); // [1, 2, 3, 4, 5]
+```
+
+## Approach
+
+- Use two pointers: one for the position to place non-zero elements, another to scan the array
+- When we find a non-zero element, swap it with the position pointer
+- Increment the position pointer after each swap
+- All zeros will naturally end up at the end
+
+## Solution
+
+- Time Complexity: `O(n)`
+  - We iterate through the array once, so the time complexity is O(n)
+- Space Complexity: `O(1)`
+  - We only use a constant amount of extra space for variables
+
+```js tab="JavaScript"
+const moveZeroes = (nums) => {
+  let nonZeroIndex = 0;
+  
+  for (let i = 0; i < nums.length; i++) {
+    if (nums[i] !== 0) {
+      [nums[nonZeroIndex], nums[i]] = [nums[i], nums[nonZeroIndex]];
+      nonZeroIndex++;
+    }
+  }
+};
+```
+
+```java tab="Java"
+public void moveZeroes(int[] nums) {
+    int nonZeroIndex = 0;
+    
+    for (int i = 0; i < nums.length; i++) {
+        if (nums[i] != 0) {
+            int temp = nums[nonZeroIndex];
+            nums[nonZeroIndex] = nums[i];
+            nums[i] = temp;
+            nonZeroIndex++;
+        }
+    }
+}
+```

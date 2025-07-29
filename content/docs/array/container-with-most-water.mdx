@@ -1,0 +1,75 @@
+---
+title: Container With Most Water
+description: Given n non-negative integers height where each represents a point at coordinate (i, height[i]), find two lines, which, together with the x-axis, form a container that can hold the maximum amount of water. Return the maximum amount of water a container can store.
+difficulty: Medium
+timeLimit: 20 mins
+tags:
+  - Array
+  - Two Pointers
+  - Greedy
+---
+
+```js title="Example"
+maxArea([1, 8, 6, 2, 5, 4, 8, 3, 7]); // 49
+maxArea([1, 1]); // 1
+maxArea([4, 3, 2, 1, 4]); // 16
+```
+
+## Approach
+
+- Use two pointers starting from both ends of the array
+- Calculate the area between the two pointers
+- Move the pointer with the smaller height inward
+- Keep track of the maximum area found
+- Continue until the pointers meet
+
+## Solution
+
+- Time Complexity: `O(n)`
+  - We use two pointers that traverse the array from both ends, so the time complexity is O(n)
+- Space Complexity: `O(1)`
+  - We only use a constant amount of extra space for variables
+
+```js tab="JavaScript"
+const maxArea = (height) => {
+  let left = 0;
+  let right = height.length - 1;
+  let maxArea = 0;
+  
+  while (left < right) {
+    const width = right - left;
+    const h = Math.min(height[left], height[right]);
+    maxArea = Math.max(maxArea, width * h);
+    
+    if (height[left] < height[right]) {
+      left++;
+    } else {
+      right--;
+    }
+  }
+  
+  return maxArea;
+};
+```
+
+```java tab="Java"
+public int maxArea(int[] height) {
+    int left = 0;
+    int right = height.length - 1;
+    int maxArea = 0;
+    
+    while (left < right) {
+        int width = right - left;
+        int h = Math.min(height[left], height[right]);
+        maxArea = Math.max(maxArea, width * h);
+        
+        if (height[left] < height[right]) {
+            left++;
+        } else {
+            right--;
+        }
+    }
+    
+    return maxArea;
+}
+```
