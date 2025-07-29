@@ -8,10 +8,7 @@ import { ChevronDown, Languages, Sidebar as SidebarIcon } from 'lucide-react';
 import { Fragment, type HTMLAttributes, useMemo } from 'react';
 import { LanguageToggle } from '../layout/language-toggle';
 import { type Option, RootToggle } from '../layout/root-toggle';
-import {
-  LargeSearchToggle,
-  SearchToggle,
-} from '../layout/search-toggle';
+import { LargeSearchToggle, SearchToggle } from '../layout/search-toggle';
 import {
   Sidebar,
   SidebarCollapseTrigger,
@@ -22,11 +19,7 @@ import {
 } from '../layout/sidebar';
 import { ThemeToggle } from '../layout/theme-toggle';
 import { buttonVariants } from '../ui/button';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '../ui/popover';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import {
   getSidebarTabsFromOptions,
   SidebarLinkItem,
@@ -74,12 +67,12 @@ export function DocsLayout(props: DocsLayoutProps) {
   const links = getLinks(props.links ?? [], props.githubUrl);
   const tabs = useMemo(
     () => getSidebarTabsFromOptions(tabOptions, props.tree) ?? [],
-    [tabOptions, props.tree],
+    [tabOptions, props.tree]
   );
 
   const variables = cn(
     '[--fd-nav-height:56px] md:[--fd-sidebar-width:286px] md:[--fd-nav-height:64px] xl:[--fd-toc-width:286px]',
-    tabs.length > 0 && tabMode === 'navbar' && 'lg:[--fd-nav-height:104px]',
+    tabs.length > 0 && tabMode === 'navbar' && 'lg:[--fd-nav-height:104px]'
   );
 
   const sidebarHeader = (
@@ -97,7 +90,7 @@ export function DocsLayout(props: DocsLayoutProps) {
               color: 'ghost',
               size: 'icon-sm',
               className: 'mt-px mb-auto text-fd-muted-foreground',
-            }),
+            })
           )}
         >
           <SidebarIcon />
@@ -119,7 +112,7 @@ export function DocsLayout(props: DocsLayoutProps) {
               navMode === 'top'
                 ? 'border-e-0 md:bg-transparent'
                 : 'md:[--fd-nav-height:0px]',
-              sidebar.className,
+              sidebar.className
             )}
           >
             <HideIfEmpty>
@@ -144,7 +137,7 @@ export function DocsLayout(props: DocsLayoutProps) {
                     item={item}
                     className={cn(
                       'lg:hidden',
-                      i === links.length - 1 && 'mb-4',
+                      i === links.length - 1 && 'mb-4'
                     )}
                   />
                 ))}
@@ -165,7 +158,7 @@ export function DocsLayout(props: DocsLayoutProps) {
                             size: 'icon-sm',
                             color: 'ghost',
                             className: 'text-fd-muted-foreground',
-                          }),
+                          })
                         )}
                         aria-label={item.label}
                       >
@@ -218,7 +211,7 @@ function DocsNavbar({
       href={props.nav?.url ?? '/'}
       className={cn(
         'inline-flex items-center gap-2.5 font-semibold empty:hidden',
-        navMode === 'auto' && 'md:hidden',
+        navMode === 'auto' && 'md:hidden'
       )}
     >
       {props.nav?.title}
@@ -230,13 +223,13 @@ function DocsNavbar({
       <div
         className={cn(
           'flex border-b px-4 flex-1',
-          navMode === 'auto' && 'md:px-6',
+          navMode === 'auto' && 'md:px-6'
         )}
       >
         <div
           className={cn(
             'flex flex-row items-center',
-            navMode === 'top' && 'flex-1 pe-4',
+            navMode === 'top' && 'flex-1 pe-4'
           )}
         >
           {sidebarCollapsible && navMode === 'auto' ? (
@@ -246,7 +239,7 @@ function DocsNavbar({
                   color: 'ghost',
                   size: 'icon-sm',
                 }),
-                'text-fd-muted-foreground -ms-1.5 me-2 data-[collapsed=false]:hidden max-md:hidden',
+                'text-fd-muted-foreground -ms-1.5 me-2 data-[collapsed=false]:hidden max-md:hidden'
               )}
             >
               <SidebarIcon />
@@ -259,7 +252,7 @@ function DocsNavbar({
             <div
               className={cn(
                 'w-full my-auto max-md:hidden',
-                navMode === 'top' ? 'rounded-xl max-w-sm' : 'max-w-[240px]',
+                navMode === 'top' ? 'rounded-xl max-w-sm' : 'max-w-[240px]'
               )}
             >
               {searchToggle.components?.lg}
@@ -271,7 +264,7 @@ function DocsNavbar({
                 'w-full my-auto max-md:hidden',
                 navMode === 'top'
                   ? 'rounded-xl max-w-sm ps-2.5'
-                  : 'max-w-[240px]',
+                  : 'max-w-[240px]'
               )}
             />
           ))}
@@ -301,7 +294,7 @@ function DocsNavbar({
                 item={item}
                 className={cn(
                   buttonVariants({ size: 'icon-sm', color: 'ghost' }),
-                  'text-fd-muted-foreground max-lg:hidden',
+                  'text-fd-muted-foreground max-lg:hidden'
                 )}
                 aria-label={item.label}
               >
@@ -327,7 +320,7 @@ function DocsNavbar({
                   color: 'secondary',
                   size: 'icon-sm',
                 }),
-                'ms-2 text-fd-muted-foreground rounded-full max-md:hidden',
+                'ms-2 text-fd-muted-foreground rounded-full max-md:hidden'
               )}
             >
               <SidebarIcon />
@@ -339,7 +332,7 @@ function DocsNavbar({
         <LayoutTabs
           className={cn(
             'border-b h-10 max-lg:hidden',
-            navMode === 'top' ? 'px-4' : 'px-6',
+            navMode === 'top' ? 'px-4' : 'px-6'
           )}
           options={tabs}
         />

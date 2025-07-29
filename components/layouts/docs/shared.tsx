@@ -1,18 +1,18 @@
+import { SidebarItem } from '@/components/layout/sidebar/sidebar-item';
 import type { PageTree } from 'fumadocs-core/server';
 import {
-	getSidebarTabs,
-	type GetSidebarTabsOptions,
+  getSidebarTabs,
+  type GetSidebarTabsOptions,
 } from 'fumadocs-ui/utils/get-sidebar-tabs';
 import type { ReactNode } from 'react';
 import type { Option } from '../../layout/root-toggle';
 import {
-	type SidebarComponents,
-	SidebarFolder,
-	SidebarFolderContent,
-	SidebarFolderLink,
-	SidebarFolderTrigger,
-	SidebarItem,
-	type SidebarProps,
+  type SidebarComponents,
+  SidebarFolder,
+  SidebarFolderContent,
+  SidebarFolderLink,
+  SidebarFolderTrigger,
+  type SidebarProps,
 } from '../../layout/sidebar';
 import type { LinkItemType } from '../links';
 
@@ -73,7 +73,7 @@ export function SidebarLinkItem({
 
 export function getSidebarTabsFromOptions(
   options: SidebarOptions['tabs'],
-  tree: PageTree.Root,
+  tree: PageTree.Root
 ) {
   if (Array.isArray(options)) {
     return options;
