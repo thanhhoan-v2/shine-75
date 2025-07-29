@@ -1,3 +1,5 @@
+'use client'
+
 import { isActive } from "@/lib/is-active";
 import { cn } from "@/lib/utils";
 import Link, { LinkProps } from "fumadocs-core/link";
