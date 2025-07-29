@@ -2,6 +2,9 @@
     "[mdx]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode",
     },
+    "[typescript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+    },
     "prettier.requireConfig": true,
     "editor.formatOnPaste": false,
     "editor.formatOnSave": false
