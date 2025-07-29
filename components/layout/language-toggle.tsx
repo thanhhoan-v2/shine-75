@@ -1,11 +1,11 @@
 "use client";
 import { buttonVariants } from "@/components/ui/button";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
 } from "@/components/ui/popover";
-import { cn } from "@/lib/cn";
+import { cn } from "@/lib/utils";
 import { useI18n } from "fumadocs-ui/contexts/i18n";
 import { type ButtonHTMLAttributes, type HTMLAttributes } from "react";
 

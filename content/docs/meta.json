@@ -2,6 +2,7 @@
 	"title": "Shine75",
 	"root": true,
 	"pages": [
+		"!template",
 		"index",
 		"---Array---",
 		"...array",

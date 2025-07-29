@@ -3,6 +3,7 @@ title: Squares of a Sorted Array
 description: Given an integer array nums sorted in non-decreasing order, return an array of the squares of each number sorted in non-decreasing order.
 difficulty: Easy
 timeLimit: 15 mins
+week: 1
 tags:
   - Array
   - Two Pointers
@@ -10,61 +11,43 @@ tags:
 ---
 
 ```js title="Example"
-sortedSquares([-4, -1, 0, 3, 10]); // [0, 1, 9, 16, 100]
-sortedSquares([-7, -3, 2, 3, 11]); // [4, 9, 9, 49, 121]
-sortedSquares([-5, -3, -2, -1]); // [1, 4, 9, 25]
+Input: nums = [-4, -1, 0, 3, 10]
+Output: [0, 1, 9, 16, 100]
+Explanation: After squaring, the array becomes [16, 1, 0, 9, 100]. After sorting, it becomes [0, 1, 9, 16, 100].
+
+Input: nums = [-7, -3, 2, 3, 11]
+Output: [4, 9, 9, 49, 121]
 ```
 
 ## Approach
 
-- Use two pointers starting from both ends of the array
-- Compare the absolute values of elements at both pointers
-- Place the larger square at the end of the result array
-- Move the pointer with the larger absolute value inward
-- Continue until all elements are processed
+1. **Two Pointers**: Use two pointers starting from both ends of the array.
+2. **Compare Absolute Values**: Compare the absolute values of elements at both pointers.
+3. **Place Larger Square**: Place the larger square at the end of the result array.
+4. **Move Pointer**: Move the pointer with the larger absolute value inward.
+5. **Continue Until Complete**: Continue until all elements are processed.
 
 ## Solution
 
 - Time Complexity: `O(n)`
-  - We iterate through the array once, so the time complexity is O(n)
+  > Where n is the length of the array. We iterate through the array once.
 - Space Complexity: `O(n)`
-  - We create a new array to store the result
+  > We create a new array to store the result.
 
 ```js tab="JavaScript"
-const sortedSquares = (nums) => {
-  const result = new Array(nums.length);
-  let left = 0;
-  let right = nums.length - 1;
-  let index = nums.length - 1;
-  
-  while (left <= right) {
-    const leftSquare = nums[left] * nums[left];
-    const rightSquare = nums[right] * nums[right];
-    
-    if (leftSquare > rightSquare) {
-      result[index] = leftSquare;
-      left++;
-    } else {
-      result[index] = rightSquare;
-      right--;
-    }
-    index--;
-  }
-  
-  return result;
-};
-```
-
-```java tab="Java"
-public int[] sortedSquares(int[] nums) {
-    int[] result = new int[nums.length];
-    int left = 0;
-    int right = nums.length - 1;
-    int index = nums.length - 1;
+/**
+ * @param {number[]} nums
+ * @return {number[]}
+ */
+var sortedSquares = function(nums) {
+    const result = new Array(nums.length);
+    let left = 0;
+    let right = nums.length - 1;
+    let index = nums.length - 1;
     
     while (left <= right) {
-        int leftSquare = nums[left] * nums[left];
-        int rightSquare = nums[right] * nums[right];
+        const leftSquare = nums[left] * nums[left];
+        const rightSquare = nums[right] * nums[right];
         
         if (leftSquare > rightSquare) {
             result[index] = leftSquare;
@@ -77,5 +60,32 @@ public int[] sortedSquares(int[] nums) {
     }
     
     return result;
+};
+```
+
+```java tab="Java"
+class Solution {
+    public int[] sortedSquares(int[] nums) {
+        int[] result = new int[nums.length];
+        int left = 0;
+        int right = nums.length - 1;
+        int index = nums.length - 1;
+        
+        while (left <= right) {
+            int leftSquare = nums[left] * nums[left];
+            int rightSquare = nums[right] * nums[right];
+            
+            if (leftSquare > rightSquare) {
+                result[index] = leftSquare;
+                left++;
+            } else {
+                result[index] = rightSquare;
+                right--;
+            }
+            index--;
+        }
+        
+        return result;
+    }
 }
 ```

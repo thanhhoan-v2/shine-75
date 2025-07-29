@@ -1,9 +1,106 @@
 ---
 title: Valid Palindrome
-description: Valid Palindrome
+description: A phrase is a palindrome if, after converting all uppercase letters into lowercase letters and removing all non-alphanumeric characters, it reads the same forward and backward.
 difficulty: Easy
 timeLimit: 15 mins
 week: 1
 tags:
   - String
+  - Two Pointers
 ---
+
+```js title="Example"
+Input: s = "A man, a plan, a canal: Panama"
+Output: true
+Explanation: "amanaplanacanalpanama" is a palindrome.
+
+Input: s = "race a car"
+Output: false
+Explanation: "raceacar" is not a palindrome.
+```
+
+## Approach
+
+1. **Two Pointers**: Use two pointers starting from both ends of the string.
+2. **Character Filtering**: Skip non-alphanumeric characters and convert to lowercase.
+3. **Character Comparison**: Compare characters from both ends moving inward.
+4. **Early Termination**: Return false as soon as we find a mismatch.
+5. **Implementation**: Use helper functions to check if a character is alphanumeric and convert to lowercase.
+
+## Solution
+
+- Time Complexity: `O(n)`
+  > Where n is the length of the string. We traverse the string once with two pointers.
+- Space Complexity: `O(1)`
+  > We only use a constant amount of extra space.
+
+```js tab="JavaScript"
+/**
+ * @param {string} s
+ * @return {boolean}
+ */
+var isPalindrome = function(s) {
+    let left = 0;
+    let right = s.length - 1;
+    
+    while (left < right) {
+        // Skip non-alphanumeric characters from left
+        while (left < right && !isAlphanumeric(s[left])) {
+            left++;
+        }
+        
+        // Skip non-alphanumeric characters from right
+        while (left < right && !isAlphanumeric(s[right])) {
+            right--;
+        }
+        
+        // Compare characters (case-insensitive)
+        if (s[left].toLowerCase() !== s[right].toLowerCase()) {
+            return false;
+        }
+        
+        left++;
+        right--;
+    }
+    
+    return true;
+};
+
+// Helper function to check if character is alphanumeric
+function isAlphanumeric(char) {
+    return (char >= 'a' && char <= 'z') ||
+           (char >= 'A' && char <= 'Z') ||
+           (char >= '0' && char <= '9');
+}
+```
+
+```java tab="Java"
+class Solution {
+    public boolean isPalindrome(String s) {
+        int left = 0;
+        int right = s.length() - 1;
+        
+        while (left < right) {
+            // Skip non-alphanumeric characters from left
+            while (left < right && !Character.isLetterOrDigit(s.charAt(left))) {
+                left++;
+            }
+            
+            // Skip non-alphanumeric characters from right
+            while (left < right && !Character.isLetterOrDigit(s.charAt(right))) {
+                right--;
+            }
+            
+            // Compare characters (case-insensitive)
+            if (Character.toLowerCase(s.charAt(left)) != Character.toLowerCase(s.charAt(right))) {
+                return false;
+            }
+            
+            left++;
+            right--;
+        }
+        
+        return true;
+    }
+}
+```

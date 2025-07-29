@@ -1,9 +1,94 @@
 ---
 title: Longest Substring Without Repeating Characters
-description: Longest Substring Without Repeating Characters
+description: Given a string s, find the length of the longest substring without repeating characters.
 difficulty: Medium
 timeLimit: 30 mins
 week: 1
 tags:
   - String
+  - Hash Table
+  - Sliding Window
 ---
+
+```js title="Example"
+Input: s = "abcabcbb"
+Output: 3
+Explanation: The answer is "abc", with the length of 3.
+
+Input: s = "bbbbb"
+Output: 1
+Explanation: The answer is "b", with the length of 1.
+```
+
+## Approach
+
+1. **Sliding Window**: Use a sliding window to maintain a substring without repeating characters.
+2. **Hash Set/Map**: Use a hash set or map to track characters in the current window.
+3. **Window Expansion**: Expand the window by adding new characters from the right.
+4. **Window Contraction**: When a repeating character is found, contract the window from the left.
+5. **Optimization**: Use a hash map to store the last position of each character for faster contraction.
+
+## Solution
+
+- Time Complexity: `O(n)`
+  > Where n is the length of the string. We traverse the string once with a sliding window.
+- Space Complexity: `O(min(m, n))`
+  > Where m is the size of the character set. We store at most min(m, n) characters in the hash set.
+
+```js tab="JavaScript"
+/**
+ * @param {string} s
+ * @return {number}
+ */
+var lengthOfLongestSubstring = function(s) {
+    const charSet = new Set();
+    let maxLength = 0;
+    let left = 0;
+    
+    for (let right = 0; right < s.length; right++) {
+        const rightChar = s[right];
+        
+        // If character is already in set, shrink window from left
+        while (charSet.has(rightChar)) {
+            charSet.delete(s[left]);
+            left++;
+        }
+        
+        // Add current character to set
+        charSet.add(rightChar);
+        
+        // Update max length
+        maxLength = Math.max(maxLength, right - left + 1);
+    }
+    
+    return maxLength;
+};
+```
+
+```java tab="Java"
+class Solution {
+    public int lengthOfLongestSubstring(String s) {
+        Set<Character> charSet = new HashSet<>();
+        int maxLength = 0;
+        int left = 0;
+        
+        for (int right = 0; right < s.length(); right++) {
+            char rightChar = s.charAt(right);
+            
+            // If character is already in set, shrink window from left
+            while (charSet.contains(rightChar)) {
+                charSet.remove(s.charAt(left));
+                left++;
+            }
+            
+            // Add current character to set
+            charSet.add(rightChar);
+            
+            // Update max length
+            maxLength = Math.max(maxLength, right - left + 1);
+        }
+        
+        return maxLength;
+    }
+}
+```

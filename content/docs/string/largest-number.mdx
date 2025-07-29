@@ -1,9 +1,89 @@
 ---
 title: Largest Number
-description: Largest Number
+description: Given a list of non-negative integers nums, arrange them such that they form the largest number and return it as a string.
 difficulty: Medium
 timeLimit: 20 mins
 week: 3
 tags:
   - String
+  - Greedy
+  - Sorting
 ---
+
+```js title="Example"
+Input: nums = [10,2]
+Output: "210"
+
+Input: nums = [3,30,34,5,9]
+Output: "9534330"
+```
+
+## Approach
+
+1. **Custom Comparator**: Create a custom sorting comparator that compares two numbers by concatenating them in both orders.
+2. **String Conversion**: Convert all numbers to strings for easier concatenation and comparison.
+3. **Sorting**: Sort the array using the custom comparator in descending order.
+4. **Edge Case**: Handle the case where all numbers are zero to avoid returning "0000" instead of "0".
+
+## Solution
+
+- Time Complexity: `O(n log n)`
+  > Where n is the number of integers. We sort the array which takes O(n log n) time.
+- Space Complexity: `O(n)`
+  > We need to store the string representations of all numbers.
+
+```js tab="JavaScript"
+/**
+ * @param {number[]} nums
+ * @return {string}
+ */
+var largestNumber = function(nums) {
+    // Convert numbers to strings
+    const strNums = nums.map(num => num.toString());
+    
+    // Custom comparator: compare a+b vs b+a
+    strNums.sort((a, b) => {
+        const order1 = a + b;
+        const order2 = b + a;
+        return order2.localeCompare(order1);
+    });
+    
+    // Handle edge case: if all numbers are 0
+    if (strNums[0] === '0') {
+        return '0';
+    }
+    
+    return strNums.join('');
+};
+```
+
+```java tab="Java"
+class Solution {
+    public String largestNumber(int[] nums) {
+        // Convert numbers to strings
+        String[] strNums = new String[nums.length];
+        for (int i = 0; i < nums.length; i++) {
+            strNums[i] = String.valueOf(nums[i]);
+        }
+        
+        // Custom comparator: compare a+b vs b+a
+        Arrays.sort(strNums, (a, b) -> {
+            String order1 = a + b;
+            String order2 = b + a;
+            return order2.compareTo(order1);
+        });
+        
+        // Handle edge case: if all numbers are 0
+        if (strNums[0].equals("0")) {
+            return "0";
+        }
+        
+        StringBuilder result = new StringBuilder();
+        for (String str : strNums) {
+            result.append(str);
+        }
+        
+        return result.toString();
+    }
+}
+```

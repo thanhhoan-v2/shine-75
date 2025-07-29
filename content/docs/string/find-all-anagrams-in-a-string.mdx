@@ -1,9 +1,145 @@
 ---
 title: Find All Anagrams in a String
-description: Find All Anagrams in a String
+description: Given two strings s and p, return an array of all the start indices of p's anagrams in s.
 difficulty: Medium
 timeLimit: 30 mins
 week: 2
 tags:
   - String
+  - Hash Table
+  - Sliding Window
 ---
+
+```js title="Example"
+Input: s = "cbaebabacd", p = "abc"
+Output: [0,6]
+
+Input: s = "abab", p = "ab"
+Output: [0,1,2]
+```
+
+## Approach
+
+1. **Sliding Window**: Use a sliding window approach to check each substring of length p.length.
+2. **Character Count**: Maintain a frequency map of characters in pattern p.
+3. **Window Comparison**: For each window, compare the character frequency with the pattern.
+4. **Optimization**: Use a counter to track matched characters instead of comparing full maps.
+
+## Solution
+
+- Time Complexity: `O(n)`
+  > Where n is the length of string s. We traverse the string once with a sliding window.
+- Space Complexity: `O(1)`
+  > We use a fixed-size array to store character frequencies (26 for lowercase letters).
+
+```js tab="JavaScript"
+/**
+ * @param {string} s
+ * @param {string} p
+ * @return {number[]}
+ */
+var findAnagrams = function(s, p) {
+    const result = [];
+    const pCount = new Array(26).fill(0);
+    const sCount = new Array(26).fill(0);
+    
+    // Count characters in pattern p
+    for (let char of p) {
+        pCount[char.charCodeAt(0) - 'a'.charCodeAt(0)]++;
+    }
+    
+    let left = 0;
+    let right = 0;
+    let matches = 0;
+    
+    while (right < s.length) {
+        const rightChar = s[right];
+        const rightIndex = rightChar.charCodeAt(0) - 'a'.charCodeAt(0);
+        
+        sCount[rightIndex]++;
+        
+        if (sCount[rightIndex] === pCount[rightIndex]) {
+            matches++;
+        } else if (sCount[rightIndex] === pCount[rightIndex] + 1) {
+            matches--;
+        }
+        
+        // Shrink window if it's larger than pattern
+        if (right - left + 1 > p.length) {
+            const leftChar = s[left];
+            const leftIndex = leftChar.charCodeAt(0) - 'a'.charCodeAt(0);
+            
+            if (sCount[leftIndex] === pCount[leftIndex]) {
+                matches--;
+            } else if (sCount[leftIndex] === pCount[leftIndex] + 1) {
+                matches++;
+            }
+            
+            sCount[leftIndex]--;
+            left++;
+        }
+        
+        // Check if current window is an anagram
+        if (matches === 26) {
+            result.push(left);
+        }
+        
+        right++;
+    }
+    
+    return result;
+};
+```
+
+```java tab="Java"
+class Solution {
+    public List<Integer> findAnagrams(String s, String p) {
+        List<Integer> result = new ArrayList<>();
+        int[] pCount = new int[26];
+        int[] sCount = new int[26];
+        
+        // Count characters in pattern p
+        for (char c : p.toCharArray()) {
+            pCount[c - 'a']++;
+        }
+        
+        int left = 0;
+        int right = 0;
+        int matches = 0;
+        
+        while (right < s.length()) {
+            char rightChar = s.charAt(right);
+            sCount[rightChar - 'a']++;
+            
+            if (sCount[rightChar - 'a'] == pCount[rightChar - 'a']) {
+                matches++;
+            } else if (sCount[rightChar - 'a'] == pCount[rightChar - 'a'] + 1) {
+                matches--;
+            }
+            
+            // Shrink window if it's larger than pattern
+            if (right - left + 1 > p.length()) {
+                char leftChar = s.charAt(left);
+                
+                if (sCount[leftChar - 'a'] == pCount[leftChar - 'a']) {
+                    matches--;
+                } else if (sCount[leftChar - 'a'] == pCount[leftChar - 'a'] + 1) {
+                    matches++;
+                }
+                
+                sCount[leftChar - 'a']--;
+                left++;
+            }
+            
+            // Check if current window is an anagram
+            if (matches == 26) {
+                result.add(left);
+            }
+            
+            right++;
+        }
+        
+        return result;
+    }
+}
+```

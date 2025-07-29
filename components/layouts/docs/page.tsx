@@ -1,5 +1,9 @@
+import { cn } from '@/lib/utils';
+import { I18nLabel } from 'fumadocs-ui/contexts/i18n';
+import { Text } from 'lucide-react';
 import { type ComponentProps } from 'react';
-import { cn } from '../../../lib/cn';
+import { TOCItems, TOCScrollArea } from '../../layout/toc';
+import ClerkTOCItems from '../../layout/toc-clerk';
 import {
   type BreadcrumbProps,
   type FooterProps,
@@ -13,10 +17,6 @@ import {
   PageTOCPopoverTrigger,
   type RootProps,
 } from './page-client';
-import { TOCItems, TOCScrollArea } from '../../layout/toc';
-import { Text } from 'lucide-react';
-import { I18nLabel } from 'fumadocs-ui/contexts/i18n';
-import ClerkTOCItems from '../../layout/toc-clerk';
 
 /**
  * Apply `prose` on div
@@ -38,7 +38,7 @@ export function PageTOCTitle(props: ComponentProps<'h2'>) {
         props.className,
       )}
     >
-      <Text className="size-4" />
+      <Text className="bg-accent size-4" />
       <I18nLabel label="toc" />
     </h3>
   );
@@ -81,15 +81,9 @@ export function PageArticle(props: ComponentProps<'article'>) {
 }
 
 export {
-  PageRoot,
   PageBreadcrumb,
   PageFooter,
-  PageLastUpdate,
-  PageTOC,
-  PageTOCPopover,
-  PageTOCPopoverTrigger,
-  PageTOCPopoverContent,
-  type FooterProps,
-  type BreadcrumbProps,
-  type RootProps,
+  PageLastUpdate, PageRoot, PageTOC,
+  PageTOCPopover, PageTOCPopoverContent, PageTOCPopoverTrigger, type BreadcrumbProps, type FooterProps, type RootProps
 };
+

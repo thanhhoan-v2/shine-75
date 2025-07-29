@@ -3,6 +3,7 @@ title: Sort Colors
 description: Given an array nums with n objects colored red, white, or blue, sort them in-place so that objects of the same color are adjacent, with the colors in the order red, white, and blue. We will use the integers 0, 1, and 2 to represent the color red, white, and blue, respectively.
 difficulty: Medium
 timeLimit: 20 mins
+week: 2
 tags:
   - Array
   - Two Pointers
@@ -10,70 +11,79 @@ tags:
 ---
 
 ```js title="Example"
-sortColors([2, 0, 2, 1, 1, 0]); // [0, 0, 1, 1, 2, 2]
-sortColors([2, 0, 1]); // [0, 1, 2]
-sortColors([0]); // [0]
+Input: nums = [2, 0, 2, 1, 1, 0]
+Output: [0, 0, 1, 1, 2, 2]
+Explanation: Sort the array so that all 0s come first, then 1s, then 2s.
+
+Input: nums = [2, 0, 1]
+Output: [0, 1, 2]
 ```
 
 ## Approach
 
-- Use three pointers: low, mid, and high
-- low points to the position for the next 0
-- high points to the position for the next 2
-- mid scans through the array
-- Swap elements based on their values to partition the array
+1. **Three Pointers**: Use three pointers: low, mid, and high.
+2. **Low Pointer**: Points to the position for the next 0.
+3. **High Pointer**: Points to the position for the next 2.
+4. **Mid Pointer**: Scans through the array.
+5. **Partition Logic**: Swap elements based on their values to partition the array.
 
 ## Solution
 
 - Time Complexity: `O(n)`
-  - We iterate through the array once, so the time complexity is O(n)
+  > Where n is the length of the array. We iterate through the array once.
 - Space Complexity: `O(1)`
-  - We only use a constant amount of extra space for variables
+  > We only use a constant amount of extra space for variables.
 
 ```js tab="JavaScript"
-const sortColors = (nums) => {
-  let low = 0;
-  let mid = 0;
-  let high = nums.length - 1;
-  
-  while (mid <= high) {
-    if (nums[mid] === 0) {
-      [nums[low], nums[mid]] = [nums[mid], nums[low]];
-      low++;
-      mid++;
-    } else if (nums[mid] === 1) {
-      mid++;
-    } else {
-      [nums[mid], nums[high]] = [nums[high], nums[mid]];
-      high--;
+/**
+ * @param {number[]} nums
+ * @return {void} Do not return anything, modify nums in-place instead.
+ */
+var sortColors = function(nums) {
+    let low = 0;
+    let mid = 0;
+    let high = nums.length - 1;
+    
+    while (mid <= high) {
+        if (nums[mid] === 0) {
+            [nums[low], nums[mid]] = [nums[mid], nums[low]];
+            low++;
+            mid++;
+        } else if (nums[mid] === 1) {
+            mid++;
+        } else {
+            [nums[mid], nums[high]] = [nums[high], nums[mid]];
+            high--;
+        }
     }
-  }
 };
 ```
 
 ```java tab="Java"
-public void sortColors(int[] nums) {
-    int low = 0;
-    int mid = 0;
-    int high = nums.length - 1;
-    
-    while (mid <= high) {
-        if (nums[mid] == 0) {
-            swap(nums, low, mid);
-            low++;
-            mid++;
-        } else if (nums[mid] == 1) {
-            mid++;
-        } else {
-            swap(nums, mid, high);
-            high--;
+class Solution {
+    public void sortColors(int[] nums) {
+        int low = 0;
+        int mid = 0;
+        int high = nums.length - 1;
+        
+        while (mid <= high) {
+            if (nums[mid] == 0) {
+                swap(nums, low, mid);
+                low++;
+                mid++;
+            } else if (nums[mid] == 1) {
+                mid++;
+            } else {
+                swap(nums, mid, high);
+                high--;
+            }
         }
     }
-}
-
-private void swap(int[] nums, int i, int j) {
-    int temp = nums[i];
-    nums[i] = nums[j];
-    nums[j] = temp;
+    
+    private void swap(int[] nums, int i, int j) {
+        int temp = nums[i];
+        nums[i] = nums[j];
+        nums[j] = temp;
+    }
 }
 ```

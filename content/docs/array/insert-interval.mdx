@@ -3,67 +3,49 @@ title: Insert Interval
 description: You are given an array of non-overlapping intervals intervals where intervals[i] = [starti, endi] represent the start and the end of the ith interval and intervals is sorted in ascending order by starti. You are also given an interval newInterval = [start, end] that represents the start and end of another interval. Insert newInterval into intervals such that intervals is still sorted in ascending order by starti and intervals still does not have any overlapping intervals (merge overlapping intervals if necessary).
 difficulty: Medium
 timeLimit: 25 mins
+week: 2
 tags:
   - Array
   - Sorting
 ---
 
 ```js title="Example"
-insert([[1, 3], [6, 9]], [2, 5]); // [[1, 5], [6, 9]]
-insert([[1, 2], [3, 5], [6, 7], [8, 10], [12, 16]], [4, 8]); // [[1, 2], [3, 10], [12, 16]]
-insert([], [5, 7]); // [[5, 7]]
+Input: intervals = [[1, 3], [6, 9]], newInterval = [2, 5]
+Output: [[1, 5], [6, 9]]
+Explanation: Since [2, 5] overlaps with [1, 3], we merge them into [1, 5].
+
+Input: intervals = [[1, 2], [3, 5], [6, 7], [8, 10], [12, 16]], newInterval = [4, 8]
+Output: [[1, 2], [3, 10], [12, 16]]
 ```
 
 ## Approach
 
-- Add all intervals that end before the new interval starts
-- Merge overlapping intervals with the new interval
-- Add all remaining intervals that start after the merged interval ends
+1. **Add Before**: Add all intervals that end before the new interval starts.
+2. **Merge Overlapping**: Merge overlapping intervals with the new interval.
+3. **Add After**: Add all remaining intervals that start after the merged interval ends.
+4. **Single Pass**: Use a single pass through the array to handle all cases.
+5. **Maintain Order**: Ensure the result maintains sorted order by start time.
 
 ## Solution
 
 - Time Complexity: `O(n)`
-  - We iterate through the array once, so the time complexity is O(n)
+  > Where n is the length of the intervals array. We iterate through the array once.
 - Space Complexity: `O(n)`
-  - We create a new array to store the result, which can grow up to n elements
+  > We create a new array to store the result, which can grow up to n elements.
 
 ```js tab="JavaScript"
-const insert = (intervals, newInterval) => {
-  const result = [];
-  let i = 0;
-  
-  // Add all intervals that end before newInterval starts
-  while (i < intervals.length && intervals[i][1] < newInterval[0]) {
-    result.push(intervals[i]);
-    i++;
-  }
-  
-  // Merge overlapping intervals
-  while (i < intervals.length && intervals[i][0] <= newInterval[1]) {
-    newInterval[0] = Math.min(newInterval[0], intervals[i][0]);
-    newInterval[1] = Math.max(newInterval[1], intervals[i][1]);
-    i++;
-  }
-  result.push(newInterval);
-  
-  // Add remaining intervals
-  while (i < intervals.length) {
-    result.push(intervals[i]);
-    i++;
-  }
-  
-  return result;
-};
-```
-
-```java tab="Java"
-public int[][] insert(int[][] intervals, int[] newInterval) {
-    List<int[]> result = new ArrayList<>();
-    int i = 0;
+/**
+ * @param {number[][]} intervals
+ * @param {number[]} newInterval
+ * @return {number[][]}
+ */
+var insert = function(intervals, newInterval) {
+    const result = [];
+    let i = 0;
     
     // Add all intervals that end before newInterval starts
     while (i < intervals.length && intervals[i][1] < newInterval[0]) {
-        result.add(intervals[i]);
+        result.push(intervals[i]);
         i++;
     }
     
@@ -73,14 +55,45 @@ public int[][] insert(int[][] intervals, int[] newInterval) {
         newInterval[1] = Math.max(newInterval[1], intervals[i][1]);
         i++;
     }
-    result.add(newInterval);
+    result.push(newInterval);
     
     // Add remaining intervals
     while (i < intervals.length) {
-        result.add(intervals[i]);
+        result.push(intervals[i]);
         i++;
     }
     
-    return result.toArray(new int[result.size()][]);
+    return result;
+};
+```
+
+```java tab="Java"
+class Solution {
+    public int[][] insert(int[][] intervals, int[] newInterval) {
+        List<int[]> result = new ArrayList<>();
+        int i = 0;
+        
+        // Add all intervals that end before newInterval starts
+        while (i < intervals.length && intervals[i][1] < newInterval[0]) {
+            result.add(intervals[i]);
+            i++;
+        }
+        
+        // Merge overlapping intervals
+        while (i < intervals.length && intervals[i][0] <= newInterval[1]) {
+            newInterval[0] = Math.min(newInterval[0], intervals[i][0]);
+            newInterval[1] = Math.max(newInterval[1], intervals[i][1]);
+            i++;
+        }
+        result.add(newInterval);
+        
+        // Add remaining intervals
+        while (i < intervals.length) {
+            result.add(intervals[i]);
+            i++;
+        }
+        
+        return result.toArray(new int[result.size()][]);
+    }
 }
 ```

@@ -1,11 +1,11 @@
 "use client";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
 } from "@/components/ui/popover";
-import { cn } from "@/lib/cn";
 import { isActive } from "@/lib/is-active";
+import { cn } from "@/lib/utils";
 import { usePathname } from "fumadocs-core/framework";
 import Link from "fumadocs-core/link";
 import { useSidebar } from "fumadocs-ui/contexts/sidebar";

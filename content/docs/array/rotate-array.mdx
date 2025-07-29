@@ -3,6 +3,7 @@ title: Rotate Array
 description: Given an array, rotate the array to the right by k steps, where k is non-negative.
 difficulty: Medium
 timeLimit: 20 mins
+week: 2
 tags:
   - Array
   - Math
@@ -10,49 +11,36 @@ tags:
 ---
 
 ```js title="Example"
-rotate([1, 2, 3, 4, 5, 6, 7], 3); // [5, 6, 7, 1, 2, 3, 4]
-rotate([-1, -100, 3, 99], 2); // [3, 99, -1, -100]
-rotate([1, 2, 3], 4); // [3, 1, 2]
+Input: nums = [1, 2, 3, 4, 5, 6, 7], k = 3
+Output: [5, 6, 7, 1, 2, 3, 4]
+Explanation: rotate 1 steps to the right: [7, 1, 2, 3, 4, 5, 6], rotate 2 steps to the right: [6, 7, 1, 2, 3, 4, 5], rotate 3 steps to the right: [5, 6, 7, 1, 2, 3, 4]
+
+Input: nums = [-1, -100, 3, 99], k = 2
+Output: [3, 99, -1, -100]
 ```
 
 ## Approach
 
-- Use the reverse method to rotate the array
-- Reverse the entire array
-- Reverse the first k elements
-- Reverse the remaining elements
-- Handle the case where k is larger than array length
+1. **Handle Large k**: Use modulo operation to handle k larger than array length.
+2. **Reverse Method**: Use the reverse method to rotate the array efficiently.
+3. **Reverse Entire Array**: Reverse the entire array first.
+4. **Reverse First k Elements**: Reverse the first k elements.
+5. **Reverse Remaining Elements**: Reverse the remaining elements.
 
 ## Solution
 
 - Time Complexity: `O(n)`
-  - We reverse the array three times, each taking O(n/2) = O(n)
+  > Where n is the length of the array. We reverse the array three times, each taking O(n/2) = O(n).
 - Space Complexity: `O(1)`
-  - We only use a constant amount of extra space for variables
+  > We only use a constant amount of extra space for variables.
 
 ```js tab="JavaScript"
-const rotate = (nums, k) => {
-  k = k % nums.length; // Handle k larger than array length
-  
-  // Reverse the entire array
-  reverse(nums, 0, nums.length - 1);
-  // Reverse the first k elements
-  reverse(nums, 0, k - 1);
-  // Reverse the remaining elements
-  reverse(nums, k, nums.length - 1);
-};
-
-const reverse = (nums, start, end) => {
-  while (start < end) {
-    [nums[start], nums[end]] = [nums[end], nums[start]];
-    start++;
-    end--;
-  }
-};
-```
-
-```java tab="Java"
-public void rotate(int[] nums, int k) {
+/**
+ * @param {number[]} nums
+ * @param {number} k
+ * @return {void} Do not return anything, modify nums in-place instead.
+ */
+var rotate = function(nums, k) {
     k = k % nums.length; // Handle k larger than array length
     
     // Reverse the entire array
@@ -61,15 +49,38 @@ public void rotate(int[] nums, int k) {
     reverse(nums, 0, k - 1);
     // Reverse the remaining elements
     reverse(nums, k, nums.length - 1);
-}
+};
 
-private void reverse(int[] nums, int start, int end) {
+const reverse = (nums, start, end) => {
     while (start < end) {
-        int temp = nums[start];
-        nums[start] = nums[end];
-        nums[end] = temp;
+        [nums[start], nums[end]] = [nums[end], nums[start]];
         start++;
         end--;
+    }
+};
+```
+
+```java tab="Java"
+class Solution {
+    public void rotate(int[] nums, int k) {
+        k = k % nums.length; // Handle k larger than array length
+        
+        // Reverse the entire array
+        reverse(nums, 0, nums.length - 1);
+        // Reverse the first k elements
+        reverse(nums, 0, k - 1);
+        // Reverse the remaining elements
+        reverse(nums, k, nums.length - 1);
+    }
+    
+    private void reverse(int[] nums, int start, int end) {
+        while (start < end) {
+            int temp = nums[start];
+            nums[start] = nums[end];
+            nums[end] = temp;
+            start++;
+            end--;
+        }
     }
 }
 ```

@@ -1,5 +1,5 @@
 'use client';
-import { cn } from '@/lib/cn';
+import { cn } from '@/lib/utils';
 import { cva } from 'class-variance-authority';
 import { Airplay, Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';

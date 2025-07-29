@@ -3,55 +3,67 @@ title: Meeting Rooms
 description: Given an array of meeting time intervals where intervals[i] = [starti, endi], determine if a person could attend all meetings.
 difficulty: Easy
 timeLimit: 15 mins
+week: 1
 tags:
   - Array
   - Sorting
 ---
 
 ```js title="Example"
-canAttendMeetings([[0, 30], [5, 10], [15, 20]]); // false
-canAttendMeetings([[7, 10], [2, 4]]); // true
-canAttendMeetings([[0, 30], [30, 40], [40, 50]]); // true
+Input: intervals = [[0, 30], [5, 10], [15, 20]]
+Output: false
+Explanation: There are overlapping intervals [0, 30] and [5, 10].
+
+Input: intervals = [[7, 10], [2, 4]]
+Output: true
+Explanation: No overlapping intervals.
 ```
 
 ## Approach
 
-- Sort the intervals by start time
-- Check if any interval overlaps with the next one
-- If start time of current interval is less than end time of previous interval, there's an overlap
-- Return false if overlap found, true otherwise
+1. **Sort Intervals**: Sort the intervals by start time.
+2. **Check Overlaps**: Check if any interval overlaps with the next one.
+3. **Overlap Condition**: If start time of current interval is less than end time of previous interval, there's an overlap.
+4. **Return Result**: Return false if overlap found, true otherwise.
+5. **Single Pass**: Use a single pass through the sorted array.
 
 ## Solution
 
 - Time Complexity: `O(n log n)`
-  - We need to sort the intervals, which takes O(n log n)
+  > Where n is the number of intervals. We need to sort the intervals, which takes O(n log n).
 - Space Complexity: `O(1)`
-  - We only use a constant amount of extra space for variables
+  > We only use a constant amount of extra space for variables.
 
 ```js tab="JavaScript"
-const canAttendMeetings = (intervals) => {
-  intervals.sort((a, b) => a[0] - b[0]);
-  
-  for (let i = 1; i < intervals.length; i++) {
-    if (intervals[i][0] < intervals[i - 1][1]) {
-      return false;
-    }
-  }
-  
-  return true;
-};
-```
-
-```java tab="Java"
-public boolean canAttendMeetings(int[][] intervals) {
-    Arrays.sort(intervals, (a, b) -> a[0] - b[0]);
+/**
+ * @param {number[][]} intervals
+ * @return {boolean}
+ */
+var canAttendMeetings = function(intervals) {
+    intervals.sort((a, b) => a[0] - b[0]);
     
-    for (int i = 1; i < intervals.length; i++) {
+    for (let i = 1; i < intervals.length; i++) {
         if (intervals[i][0] < intervals[i - 1][1]) {
             return false;
         }
     }
     
     return true;
+};
+```
+
+```java tab="Java"
+class Solution {
+    public boolean canAttendMeetings(int[][] intervals) {
+        Arrays.sort(intervals, (a, b) -> a[0] - b[0]);
+        
+        for (int i = 1; i < intervals.length; i++) {
+            if (intervals[i][0] < intervals[i - 1][1]) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
 }
 ```

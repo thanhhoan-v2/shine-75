@@ -1,3 +1,4 @@
+import { cn } from '@/lib/utils';
 import { HideIfEmpty } from 'fumadocs-core/hide-if-empty';
 import Link from 'fumadocs-core/link';
 import type { PageTree } from 'fumadocs-core/server';
@@ -5,39 +6,38 @@ import { NavProvider } from 'fumadocs-ui/contexts/layout';
 import { TreeContextProvider } from 'fumadocs-ui/contexts/tree';
 import { ChevronDown, Languages, Sidebar as SidebarIcon } from 'lucide-react';
 import { Fragment, type HTMLAttributes, useMemo } from 'react';
-import { cn } from '../../lib/cn';
 import { LanguageToggle } from '../layout/language-toggle';
 import { type Option, RootToggle } from '../layout/root-toggle';
 import {
-	LargeSearchToggle,
-	SearchToggle,
+  LargeSearchToggle,
+  SearchToggle,
 } from '../layout/search-toggle';
 import {
-	Sidebar,
-	SidebarCollapseTrigger,
-	SidebarFooter,
-	SidebarHeader,
-	SidebarPageTree,
-	SidebarViewport,
+  Sidebar,
+  SidebarCollapseTrigger,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarPageTree,
+  SidebarViewport,
 } from '../layout/sidebar';
 import { ThemeToggle } from '../layout/theme-toggle';
 import { buttonVariants } from '../ui/button';
 import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from '../ui/popover';
 import {
-	getSidebarTabsFromOptions,
-	SidebarLinkItem,
-	type SidebarOptions,
+  getSidebarTabsFromOptions,
+  SidebarLinkItem,
+  type SidebarOptions,
 } from './docs/shared';
 import { BaseLinkItem, type LinkItemType } from './links';
 import {
-	LayoutBody,
-	LayoutTabs,
-	Navbar,
-	NavbarSidebarTrigger,
+  LayoutBody,
+  LayoutTabs,
+  Navbar,
+  NavbarSidebarTrigger,
 } from './notebook-client';
 import { type BaseLayoutProps, getLinks } from './shared';
 

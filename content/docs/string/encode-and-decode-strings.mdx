@@ -1,9 +1,99 @@
 ---
 title: Encode and Decode Strings
-description: Encode and Decode Strings
+description: Design an algorithm to encode a list of strings to a string and decode the string back to the original list of strings.
 difficulty: Medium
 timeLimit: 25 mins
 week: 3
 tags:
   - String
+  - Design
 ---
+
+```js title="Example"
+Input: ["Hello","World"]
+Output: "5#Hello5#World"
+
+Input: [""]
+Output: "0#"
+```
+
+## Approach
+
+1. **Encoding**: For each string, we encode it as `length#string`. This allows us to know exactly where each string starts and ends.
+2. **Decoding**: We parse the encoded string by reading the length prefix, then extracting the substring of that length.
+3. **Implementation**: Use a delimiter (like '#') to separate the length from the actual string content.
+
+## Solution
+
+- Time Complexity: `O(n)`
+  > Where n is the total length of all strings. We need to iterate through each character once during encoding and decoding.
+- Space Complexity: `O(n)`
+  > We need to store the encoded string which has length proportional to the total length of all input strings.
+
+```js tab="JavaScript"
+/**
+ * Encodes a list of strings to a single string.
+ * @param {string[]} strs
+ * @return {string}
+ */
+var encode = function(strs) {
+    return strs.map(str => str.length + '#' + str).join('');
+};
+
+/**
+ * Decodes a single string to a list of strings.
+ * @param {string} s
+ * @return {string[]}
+ */
+var decode = function(s) {
+    const result = [];
+    let i = 0;
+    
+    while (i < s.length) {
+        // Find the position of '#'
+        const hashIndex = s.indexOf('#', i);
+        // Extract the length
+        const length = parseInt(s.substring(i, hashIndex));
+        // Extract the string
+        const str = s.substring(hashIndex + 1, hashIndex + 1 + length);
+        result.push(str);
+        // Move to next string
+        i = hashIndex + 1 + length;
+    }
+    
+    return result;
+};
+```
+
+```java tab="Java"
+public class Codec {
+    // Encodes a list of strings to a single string.
+    public String encode(List<String> strs) {
+        StringBuilder sb = new StringBuilder();
+        for (String str : strs) {
+            sb.append(str.length()).append('#').append(str);
+        }
+        return sb.toString();
+    }
+
+    // Decodes a single string to a list of strings.
+    public List<String> decode(String s) {
+        List<String> result = new ArrayList<>();
+        int i = 0;
+        
+        while (i < s.length()) {
+            // Find the position of '#'
+            int hashIndex = s.indexOf('#', i);
+            // Extract the length
+            int length = Integer.parseInt(s.substring(i, hashIndex));
+            // Extract the string
+            String str = s.substring(hashIndex + 1, hashIndex + 1 + length);
+            result.add(str);
+            // Move to next string
+            i = hashIndex + 1 + length;
+        }
+        
+        return result;
+    }
+}
+```

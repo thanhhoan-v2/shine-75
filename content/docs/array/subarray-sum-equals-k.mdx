@@ -3,6 +3,7 @@ title: Subarray Sum Equals K
 description: Given an array of integers nums and an integer k, return the total number of subarrays whose sum equals to k.
 difficulty: Medium
 timeLimit: 25 mins
+week: 3
 tags:
   - Array
   - Hash Table
@@ -10,66 +11,77 @@ tags:
 ---
 
 ```js title="Example"
-subarraySum([1, 1, 1], 2); // 2
-subarraySum([1, 2, 3], 3); // 2
-subarraySum([1, -1, 0], 0); // 3
+Input: nums = [1, 1, 1], k = 2
+Output: 2
+Explanation: The subarrays [1, 1] and [1, 1] sum to 2.
+
+Input: nums = [1, 2, 3], k = 3
+Output: 2
+Explanation: The subarrays [1, 2] and [3] sum to 3.
 ```
 
 ## Approach
 
-- Use a hash map to store prefix sums and their frequencies
-- For each element, calculate the current prefix sum
-- Check if (current_sum - k) exists in the map
-- If found, add the frequency to the count
-- Update the map with the current prefix sum
+1. **Hash Map**: Use a hash map to store prefix sums and their frequencies.
+2. **Prefix Sum**: For each element, calculate the current prefix sum.
+3. **Check Difference**: Check if (current_sum - k) exists in the map.
+4. **Add Frequency**: If found, add the frequency to the count.
+5. **Update Map**: Update the map with the current prefix sum.
 
 ## Solution
 
 - Time Complexity: `O(n)`
-  - We iterate through the array once, so the time complexity is O(n)
+  > Where n is the length of the array. We iterate through the array once.
 - Space Complexity: `O(n)`
-  - We use a hash map to store prefix sums, which can grow up to n elements
+  > We use a hash map to store prefix sums, which can grow up to n elements.
 
 ```js tab="JavaScript"
-const subarraySum = (nums, k) => {
-  const map = new Map();
-  map.set(0, 1); // Initialize with sum 0 having frequency 1
-  
-  let count = 0;
-  let sum = 0;
-  
-  for (let num of nums) {
-    sum += num;
+/**
+ * @param {number[]} nums
+ * @param {number} k
+ * @return {number}
+ */
+var subarraySum = function(nums, k) {
+    const map = new Map();
+    map.set(0, 1); // Initialize with sum 0 having frequency 1
     
-    if (map.has(sum - k)) {
-      count += map.get(sum - k);
+    let count = 0;
+    let sum = 0;
+    
+    for (let num of nums) {
+        sum += num;
+        
+        if (map.has(sum - k)) {
+            count += map.get(sum - k);
+        }
+        
+        map.set(sum, (map.get(sum) || 0) + 1);
     }
     
-    map.set(sum, (map.get(sum) || 0) + 1);
-  }
-  
-  return count;
+    return count;
 };
 ```
 
 ```java tab="Java"
-public int subarraySum(int[] nums, int k) {
-    Map<Integer, Integer> map = new HashMap<>();
-    map.put(0, 1); // Initialize with sum 0 having frequency 1
-    
-    int count = 0;
-    int sum = 0;
-    
-    for (int num : nums) {
-        sum += num;
+class Solution {
+    public int subarraySum(int[] nums, int k) {
+        Map<Integer, Integer> map = new HashMap<>();
+        map.put(0, 1); // Initialize with sum 0 having frequency 1
         
-        if (map.containsKey(sum - k)) {
-            count += map.get(sum - k);
+        int count = 0;
+        int sum = 0;
+        
+        for (int num : nums) {
+            sum += num;
+            
+            if (map.containsKey(sum - k)) {
+                count += map.get(sum - k);
+            }
+            
+            map.put(sum, map.getOrDefault(sum, 0) + 1);
         }
         
-        map.put(sum, map.getOrDefault(sum, 0) + 1);
+        return count;
     }
-    
-    return count;
 }
 ```

@@ -2,15 +2,15 @@
 
 import { TOCProvider, useTOCItems } from "@/components/layout/toc";
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
+	Collapsible,
+	CollapsibleContent,
+	CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { cn } from "@/lib/cn";
 import { isActive } from "@/lib/is-active";
+import { cn } from "@/lib/utils";
 import {
-  type BreadcrumbOptions,
-  getBreadcrumbItemsFromPath,
+	type BreadcrumbOptions,
+	getBreadcrumbItemsFromPath,
 } from "fumadocs-core/breadcrumb";
 import { createContext, usePathname } from "fumadocs-core/framework";
 import Link from "fumadocs-core/link";
@@ -23,12 +23,12 @@ import { useSidebar } from "fumadocs-ui/contexts/sidebar";
 import { useTreeContext, useTreePath } from "fumadocs-ui/contexts/tree";
 import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import {
-  type ComponentProps,
-  Fragment,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
+	type ComponentProps,
+	Fragment,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
 } from "react";
 
 const TocPopoverContext = createContext<{
@@ -384,7 +384,7 @@ export function PageBreadcrumb({
 		<div
 			{...props}
 			className={cn(
-				"flex items-center gap-1.5 text-sm text-fd-muted-foreground",
+				"flex items-center gap-1.5 text-lg text-fd-muted-foreground bg-accent w-fit px-2 py-1 rounded-md",
 				props.className
 			)}
 		>

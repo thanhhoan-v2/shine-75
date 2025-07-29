@@ -1,21 +1,21 @@
 import {
-  type BreadcrumbProps,
-  type FooterProps,
-  PageArticle,
-  PageBreadcrumb,
-  PageFooter,
-  PageLastUpdate,
-  PageRoot,
-  PageTOC,
-  PageTOCItems,
-  PageTOCPopover,
-  PageTOCPopoverContent,
-  PageTOCPopoverItems,
-  PageTOCPopoverTrigger,
-  PageTOCTitle,
+	type BreadcrumbProps,
+	type FooterProps,
+	PageArticle,
+	PageBreadcrumb,
+	PageFooter,
+	PageLastUpdate,
+	PageRoot,
+	PageTOC,
+	PageTOCItems,
+	PageTOCPopover,
+	PageTOCPopoverContent,
+	PageTOCPopoverItems,
+	PageTOCPopoverTrigger,
+	PageTOCTitle,
 } from "@/components/layouts/docs/page";
 import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/cn";
+import { cn } from "@/lib/utils";
 import type { TOCItemType } from "fumadocs-core/server";
 import type { AnchorProviderProps } from "fumadocs-core/toc";
 import { I18nLabel } from "fumadocs-ui/contexts/i18n";

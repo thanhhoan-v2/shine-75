@@ -1,5 +1,5 @@
-import { cn } from "@/lib/cn";
 import { isActive } from "@/lib/is-active";
+import { cn } from "@/lib/utils";
 import Link, { LinkProps } from "fumadocs-core/link";
 import { ExternalLink } from "lucide-react";
 import { usePathname } from "next/navigation";

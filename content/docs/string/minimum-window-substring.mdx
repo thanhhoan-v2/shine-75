@@ -1,9 +1,165 @@
 ---
 title: Minimum Window Substring
-description: Minimum Window Substring
+description: Given two strings s and t of lengths m and n respectively, return the minimum window substring of s such that every character in t (including duplicates) is included in the window.
 difficulty: Hard
 timeLimit: 30 mins
 week: 3
 tags:
   - String
+  - Hash Table
+  - Sliding Window
 ---
+
+```js title="Example"
+Input: s = "ADOBECODEBANC", t = "ABC"
+Output: "BANC"
+Explanation: The minimum window substring "BANC" includes 'A', 'B', and 'C' from string t.
+
+Input: s = "a", t = "a"
+Output: "a"
+```
+
+## Approach
+
+1. **Sliding Window**: Use a sliding window to find the minimum substring containing all characters from t.
+2. **Character Count**: Maintain frequency maps for both the target string t and the current window.
+3. **Window Expansion**: Expand the window until it contains all required characters.
+4. **Window Contraction**: Once all characters are found, contract the window to find the minimum.
+5. **Optimization**: Use a counter to track how many unique characters from t are satisfied.
+
+## Solution
+
+- Time Complexity: `O(n)`
+  > Where n is the length of string s. We traverse the string once with a sliding window.
+- Space Complexity: `O(k)`
+  > Where k is the number of unique characters in string t. We store character frequencies.
+
+```js tab="JavaScript"
+/**
+ * @param {string} s
+ * @param {string} t
+ * @return {string}
+ */
+var minWindow = function(s, t) {
+    if (s.length === 0 || t.length === 0) return "";
+    
+    const tCount = new Array(128).fill(0);
+    const sCount = new Array(128).fill(0);
+    
+    // Count characters in t
+    for (let char of t) {
+        tCount[char.charCodeAt(0)]++;
+    }
+    
+    let left = 0;
+    let right = 0;
+    let minStart = 0;
+    let minLength = Infinity;
+    let required = 0;
+    let formed = 0;
+    
+    // Count unique characters in t
+    for (let i = 0; i < 128; i++) {
+        if (tCount[i] > 0) required++;
+    }
+    
+    while (right < s.length) {
+        const rightChar = s[right];
+        const rightIndex = rightChar.charCodeAt(0);
+        
+        sCount[rightIndex]++;
+        
+        // Check if this character satisfies the requirement
+        if (tCount[rightIndex] > 0 && sCount[rightIndex] === tCount[rightIndex]) {
+            formed++;
+        }
+        
+        // Try to contract window
+        while (left <= right && formed === required) {
+            const leftChar = s[left];
+            const leftIndex = leftChar.charCodeAt(0);
+            
+            // Update minimum window
+            if (right - left + 1 < minLength) {
+                minLength = right - left + 1;
+                minStart = left;
+            }
+            
+            sCount[leftIndex]--;
+            
+            // Check if removing this character breaks the requirement
+            if (tCount[leftIndex] > 0 && sCount[leftIndex] < tCount[leftIndex]) {
+                formed--;
+            }
+            
+            left++;
+        }
+        
+        right++;
+    }
+    
+    return minLength === Infinity ? "" : s.substring(minStart, minStart + minLength);
+};
+```
+
+```java tab="Java"
+class Solution {
+    public String minWindow(String s, String t) {
+        if (s.length() == 0 || t.length() == 0) return "";
+        
+        int[] tCount = new int[128];
+        int[] sCount = new int[128];
+        
+        // Count characters in t
+        for (char c : t.toCharArray()) {
+            tCount[c]++;
+        }
+        
+        int left = 0;
+        int right = 0;
+        int minStart = 0;
+        int minLength = Integer.MAX_VALUE;
+        int required = 0;
+        int formed = 0;
+        
+        // Count unique characters in t
+        for (int i = 0; i < 128; i++) {
+            if (tCount[i] > 0) required++;
+        }
+        
+        while (right < s.length()) {
+            char rightChar = s.charAt(right);
+            sCount[rightChar]++;
+            
+            // Check if this character satisfies the requirement
+            if (tCount[rightChar] > 0 && sCount[rightChar] == tCount[rightChar]) {
+                formed++;
+            }
+            
+            // Try to contract window
+            while (left <= right && formed == required) {
+                char leftChar = s.charAt(left);
+                
+                // Update minimum window
+                if (right - left + 1 < minLength) {
+                    minLength = right - left + 1;
+                    minStart = left;
+                }
+                
+                sCount[leftChar]--;
+                
+                // Check if removing this character breaks the requirement
+                if (tCount[leftChar] > 0 && sCount[leftChar] < tCount[leftChar]) {
+                    formed--;
+                }
+                
+                left++;
+            }
+            
+            right++;
+        }
+        
+        return minLength == Integer.MAX_VALUE ? "" : s.substring(minStart, minStart + minLength);
+    }
+}
+```

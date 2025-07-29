@@ -1,9 +1,112 @@
 ---
 title: String to Integer (atoi)
-description: String to Integer (atoi)
+description: Implement the myAtoi(string s) function, which converts a string to a 32-bit signed integer (similar to C/C++'s atoi function).
 difficulty: Medium
 timeLimit: 25 mins
 week: 2
 tags:
   - String
+  - Math
 ---
+
+```js title="Example"
+Input: s = "42"
+Output: 42
+
+Input: s = "   -42"
+Output: -42
+
+Input: s = "4193 with words"
+Output: 4193
+```
+
+## Approach
+
+1. **Whitespace Handling**: Skip leading whitespace characters.
+2. **Sign Detection**: Check for '+' or '-' sign and handle accordingly.
+3. **Digit Processing**: Convert consecutive digits to integer.
+4. **Overflow Handling**: Check for integer overflow/underflow conditions.
+5. **Early Termination**: Stop processing when encountering non-digit characters.
+
+## Solution
+
+- Time Complexity: `O(n)`
+  > Where n is the length of the string. We traverse the string once.
+- Space Complexity: `O(1)`
+  > We only use a constant amount of extra space.
+
+```js tab="JavaScript"
+/**
+ * @param {string} s
+ * @return {number}
+ */
+var myAtoi = function(s) {
+    let i = 0;
+    let sign = 1;
+    let result = 0;
+    
+    // Skip leading whitespace
+    while (i < s.length && s[i] === ' ') {
+        i++;
+    }
+    
+    // Handle sign
+    if (i < s.length && (s[i] === '+' || s[i] === '-')) {
+        sign = s[i] === '-' ? -1 : 1;
+        i++;
+    }
+    
+    // Process digits
+    while (i < s.length && s[i] >= '0' && s[i] <= '9') {
+        const digit = s[i] - '0';
+        
+        // Check for overflow
+        if (result > Math.floor(2147483647 / 10) || 
+            (result === Math.floor(2147483647 / 10) && digit > 7)) {
+            return sign === 1 ? 2147483647 : -2147483648;
+        }
+        
+        result = result * 10 + digit;
+        i++;
+    }
+    
+    return sign * result;
+};
+```
+
+```java tab="Java"
+class Solution {
+    public int myAtoi(String s) {
+        int i = 0;
+        int sign = 1;
+        int result = 0;
+        
+        // Skip leading whitespace
+        while (i < s.length() && s.charAt(i) == ' ') {
+            i++;
+        }
+        
+        // Handle sign
+        if (i < s.length() && (s.charAt(i) == '+' || s.charAt(i) == '-')) {
+            sign = s.charAt(i) == '-' ? -1 : 1;
+            i++;
+        }
+        
+        // Process digits
+        while (i < s.length() && Character.isDigit(s.charAt(i))) {
+            int digit = s.charAt(i) - '0';
+            
+            // Check for overflow
+            if (result > Integer.MAX_VALUE / 10 || 
+                (result == Integer.MAX_VALUE / 10 && digit > 7)) {
+                return sign == 1 ? Integer.MAX_VALUE : Integer.MIN_VALUE;
+            }
+            
+            result = result * 10 + digit;
+            i++;
+        }
+        
+        return sign * result;
+    }
+}
+```

@@ -1,14 +1,14 @@
 'use client';
-import { cn } from '../../lib/cn';
-import { type ComponentProps, useMemo } from 'react';
-import { useSidebar } from 'fumadocs-ui/contexts/sidebar';
-import { useNav } from 'fumadocs-ui/contexts/layout';
-import { buttonVariants } from '../ui/button';
-import { Sidebar as SidebarIcon } from 'lucide-react';
-import Link from 'fumadocs-core/link';
+import { cn } from '@/lib/utils';
 import { usePathname } from 'fumadocs-core/framework';
+import Link from 'fumadocs-core/link';
+import { useNav } from 'fumadocs-ui/contexts/layout';
+import { useSidebar } from 'fumadocs-ui/contexts/sidebar';
+import { Sidebar as SidebarIcon } from 'lucide-react';
+import { type ComponentProps, useMemo } from 'react';
 import { isActive } from '../../lib/is-active';
 import type { Option } from '../layout/root-toggle';
+import { buttonVariants } from '../ui/button';
 
 export function Navbar({
   mode,

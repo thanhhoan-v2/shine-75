@@ -1,11 +1,10 @@
 'use client';
 import type { TOCItemType } from 'fumadocs-core/server';
 import * as Primitive from 'fumadocs-core/toc';
-import { type ComponentProps, createContext, useContext, useRef } from 'react';
-import { cn } from '../../lib/cn';
 import { useI18n } from 'fumadocs-ui/contexts/i18n';
-import { TocThumb } from './toc-thumb';
+import { type ComponentProps, createContext, useContext, useRef } from 'react';
 import { mergeRefs } from '../../lib/merge-refs';
+import { TocThumb } from './toc-thumb';
 
 const TOCContext = createContext<TOCItemType[]>([]);
 
@@ -57,7 +56,7 @@ export function TOCItems({ ref, className, ...props }: ComponentProps<'div'>) {
 
   if (items.length === 0)
     return (
-      <div className="rounded-lg border bg-fd-card p-3 text-xs text-fd-muted-foreground">
+      <div className="bg-fd-card p-3 border rounded-lg text-fd-muted-foreground text-xs">
         {text.tocNoHeadings}
       </div>
     );
@@ -66,7 +65,7 @@ export function TOCItems({ ref, className, ...props }: ComponentProps<'div'>) {
     <>
       <TocThumb
         containerRef={containerRef}
-        className="absolute top-(--fd-top) h-(--fd-height) w-px bg-fd-primary transition-all"
+        className="top-(--fd-top) absolute bg-fd-primary w-px h-(--fd-height) transition-all"
       />
       <div
         ref={mergeRefs(ref, containerRef)}

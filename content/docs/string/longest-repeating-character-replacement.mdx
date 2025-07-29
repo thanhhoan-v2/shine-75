@@ -1,9 +1,100 @@
 ---
 title: Longest Repeating Character Replacement
-description: Longest Repeating Character Replacement
+description: You are given a string s and an integer k. You can choose any character of the string and change it to any other uppercase English character. You can perform this operation at most k times. Return the length of the longest substring containing the same letter you can get after performing the above operations.
 difficulty: Medium
 timeLimit: 30 mins
 week: 3
 tags:
   - String
+  - Sliding Window
+  - Hash Table
 ---
+
+```js title="Example"
+Input: s = "ABAB", k = 1
+Output: 3
+Explanation: Replace the one 'A' in the middle with 'B' and form "AAB" or "ABB".
+
+Input: s = "AABABBA", k = 1
+Output: 4
+```
+
+## Approach
+
+1. **Sliding Window**: Use a sliding window to find the longest substring that can be made uniform.
+2. **Character Count**: Maintain a frequency map of characters in the current window.
+3. **Max Frequency**: Track the most frequent character in the window.
+4. **Window Size**: The window size minus the max frequency should be ≤ k.
+5. **Optimization**: Only shrink the window when necessary, not on every iteration.
+
+## Solution
+
+- Time Complexity: `O(n)`
+  > Where n is the length of the string. We traverse the string once with a sliding window.
+- Space Complexity: `O(1)`
+  > We use a fixed-size array to store character frequencies (26 for uppercase letters).
+
+```js tab="JavaScript"
+/**
+ * @param {string} s
+ * @param {number} k
+ * @return {number}
+ */
+var characterReplacement = function(s, k) {
+    const charCount = new Array(26).fill(0);
+    let maxCount = 0;
+    let maxLength = 0;
+    let left = 0;
+    
+    for (let right = 0; right < s.length; right++) {
+        const rightChar = s[right];
+        const rightIndex = rightChar.charCodeAt(0) - 'A'.charCodeAt(0);
+        
+        charCount[rightIndex]++;
+        maxCount = Math.max(maxCount, charCount[rightIndex]);
+        
+        // If window size - maxCount > k, shrink window
+        if (right - left + 1 - maxCount > k) {
+            const leftChar = s[left];
+            const leftIndex = leftChar.charCodeAt(0) - 'A'.charCodeAt(0);
+            charCount[leftIndex]--;
+            left++;
+        }
+        
+        maxLength = Math.max(maxLength, right - left + 1);
+    }
+    
+    return maxLength;
+};
+```
+
+```java tab="Java"
+class Solution {
+    public int characterReplacement(String s, int k) {
+        int[] charCount = new int[26];
+        int maxCount = 0;
+        int maxLength = 0;
+        int left = 0;
+        
+        for (int right = 0; right < s.length(); right++) {
+            char rightChar = s.charAt(right);
+            int rightIndex = rightChar - 'A';
+            
+            charCount[rightIndex]++;
+            maxCount = Math.max(maxCount, charCount[rightIndex]);
+            
+            // If window size - maxCount > k, shrink window
+            if (right - left + 1 - maxCount > k) {
+                char leftChar = s.charAt(left);
+                int leftIndex = leftChar - 'A';
+                charCount[leftIndex]--;
+                left++;
+            }
+            
+            maxLength = Math.max(maxLength, right - left + 1);
+        }
+        
+        return maxLength;
+    }
+}
+```

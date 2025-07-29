@@ -1,9 +1,74 @@
 ---
 title: Group Anagrams
-description: Group Anagrams
+description: Given an array of strings strs, group the anagrams together. You can return the answer in any order.
 difficulty: Medium
 timeLimit: 25 mins
 week: 2
 tags:
   - String
+  - Hash Table
+  - Sorting
 ---
+
+```js title="Example"
+Input: strs = ["eat","tea","tan","ate","nat","bat"]
+Output: [["bat"],["nat","tan"],["ate","eat","tea"]]
+
+Input: strs = [""]
+Output: [[""]]
+```
+
+## Approach
+
+1. **Sorting Method**: Sort each string to get a canonical form, then group strings with the same sorted form.
+2. **Character Count Method**: Count the frequency of each character in each string, then group strings with the same character count.
+3. **Hash Map**: Use a hash map to group strings by their sorted form or character count.
+4. **Implementation**: For each string, create a key (sorted string or character count), then group by this key.
+
+## Solution
+
+- Time Complexity: `O(n * k * log k)`
+  > Where n is the number of strings and k is the maximum length of any string. We sort each string which takes O(k log k) time.
+- Space Complexity: `O(n * k)`
+  > We need to store all the strings in the hash map.
+
+```js tab="JavaScript"
+/**
+ * @param {string[]} strs
+ * @return {string[][]}
+ */
+var groupAnagrams = function(strs) {
+    const groups = new Map();
+    
+    for (let str of strs) {
+        // Create a key by sorting the string
+        const sortedStr = str.split('').sort().join('');
+        
+        if (!groups.has(sortedStr)) {
+            groups.set(sortedStr, []);
+        }
+        groups.get(sortedStr).push(str);
+    }
+    
+    return Array.from(groups.values());
+};
+```
+
+```java tab="Java"
+class Solution {
+    public List<List<String>> groupAnagrams(String[] strs) {
+        Map<String, List<String>> groups = new HashMap<>();
+        
+        for (String str : strs) {
+            // Create a key by sorting the string
+            char[] charArray = str.toCharArray();
+            Arrays.sort(charArray);
+            String sortedStr = new String(charArray);
+            
+            groups.computeIfAbsent(sortedStr, k -> new ArrayList<>()).add(str);
+        }
+        
+        return new ArrayList<>(groups.values());
+    }
+}
+```
