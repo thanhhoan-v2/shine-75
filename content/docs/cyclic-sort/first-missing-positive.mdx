@@ -1,9 +1,96 @@
 ---
 title: First Missing Positive
-description: First Missing Positive
+description: Given an unsorted integer array nums, return the smallest missing positive integer. You must implement an algorithm that runs in O(n) time and uses constant extra space.
 difficulty: Hard
 timeLimit: 35 mins
 week: 4
 tags:
   - Hash Table
+  - Array
+  - Cyclic Sort
 ---
+
+```js title="Example"
+Input: nums = [1,2,0]
+Output: 3
+Explanation: The numbers in the range [1,2] are all in the array.
+
+Input: nums = [3,4,-1,1]
+Output: 2
+Explanation: 1 is in the array but 2 is missing.
+
+Input: nums = [7,8,9,11,12]
+Output: 1
+Explanation: The smallest positive integer 1 is missing.
+```
+
+## Approach
+
+1. **Cyclic Sort**: Use cyclic sort to place numbers in their correct positions
+2. **Range Check**: Only consider numbers in range [1, n] where n is array length
+3. **Correct Position**: Place number i at index i-1 if it's in valid range
+4. **Scan for Missing**: After sorting, scan to find first missing positive
+5. **Edge Cases**: Handle cases where all numbers are present or all are missing
+
+## Solution
+
+- Time Complexity: `O(n)`
+  > We traverse the array at most twice
+- Space Complexity: `O(1)`
+  > We use constant extra space
+
+```js tab="JavaScript"
+/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var firstMissingPositive = function(nums) {
+    const n = nums.length;
+    
+    // Cyclic sort: place numbers in their correct positions
+    for (let i = 0; i < n; i++) {
+        while (nums[i] > 0 && nums[i] <= n && nums[nums[i] - 1] !== nums[i]) {
+            // Swap nums[i] with nums[nums[i] - 1]
+            const temp = nums[nums[i] - 1];
+            nums[nums[i] - 1] = nums[i];
+            nums[i] = temp;
+        }
+    }
+    
+    // Find first missing positive
+    for (let i = 0; i < n; i++) {
+        if (nums[i] !== i + 1) {
+            return i + 1;
+        }
+    }
+    
+    return n + 1;
+};
+```
+
+```java tab="Java"
+class Solution {
+    public int firstMissingPositive(int[] nums) {
+        int n = nums.length;
+        
+        // Cyclic sort: place numbers in their correct positions
+        for (int i = 0; i < n; i++) {
+            while (nums[i] > 0 && nums[i] <= n && nums[nums[i] - 1] != nums[i]) {
+                // Swap nums[i] with nums[nums[i] - 1]
+                int temp = nums[nums[i] - 1];
+                nums[nums[i] - 1] = nums[i];
+                nums[i] = temp;
+            }
+        }
+        
+        // Find first missing positive
+        for (int i = 0; i < n; i++) {
+            if (nums[i] != i + 1) {
+                return i + 1;
+            }
+        }
+        
+        return n + 1;
+    }
+}
+```

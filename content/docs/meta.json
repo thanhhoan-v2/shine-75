@@ -4,6 +4,7 @@
   "pages": [
     "!template",
     "index",
+    "problem-generator",
     "easy-problems",
     "---Two Pointers---",
     "...two-pointers",

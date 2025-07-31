@@ -1,9 +1,97 @@
 ---
 title: Construct Binary Tree from Preorder and Inorder Traversal
-description: Construct Binary Tree from Preorder and Inorder Traversal
+description: Given two integer arrays preorder and inorder where preorder is the preorder traversal of a binary tree and inorder is the inorder traversal of the same tree, construct and return the binary tree.
 difficulty: Medium
 timeLimit: 25 mins
 week: 2
 tags:
   - Binary Tree
+  - Tree
+  - Array
+  - Hash Table
+  - Divide and Conquer
 ---
+
+```js title="Example"
+Input: preorder = [3,9,20,15,7], inorder = [9,3,15,20,7]
+Output: [3,9,20,null,null,15,7]
+
+Input: preorder = [-1], inorder = [-1]
+Output: [-1]
+```
+
+## Approach
+
+1. **Root from Preorder**: The first element in preorder is always the root
+2. **Find Root in Inorder**: Use inorder to find the root's position and determine left/right subtrees
+3. **Recursive Construction**: Recursively build left and right subtrees
+4. **Hash Map**: Use a hash map to quickly find root position in inorder array
+5. **Index Tracking**: Track the current position in preorder array
+
+## Solution
+
+- Time Complexity: `O(n)`
+  > Where n is the number of nodes. We visit each node once.
+- Space Complexity: `O(n)`
+  > Space for the hash map and recursion stack.
+
+```js tab="JavaScript"
+/**
+ * @param {number[]} preorder
+ * @param {number[]} inorder
+ * @return {TreeNode}
+ */
+var buildTree = function(preorder, inorder) {
+    const inorderMap = new Map();
+    for (let i = 0; i < inorder.length; i++) {
+        inorderMap.set(inorder[i], i);
+    }
+    
+    let preorderIndex = 0;
+    
+    const build = (left, right) => {
+        if (left > right) return null;
+        
+        const rootVal = preorder[preorderIndex++];
+        const root = new TreeNode(rootVal);
+        
+        const inorderIndex = inorderMap.get(rootVal);
+        
+        root.left = build(left, inorderIndex - 1);
+        root.right = build(inorderIndex + 1, right);
+        
+        return root;
+    };
+    
+    return build(0, inorder.length - 1);
+};
+```
+
+```java tab="Java"
+class Solution {
+    private Map<Integer, Integer> inorderMap = new HashMap<>();
+    private int preorderIndex = 0;
+    
+    public TreeNode buildTree(int[] preorder, int[] inorder) {
+        for (int i = 0; i < inorder.length; i++) {
+            inorderMap.put(inorder[i], i);
+        }
+        
+        return build(preorder, 0, inorder.length - 1);
+    }
+    
+    private TreeNode build(int[] preorder, int left, int right) {
+        if (left > right) return null;
+        
+        int rootVal = preorder[preorderIndex++];
+        TreeNode root = new TreeNode(rootVal);
+        
+        int inorderIndex = inorderMap.get(rootVal);
+        
+        root.left = build(preorder, left, inorderIndex - 1);
+        root.right = build(preorder, inorderIndex + 1, right);
+        
+        return root;
+    }
+}
+```

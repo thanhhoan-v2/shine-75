@@ -1011,59 +1011,20 @@ const getRecommendedStudyOrder = (): string[] => {
 };
 
 /**
- * Get difficulty from pathname
- * @param pathname - Pathname like "docs/two-pointers/3sum", "/docs/two-pointers/3sum", or "two-pointers/squares-of-a-sorted-array"
+ * Get difficulty from problem name
+ * @param problemName - Problem name like "Two Sum", "Valid Palindrome", etc.
  * @returns The difficulty of the problem or null if not found
  */
-const getDifficultyFromPathname = (pathname: string): 'Easy' | 'Medium' | 'Hard' | null => {
-  // Remove leading slash and "docs/" prefix if present
-  const cleanPath = pathname.replace(/^\/?docs\//, '');
+const getDifficultyFromPathname = (problemName: string): 'Easy' | 'Medium' | 'Hard' | null => {
+  // Search through all patterns to find the problem by name
+  for (const pattern of Object.values(studyPlan)) {
+    const problem = pattern.problems.find(p => p.name === problemName);
+    if (problem) {
+      return problem.difficulty;
+    }
+  }
   
-  // Split the path to get pattern and problem name
-  const pathParts = cleanPath.split('/');
-  if (pathParts.length < 2) return null;
-  
-  const directoryName = pathParts[0];
-  const problemSlug = pathParts[1];
-  
-  // Mapping from directory names to pattern names
-  const directoryToPatternMap: Record<string, string> = {
-    'two-pointers': 'Two Pointers',
-    'sliding-window': 'Sliding Window',
-    'fast-slow-pointers': 'Fast & Slow Pointers',
-    'merge-intervals': 'Merge Intervals',
-    'cyclic-sort': 'Cyclic Sort',
-    'binary-search': 'Binary Search',
-    'tree-traversal': 'Tree Traversal',
-    'graph-traversal': 'Graph Traversal (BFS/DFS)',
-    'topological-sort': 'Topological Sort',
-    'backtracking': 'Backtracking',
-    'hash-table': 'Hash Table',
-    'bit-manipulation': 'Bit Manipulation',
-    'linked-list': 'Linked List',
-    'dynamic-programming': 'Dynamic Programming',
-    'heap': 'Heap (Priority Queue)',
-  };
-  
-  const patternName = directoryToPatternMap[directoryName];
-  if (!patternName) return null;
-  
-  // Find the pattern in study plan
-  const pattern = studyPlan[patternName];
-  if (!pattern) return null;
-  
-  // Find the problem by matching the slug
-  const problem = pattern.problems.find(p => {
-    // Convert problem name to slug format (lowercase, hyphenated)
-    const problemSlugFromName = p.name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '');
-    
-    return problemSlugFromName === problemSlug;
-  });
-  
-  return problem?.difficulty || null;
+  return null;
 };
 
 // Export the main object and helper functions

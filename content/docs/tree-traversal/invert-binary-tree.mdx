@@ -1,9 +1,76 @@
 ---
 title: Invert Binary Tree
-description: Invert Binary Tree
+description: Given the root of a binary tree, invert the tree, and return its root. To invert a binary tree, swap every left node with its corresponding right node.
 difficulty: Easy
 timeLimit: 15 mins
 week: 1
 tags:
   - Binary Tree
+  - Tree
+  - Depth-First Search
+  - Breadth-First Search
 ---
+
+```js title="Example"
+Input: root = [4,2,7,1,3,6,9]
+Output: [4,7,2,9,6,3,1]
+
+Input: root = [2,1,3]
+Output: [2,3,1]
+
+Input: root = []
+Output: []
+```
+
+## Approach
+
+1. **Recursive DFS**: Use recursive depth-first search to traverse the tree
+2. **Swap Children**: For each node, swap its left and right children
+3. **Base Case**: If node is null, return null
+4. **Post-order Traversal**: Process children first, then swap
+5. **Return Root**: Return the root after all swaps are complete
+
+## Solution
+
+- Time Complexity: `O(n)`
+  > Where n is the number of nodes in the tree. We visit each node once.
+- Space Complexity: `O(h)`
+  > The recursion stack depth is at most the height of the tree.
+
+```js tab="JavaScript"
+/**
+ * @param {TreeNode} root
+ * @return {TreeNode}
+ */
+var invertTree = function(root) {
+    if (root === null) return null;
+    
+    // Recursively invert left and right subtrees
+    const left = invertTree(root.left);
+    const right = invertTree(root.right);
+    
+    // Swap left and right children
+    root.left = right;
+    root.right = left;
+    
+    return root;
+};
+```
+
+```java tab="Java"
+class Solution {
+    public TreeNode invertTree(TreeNode root) {
+        if (root == null) return null;
+        
+        // Recursively invert left and right subtrees
+        TreeNode left = invertTree(root.left);
+        TreeNode right = invertTree(root.right);
+        
+        // Swap left and right children
+        root.left = right;
+        root.right = left;
+        
+        return root;
+    }
+}
+```

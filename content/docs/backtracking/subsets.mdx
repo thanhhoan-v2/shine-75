@@ -1,9 +1,78 @@
 ---
 title: Subsets
-description: Subsets
+description: Given an integer array nums of unique elements, return all possible subsets (the power set). The solution set must not contain duplicate subsets. Return the solution in any order.
 difficulty: Medium
 timeLimit: 30 mins
 week: 2
 tags:
   - Recursion
+  - Backtracking
+  - Array
 ---
+
+```js title="Example"
+Input: nums = [1,2,3]
+Output: [[],[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3]]
+
+Input: nums = [0]
+Output: [[],[0]]
+```
+
+## Approach
+
+1. **Backtracking**: Use backtracking to generate all possible subsets
+2. **Start Index**: Use a start index to avoid duplicate combinations
+3. **Recursive Function**: For each position, either include or exclude the current number
+4. **Base Case**: Add the current subset to result at each step
+5. **No Duplicates**: Using start index ensures no duplicate subsets
+
+## Solution
+
+- Time Complexity: `O(2^n)`
+  > Where n is the length of the array, as there are 2^n possible subsets
+- Space Complexity: `O(2^n)`
+  > Space for storing all subsets
+
+```js tab="JavaScript"
+/**
+ * @param {number[]} nums
+ * @return {number[][]}
+ */
+var subsets = function(nums) {
+    const result = [];
+    
+    const backtrack = (start, subset) => {
+        result.push([...subset]);
+        
+        for (let i = start; i < nums.length; i++) {
+            subset.push(nums[i]);
+            backtrack(i + 1, subset);
+            subset.pop();
+        }
+    };
+    
+    backtrack(0, []);
+    return result;
+};
+```
+
+```java tab="Java"
+class Solution {
+    public List<List<Integer>> subsets(int[] nums) {
+        List<List<Integer>> result = new ArrayList<>();
+        backtrack(result, new ArrayList<>(), nums, 0);
+        return result;
+    }
+    
+    private void backtrack(List<List<Integer>> result, List<Integer> subset, 
+                         int[] nums, int start) {
+        result.add(new ArrayList<>(subset));
+        
+        for (int i = start; i < nums.length; i++) {
+            subset.add(nums[i]);
+            backtrack(result, subset, nums, i + 1);
+            subset.remove(subset.size() - 1);
+        }
+    }
+}
+```

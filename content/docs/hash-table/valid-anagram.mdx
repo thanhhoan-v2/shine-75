@@ -6,6 +6,8 @@ timeLimit: 30 mins
 week: 2
 tags:
   - String
+  - Hash Table
+  - Sorting
 ---
 
 ```js title="Example"
@@ -14,4 +16,73 @@ Output: true
 
 Input: s = "rat", t = "car"
 Output: false
+```
+
+## Approach
+
+1. **Hash Table Method**: Use a hash table to count character frequencies
+2. **Count Characters**: Count the frequency of each character in both strings
+3. **Compare Frequencies**: Check if the character frequencies match
+4. **Length Check**: First check if the strings have the same length
+5. **Return Result**: Return true if all frequencies match, false otherwise
+
+## Solution
+
+- Time Complexity: `O(n)`
+  > Where n is the length of the strings
+- Space Complexity: `O(1)`
+  > Since we use a fixed-size array for character counts
+
+```js tab="JavaScript"
+/**
+ * @param {string} s
+ * @param {string} t
+ * @return {boolean}
+ */
+var isAnagram = function(s, t) {
+    if (s.length !== t.length) return false;
+    
+    const charCount = new Array(26).fill(0);
+    
+    // Count characters in s
+    for (let char of s) {
+        charCount[char.charCodeAt(0) - 'a'.charCodeAt(0)]++;
+    }
+    
+    // Decrement counts for characters in t
+    for (let char of t) {
+        const index = char.charCodeAt(0) - 'a'.charCodeAt(0);
+        charCount[index]--;
+        if (charCount[index] < 0) {
+            return false;
+        }
+    }
+    
+    return true;
+};
+```
+
+```java tab="Java"
+class Solution {
+    public boolean isAnagram(String s, String t) {
+        if (s.length() != t.length()) return false;
+        
+        int[] charCount = new int[26];
+        
+        // Count characters in s
+        for (char c : s.toCharArray()) {
+            charCount[c - 'a']++;
+        }
+        
+        // Decrement counts for characters in t
+        for (char c : t.toCharArray()) {
+            charCount[c - 'a']--;
+            if (charCount[c - 'a'] < 0) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+}
 ```

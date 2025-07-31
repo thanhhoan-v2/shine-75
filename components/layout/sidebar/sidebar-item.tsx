@@ -3,7 +3,7 @@
 import { isActive } from '@/lib/is-active';
 import { cn } from '@/lib/utils';
 import Link, { LinkProps } from 'fumadocs-core/link';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, FileIcon } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { ReactNode } from 'react';
 import { itemVariants, useInternalContext } from './index';
@@ -26,7 +26,7 @@ export function SidebarItem({
       className={cn(itemVariants({ active }), props.className)}
       prefetch={prefetch}
     >
-      {icon ?? (props.external ? <ExternalLink /> : null)}
+      {icon ?? (props.external ? <ExternalLink /> : <FileIcon />)}
       {props.children}
     </Link>
   );

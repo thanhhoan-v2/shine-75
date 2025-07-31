@@ -4,12 +4,15 @@ import {
   DocsPage,
   DocsTitle,
 } from '@/components/layouts/page';
+import { Badge } from '@/components/ui/badge';
 import { getDifficultyFromPathname } from '@/lib/db';
 import { source } from '@/lib/source';
 import { getMDXComponents } from '@/mdx-components';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 import { createRelativeLink } from 'fumadocs-ui/mdx';
+import { BrainIcon } from 'lucide-react';
 import Head from 'next/head';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 export default async function Page(props: {
@@ -19,7 +22,7 @@ export default async function Page(props: {
   const page = source.getPage(params.slug);
   if (!page) notFound();
 
-  const difficulty = getDifficultyFromPathname(page.path);
+  const difficulty = getDifficultyFromPathname(page.data.title);
 
   const MDXContent = page.data.body;
 
@@ -51,10 +54,32 @@ export default async function Page(props: {
           path: `content/docs/${page.path}`,
         }}
       >
-        <DocsTitle className="font-bold text-4xl">
+        <DocsTitle className="flex items-baseline gap-2 font-bold text-4xl">
           {page.data.title}
+          {difficulty && (
+            <Badge
+              className="-translate-y-1.5"
+              variant={
+                difficulty === 'Easy'
+                  ? 'easy'
+                  : difficulty === 'Medium'
+                  ? 'medium'
+                  : 'hard'
+              }
+            >
+              {difficulty}
+            </Badge>
+          )}
         </DocsTitle>
         <DocsDescription>{page.data.description}</DocsDescription>
+        {difficulty === 'Easy' && (
+          <Link
+            href="/docs/easy-problems"
+            className="flex items-center gap-1 font-bold hover:underline transition-all duration-500"
+          >
+            <BrainIcon className="size-4" /> Easy Problems
+          </Link>
+        )}
         <DocsBody>
           <MDXContent
             components={getMDXComponents({

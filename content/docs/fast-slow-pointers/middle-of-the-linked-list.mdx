@@ -1,9 +1,87 @@
 ---
 title: Middle of the Linked List
-description: Middle of the Linked List
+description: Given the head of a singly linked list, return the middle node of the linked list. If there are two middle nodes, return the second middle node.
 difficulty: Easy
 timeLimit: 20 mins
 week: 1
 tags:
   - Linked List
+  - Two Pointers
+  - Fast Slow Pointers
 ---
+
+```js title="Example"
+Input: head = [1,2,3,4,5]
+Output: [3,4,5]
+Explanation: The middle node of the list is node 3.
+
+Input: head = [1,2,3,4,5,6]
+Output: [4,5,6]
+Explanation: Since the list has two middle nodes with values 3 and 4, we return the second one.
+```
+
+## Approach
+
+1. **Fast Slow Pointers**: Use two pointers - slow and fast
+2. **Initialize Pointers**: Set both pointers to the head of the list
+3. **Move Pointers**: Move slow pointer by 1 step and fast pointer by 2 steps
+4. **Middle Detection**: When fast reaches the end, slow will be at the middle
+5. **Return Middle**: Return the slow pointer which points to the middle node
+
+## Solution
+
+- Time Complexity: `O(n)`
+  > Where n is the number of nodes in the linked list
+- Space Complexity: `O(1)`
+  > We only use two pointers regardless of input size
+
+```js tab="JavaScript"
+/**
+ * Definition for singly-linked list.
+ * function ListNode(val, next) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.next = (next===undefined ? null : next)
+ * }
+ */
+/**
+ * @param {ListNode} head
+ * @return {ListNode}
+ */
+var middleNode = function(head) {
+    let slow = head;
+    let fast = head;
+    
+    while (fast && fast.next) {
+        slow = slow.next;
+        fast = fast.next.next;
+    }
+    
+    return slow;
+};
+```
+
+```java tab="Java"
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode() {}
+ *     ListNode(int val) { this.val = val; }
+ *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * }
+ */
+class Solution {
+    public ListNode middleNode(ListNode head) {
+        ListNode slow = head;
+        ListNode fast = head;
+        
+        while (fast != null && fast.next != null) {
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        
+        return slow;
+    }
+}
+```

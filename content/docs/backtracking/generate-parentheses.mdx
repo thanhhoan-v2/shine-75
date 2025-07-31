@@ -1,9 +1,86 @@
 ---
 title: Generate Parentheses
-description: Generate Parentheses
+description: Given n pairs of parentheses, write a function to generate all combinations of well-formed parentheses.
 difficulty: Medium
 timeLimit: 25 mins
 week: 3
 tags:
   - Recursion
+  - Backtracking
 ---
+
+```js title="Example"
+Input: n = 3
+Output: ["((()))","(()())","(())()","()(())","()()()"]
+
+Input: n = 1
+Output: ["()"]
+```
+
+## Approach
+
+1. **Backtracking**: Use backtracking to generate all valid combinations
+2. **Track Open and Close**: Keep track of the number of open and close parentheses used
+3. **Valid Combinations**: Only add close parentheses if there are more open than close
+4. **Base Case**: When both open and close reach n, add the combination to result
+5. **Recursive Calls**: Try adding open parenthesis first, then close parenthesis
+
+## Solution
+
+- Time Complexity: `O(4^n/√n)`
+  > This is the Catalan number which grows exponentially
+- Space Complexity: `O(4^n/√n)`
+  > Space for storing all valid combinations
+
+```js tab="JavaScript"
+/**
+ * @param {number} n
+ * @return {string[]}
+ */
+var generateParenthesis = function(n) {
+    const result = [];
+    
+    const backtrack = (open, close, combination) => {
+        if (open === n && close === n) {
+            result.push(combination);
+            return;
+        }
+        
+        if (open < n) {
+            backtrack(open + 1, close, combination + '(');
+        }
+        
+        if (close < open) {
+            backtrack(open, close + 1, combination + ')');
+        }
+    };
+    
+    backtrack(0, 0, '');
+    return result;
+};
+```
+
+```java tab="Java"
+class Solution {
+    public List<String> generateParenthesis(int n) {
+        List<String> result = new ArrayList<>();
+        backtrack(result, "", 0, 0, n);
+        return result;
+    }
+    
+    private void backtrack(List<String> result, String combination, int open, int close, int n) {
+        if (open == n && close == n) {
+            result.add(combination);
+            return;
+        }
+        
+        if (open < n) {
+            backtrack(result, combination + "(", open + 1, close, n);
+        }
+        
+        if (close < open) {
+            backtrack(result, combination + ")", open, close + 1, n);
+        }
+    }
+}
+```

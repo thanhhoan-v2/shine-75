@@ -1,9 +1,81 @@
 ---
 title: Subtree of Another Tree
-description: Subtree of Another Tree
+description: Given the roots of two binary trees root and subRoot, return true if there is a subtree of root with the same structure and node values of subRoot and false otherwise. A subtree of a binary tree tree is a tree that consists of a node in tree and all of this node's descendants.
 difficulty: Easy
 timeLimit: 20 mins
 week: 1
 tags:
   - Binary Tree
+  - Tree
+  - Depth-First Search
+  - String Matching
 ---
+
+```js title="Example"
+Input: root = [3,4,5,1,2], subRoot = [4,1,2]
+Output: true
+Explanation: There is a subtree with the same structure and node values.
+
+Input: root = [3,4,5,1,2,null,null,null,null,0], subRoot = [4,1,2]
+Output: false
+```
+
+## Approach
+
+1. **Recursive DFS**: Use recursive depth-first search to check each node
+2. **Subtree Check**: For each node in root, check if it's the start of subRoot
+3. **Same Tree Function**: Use the same tree comparison logic
+4. **Base Cases**: Handle null cases appropriately
+5. **Return Result**: Return true if any subtree matches
+
+## Solution
+
+- Time Complexity: `O(m*n)`
+  > Where m and n are the number of nodes in root and subRoot respectively.
+- Space Complexity: `O(h)`
+  > The recursion stack depth is at most the height of the tree.
+
+```js tab="JavaScript"
+/**
+ * @param {TreeNode} root
+ * @param {TreeNode} subRoot
+ * @return {boolean}
+ */
+var isSubtree = function(root, subRoot) {
+    if (root === null) return false;
+    
+    if (isSameTree(root, subRoot)) return true;
+    
+    return isSubtree(root.left, subRoot) || isSubtree(root.right, subRoot);
+};
+
+const isSameTree = (p, q) => {
+    if (p === null && q === null) return true;
+    if (p === null || q === null) return false;
+    
+    if (p.val !== q.val) return false;
+    
+    return isSameTree(p.left, q.left) && isSameTree(p.right, q.right);
+};
+```
+
+```java tab="Java"
+class Solution {
+    public boolean isSubtree(TreeNode root, TreeNode subRoot) {
+        if (root == null) return false;
+        
+        if (isSameTree(root, subRoot)) return true;
+        
+        return isSubtree(root.left, subRoot) || isSubtree(root.right, subRoot);
+    }
+    
+    private boolean isSameTree(TreeNode p, TreeNode q) {
+        if (p == null && q == null) return true;
+        if (p == null || q == null) return false;
+        
+        if (p.val != q.val) return false;
+        
+        return isSameTree(p.left, q.left) && isSameTree(p.right, q.right);
+    }
+}
+```

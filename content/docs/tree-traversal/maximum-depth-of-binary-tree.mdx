@@ -1,9 +1,64 @@
 ---
 title: Maximum Depth of Binary Tree
-description: Maximum Depth of Binary Tree
+description: Given the root of a binary tree, return its maximum depth. A binary tree's maximum depth is the number of nodes along the longest path from the root node down to the farthest leaf node.
 difficulty: Easy
 timeLimit: 15 mins
 week: 1
 tags:
   - Binary Tree
+  - Tree
+  - Depth-First Search
+  - Breadth-First Search
 ---
+
+```js title="Example"
+Input: root = [3,9,20,null,null,15,7]
+Output: 3
+Explanation: The maximum depth is 3.
+
+Input: root = [1,null,2]
+Output: 2
+```
+
+## Approach
+
+1. **Recursive DFS**: Use recursive depth-first search to calculate depth
+2. **Base Case**: If node is null, return 0
+3. **Recursive Calls**: Calculate depth of left and right subtrees
+4. **Maximum Depth**: Return 1 + maximum of left and right subtree depths
+5. **Leaf Nodes**: Leaf nodes have depth 1
+
+## Solution
+
+- Time Complexity: `O(n)`
+  > Where n is the number of nodes in the tree. We visit each node once.
+- Space Complexity: `O(h)`
+  > The recursion stack depth is at most the height of the tree.
+
+```js tab="JavaScript"
+/**
+ * @param {TreeNode} root
+ * @return {number}
+ */
+var maxDepth = function(root) {
+    if (root === null) return 0;
+    
+    const leftDepth = maxDepth(root.left);
+    const rightDepth = maxDepth(root.right);
+    
+    return Math.max(leftDepth, rightDepth) + 1;
+};
+```
+
+```java tab="Java"
+class Solution {
+    public int maxDepth(TreeNode root) {
+        if (root == null) return 0;
+        
+        int leftDepth = maxDepth(root.left);
+        int rightDepth = maxDepth(root.right);
+        
+        return Math.max(leftDepth, rightDepth) + 1;
+    }
+}
+```

@@ -70,8 +70,9 @@ export function DocsLayout(props: DocsLayoutProps) {
     [tabOptions, props.tree]
   );
 
+  // Dimension variables
   const variables = cn(
-    '[--fd-nav-height:56px] md:[--fd-sidebar-width:286px] md:[--fd-nav-height:64px] xl:[--fd-toc-width:286px]',
+    '[--fd-nav-height:56px] md:[--fd-sidebar-width:386px] md:[--fd-nav-height:64px] xl:[--fd-toc-width:286px]',
     tabs.length > 0 && tabMode === 'navbar' && 'lg:[--fd-nav-height:104px]'
   );
 

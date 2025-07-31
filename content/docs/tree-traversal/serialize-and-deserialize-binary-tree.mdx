@@ -1,9 +1,114 @@
 ---
 title: Serialize and Deserialize Binary Tree
-description: Serialize and Deserialize Binary Tree
+description: Design an algorithm to serialize and deserialize a binary tree. There is no restriction on how your serialization/deserialization algorithm should work. You just need to ensure that a binary tree can be serialized to a string and this string can be deserialized to the original tree structure.
 difficulty: Hard
 timeLimit: 40 mins
 week: 4
 tags:
   - Binary Tree
+  - Tree
+  - Depth-First Search
+  - String
 ---
+
+```js title="Example"
+Input: root = [1,2,3,null,null,4,5]
+Output: [1,2,3,null,null,4,5]
+Explanation: The serialized string can be deserialized back to the original tree.
+
+Input: root = []
+Output: []
+```
+
+## Approach
+
+1. **Preorder Traversal**: Use preorder traversal for serialization
+2. **Null Handling**: Include null values in the serialized string
+3. **String Building**: Build comma-separated string with node values
+4. **Deserialization**: Parse the string and reconstruct the tree
+5. **Index Tracking**: Use an index to track current position in string
+
+## Solution
+
+- Time Complexity: `O(n)`
+  > Where n is the number of nodes. We visit each node once during serialization and deserialization.
+- Space Complexity: `O(n)`
+  > Space for the serialized string and recursion stack.
+
+```js tab="JavaScript"
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val) {
+ *     this.val = val;
+ *     this.left = this.right = null;
+ * }
+ */
+
+/**
+ * Encodes a tree to a single string.
+ *
+ * @param {TreeNode} root
+ * @return {string}
+ */
+var serialize = function(root) {
+    if (root === null) return "null";
+    
+    return root.val + "," + serialize(root.left) + "," + serialize(root.right);
+};
+
+/**
+ * Decodes your encoded data to tree.
+ *
+ * @param {string} data
+ * @return {TreeNode}
+ */
+var deserialize = function(data) {
+    const values = data.split(",");
+    let index = 0;
+    
+    const buildTree = () => {
+        if (index >= values.length || values[index] === "null") {
+            index++;
+            return null;
+        }
+        
+        const node = new TreeNode(parseInt(values[index++]));
+        node.left = buildTree();
+        node.right = buildTree();
+        
+        return node;
+    };
+    
+    return buildTree();
+};
+```
+
+```java tab="Java"
+public class Codec {
+    // Encodes a tree to a single string.
+    public String serialize(TreeNode root) {
+        if (root == null) return "null";
+        return root.val + "," + serialize(root.left) + "," + serialize(root.right);
+    }
+    
+    // Decodes your encoded data to tree.
+    public TreeNode deserialize(String data) {
+        String[] values = data.split(",");
+        int[] index = {0};
+        return buildTree(values, index);
+    }
+    
+    private TreeNode buildTree(String[] values, int[] index) {
+        if (index[0] >= values.length || values[index[0]].equals("null")) {
+            index[0]++;
+            return null;
+        }
+        
+        TreeNode node = new TreeNode(Integer.parseInt(values[index[0]++]));
+        node.left = buildTree(values, index);
+        node.right = buildTree(values, index);
+        
+        return node;
+    }
+}
+```

@@ -1,9 +1,77 @@
 ---
 title: Symmetric Tree
-description: Symmetric Tree
+description: Given the root of a binary tree, check whether it is a mirror of itself (i.e., symmetric around its center).
 difficulty: Easy
 timeLimit: 20 mins
 week: 1
 tags:
   - Binary Tree
+  - Tree
+  - Depth-First Search
+  - Breadth-First Search
 ---
+
+```js title="Example"
+Input: root = [1,2,2,3,4,4,3]
+Output: true
+Explanation: The tree is symmetric around its center.
+
+Input: root = [1,2,2,null,3,null,3]
+Output: false
+Explanation: The tree is not symmetric.
+```
+
+## Approach
+
+1. **Recursive DFS**: Use recursive depth-first search to check symmetry
+2. **Mirror Comparison**: Compare left subtree with right subtree
+3. **Value Check**: Check if corresponding nodes have the same value
+4. **Structure Check**: Ensure the structure is mirrored
+5. **Base Cases**: Handle null cases appropriately
+
+## Solution
+
+- Time Complexity: `O(n)`
+  > Where n is the number of nodes in the tree. We visit each node once.
+- Space Complexity: `O(h)`
+  > The recursion stack depth is at most the height of the tree.
+
+```js tab="JavaScript"
+/**
+ * @param {TreeNode} root
+ * @return {boolean}
+ */
+var isSymmetric = function(root) {
+    if (root === null) return true;
+    
+    return isMirror(root.left, root.right);
+};
+
+const isMirror = (left, right) => {
+    if (left === null && right === null) return true;
+    if (left === null || right === null) return false;
+    
+    if (left.val !== right.val) return false;
+    
+    return isMirror(left.left, right.right) && isMirror(left.right, right.left);
+};
+```
+
+```java tab="Java"
+class Solution {
+    public boolean isSymmetric(TreeNode root) {
+        if (root == null) return true;
+        
+        return isMirror(root.left, root.right);
+    }
+    
+    private boolean isMirror(TreeNode left, TreeNode right) {
+        if (left == null && right == null) return true;
+        if (left == null || right == null) return false;
+        
+        if (left.val != right.val) return false;
+        
+        return isMirror(left.left, right.right) && isMirror(left.right, right.left);
+    }
+}
+```

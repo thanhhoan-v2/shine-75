@@ -3,16 +3,16 @@ import { SidebarItem } from '@/components/layout/sidebar/sidebar-item';
 import { SidebarSeparator } from '@/components/layout/sidebar/sidebar-separator';
 import { buttonVariants } from '@/components/ui/button';
 import {
-	Collapsible,
-	CollapsibleContent,
-	CollapsibleTrigger,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import { ScrollArea, ScrollViewport } from '@/components/ui/scroll-area';
 import { isActive } from '@/lib/is-active';
 import { cn } from '@/lib/utils';
 import type {
-	CollapsibleContentProps,
-	CollapsibleTriggerProps,
+  CollapsibleContentProps,
+  CollapsibleTriggerProps,
 } from '@radix-ui/react-collapsible';
 import { Presence } from '@radix-ui/react-presence';
 import { type ScrollAreaProps } from '@radix-ui/react-scroll-area';
@@ -26,15 +26,15 @@ import { useSidebar } from 'fumadocs-ui/contexts/sidebar';
 import { useTreeContext, useTreePath } from 'fumadocs-ui/contexts/tree';
 import { ChevronDown, X } from 'lucide-react';
 import {
-	type ComponentProps,
-	createContext,
-	type FC,
-	Fragment,
-	type ReactNode,
-	useContext,
-	useMemo,
-	useRef,
-	useState,
+  type ComponentProps,
+  createContext,
+  type FC,
+  Fragment,
+  type ReactNode,
+  useContext,
+  useMemo,
+  useRef,
+  useState,
 } from 'react';
 
 export interface SidebarProps extends ComponentProps<'aside'> {
@@ -131,7 +131,7 @@ export function Sidebar({
               {...props}
               data-state={state}
               className={cn(
-                'fixed text-[15px] flex flex-col shadow-lg border-s end-0 inset-y-0 w-[85%] max-w-[380px] z-40 bg-fd-background data-[state=open]:animate-fd-sidebar-in data-[state=closed]:animate-fd-sidebar-out',
+                'fixed text-[15px] flex flex-col shadow-lg border-s end-0 inset-y-0 w-[85%] max-w-[580px] z-40 bg-fd-background data-[state=open]:animate-fd-sidebar-in data-[state=closed]:animate-fd-sidebar-out',
                 !present && 'invisible',
                 props.className
               )}

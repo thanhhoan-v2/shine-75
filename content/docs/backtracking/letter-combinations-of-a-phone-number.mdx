@@ -1,9 +1,104 @@
 ---
 title: Letter Combinations of a Phone Number
-description: Letter Combinations of a Phone Number
+description: Given a string containing digits from 2-9 inclusive, return all possible letter combinations that the number could represent. Return the answer in any order.
 difficulty: Medium
 timeLimit: 30 mins
 week: 2
 tags:
   - Recursion
+  - Backtracking
+  - String
 ---
+
+```js title="Example"
+Input: digits = "23"
+Output: ["ad","ae","af","bd","be","bf","cd","ce","cf"]
+
+Input: digits = ""
+Output: []
+
+Input: digits = "2"
+Output: ["a","b","c"]
+```
+
+## Approach
+
+1. **Digit to Letters Mapping**: Create a mapping of digits to their corresponding letters
+2. **Backtracking**: Use backtracking to generate all possible combinations
+3. **Recursive Function**: For each digit, try all possible letters for that digit
+4. **Base Case**: When we've processed all digits, add the combination to result
+5. **String Building**: Build the combination string as we traverse
+
+## Solution
+
+- Time Complexity: `O(4^n)`
+  > Where n is the number of digits, and 4 is the maximum letters per digit
+- Space Complexity: `O(4^n)`
+  > Space for storing all combinations
+
+```js tab="JavaScript"
+/**
+ * @param {string} digits
+ * @return {string[]}
+ */
+var letterCombinations = function(digits) {
+    if (digits.length === 0) return [];
+    
+    const digitToLetters = {
+        '2': 'abc',
+        '3': 'def',
+        '4': 'ghi',
+        '5': 'jkl',
+        '6': 'mno',
+        '7': 'pqrs',
+        '8': 'tuv',
+        '9': 'wxyz'
+    };
+    
+    const result = [];
+    
+    const backtrack = (index, combination) => {
+        if (index === digits.length) {
+            result.push(combination);
+            return;
+        }
+        
+        const letters = digitToLetters[digits[index]];
+        for (let letter of letters) {
+            backtrack(index + 1, combination + letter);
+        }
+    };
+    
+    backtrack(0, '');
+    return result;
+};
+```
+
+```java tab="Java"
+class Solution {
+    public List<String> letterCombinations(String digits) {
+        if (digits.length() == 0) return new ArrayList<>();
+        
+        String[] digitToLetters = {
+            "", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"
+        };
+        
+        List<String> result = new ArrayList<>();
+        backtrack(result, digits, digitToLetters, 0, "");
+        return result;
+    }
+    
+    private void backtrack(List<String> result, String digits, String[] digitToLetters, 
+                         int index, String combination) {
+        if (index == digits.length()) {
+            result.add(combination);
+            return;
+        }
+        
+        String letters = digitToLetters[digits.charAt(index) - '0'];
+        for (char letter : letters.toCharArray()) {
+            backtrack(result, digits, digitToLetters, index + 1, combination + letter);
+        }
+    }
+}
+```

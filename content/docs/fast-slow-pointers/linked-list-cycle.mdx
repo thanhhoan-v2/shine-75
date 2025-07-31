@@ -1,9 +1,105 @@
 ---
 title: Linked List Cycle
-description: Linked List Cycle
+description: Given head, the head of a linked list, determine if the linked list has a cycle in it. There is a cycle in a linked list if there is some node in the list that can be reached again by continuously following the next pointer.
 difficulty: Easy
 timeLimit: 20 mins
 week: 1
 tags:
   - Linked List
+  - Two Pointers
+  - Fast Slow Pointers
 ---
+
+```js title="Example"
+Input: head = [3,2,0,-4], pos = 1
+Output: true
+Explanation: There is a cycle in the linked list, where the tail connects to the 1st node (0-indexed).
+
+Input: head = [1,2], pos = 0
+Output: true
+Explanation: There is a cycle in the linked list, where the tail connects to the 0th node.
+
+Input: head = [1], pos = -1
+Output: false
+Explanation: There is no cycle in the linked list.
+```
+
+## Approach
+
+1. **Floyd's Tortoise and Hare**: Use two pointers - slow and fast
+2. **Initialize Pointers**: Set both pointers to the head of the list
+3. **Move Pointers**: Move slow pointer by 1 step and fast pointer by 2 steps
+4. **Cycle Detection**: If fast pointer reaches null, there's no cycle
+5. **Meeting Point**: If slow and fast meet, there's a cycle
+
+## Solution
+
+- Time Complexity: `O(n)`
+  > Where n is the number of nodes in the linked list
+- Space Complexity: `O(1)`
+  > We only use two pointers regardless of input size
+
+```js tab="JavaScript"
+/**
+ * Definition for singly-linked list.
+ * function ListNode(val) {
+ *     this.val = val;
+ *     this.next = null;
+ * }
+ */
+
+/**
+ * @param {ListNode} head
+ * @return {boolean}
+ */
+var hasCycle = function(head) {
+    if (!head || !head.next) return false;
+    
+    let slow = head;
+    let fast = head;
+    
+    while (fast && fast.next) {
+        slow = slow.next;
+        fast = fast.next.next;
+        
+        if (slow === fast) {
+            return true;
+        }
+    }
+    
+    return false;
+};
+```
+
+```java tab="Java"
+/**
+ * Definition for singly-linked list.
+ * class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) {
+ *         val = x;
+ *         next = null;
+ *     }
+ * }
+ */
+public class Solution {
+    public boolean hasCycle(ListNode head) {
+        if (head == null || head.next == null) return false;
+        
+        ListNode slow = head;
+        ListNode fast = head;
+        
+        while (fast != null && fast.next != null) {
+            slow = slow.next;
+            fast = fast.next.next;
+            
+            if (slow == fast) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+}
+```

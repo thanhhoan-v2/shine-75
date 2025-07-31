@@ -1,9 +1,95 @@
 ---
 title: Path Sum II
-description: Path Sum II
+description: Given the root of a binary tree and an integer targetSum, return all root-to-leaf paths where the sum of the node values in the path equals targetSum. Each path should be returned as a list of the node values, not node references.
 difficulty: Medium
 timeLimit: 25 mins
 week: 3
 tags:
   - Binary Tree
+  - Tree
+  - Depth-First Search
+  - Backtracking
 ---
+
+```js title="Example"
+Input: root = [5,4,8,11,null,13,4,7,2,null,null,5,1], targetSum = 22
+Output: [[5,4,11,2],[5,8,4,5]]
+Explanation: There are two paths whose sum equals targetSum: 5 + 4 + 11 + 2 = 22 and 5 + 8 + 4 + 5 = 22.
+
+Input: root = [1,2,3], targetSum = 5
+Output: []
+```
+
+## Approach
+
+1. **Recursive DFS**: Use recursive depth-first search to explore all paths
+2. **Path Tracking**: Keep track of the current path from root to current node
+3. **Sum Calculation**: Maintain running sum of the current path
+4. **Leaf Check**: When reaching a leaf, check if sum equals targetSum
+5. **Backtracking**: Remove current node from path when backtracking
+
+## Solution
+
+- Time Complexity: `O(n)`
+  > Where n is the number of nodes in the tree. We visit each node once.
+- Space Complexity: `O(h)`
+  > The recursion stack depth is at most the height of the tree.
+
+```js tab="JavaScript"
+/**
+ * @param {TreeNode} root
+ * @param {number} targetSum
+ * @return {number[][]}
+ */
+var pathSum = function(root, targetSum) {
+    const result = [];
+    
+    const dfs = (node, sum, path) => {
+        if (node === null) return;
+        
+        path.push(node.val);
+        sum += node.val;
+        
+        if (node.left === null && node.right === null) {
+            if (sum === targetSum) {
+                result.push([...path]);
+            }
+        } else {
+            dfs(node.left, sum, path);
+            dfs(node.right, sum, path);
+        }
+        
+        path.pop();
+    };
+    
+    dfs(root, 0, []);
+    return result;
+};
+```
+
+```java tab="Java"
+class Solution {
+    public List<List<Integer>> pathSum(TreeNode root, int targetSum) {
+        List<List<Integer>> result = new ArrayList<>();
+        dfs(root, targetSum, new ArrayList<>(), result);
+        return result;
+    }
+    
+    private void dfs(TreeNode node, int targetSum, List<Integer> path, List<List<Integer>> result) {
+        if (node == null) return;
+        
+        path.add(node.val);
+        
+        if (node.left == null && node.right == null) {
+            if (targetSum == node.val) {
+                result.add(new ArrayList<>(path));
+            }
+        } else {
+            dfs(node.left, targetSum - node.val, path, result);
+            dfs(node.right, targetSum - node.val, path, result);
+        }
+        
+        path.remove(path.size() - 1);
+    }
+}
+```
