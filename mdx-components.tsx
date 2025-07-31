@@ -8,6 +8,7 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
 	return {
 		...defaultMdxComponents,
 		Mermaid,
+		// AddToFavoriteBtn is now handled conditionally in the docs page
 		// HTML `ref` attribute conflicts with `forwardRef`
 		pre: ({ ref: _ref, ...props }) => (
 			<CodeBlock {...props}>

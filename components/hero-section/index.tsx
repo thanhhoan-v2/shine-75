@@ -163,6 +163,15 @@ export default function HeroSection({
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Link>
             </Button>
+            <Button
+              asChild
+              className="hover:bg-primary/5 shadow-sm border-primary/30 rounded-full"
+            >
+              <Link href="/favorites">
+                My Favorites
+                <ArrowRight className="ml-2 w-4 h-4" />
+              </Link>
+            </Button>
           </motion.div>
         </div>
       </div>

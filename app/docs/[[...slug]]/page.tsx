@@ -4,9 +4,11 @@ import {
   DocsPage,
   DocsTitle,
 } from '@/components/layouts/page';
+import AddToFavoriteBtn from '@/components/mdx/add-to-favorite-btn';
 import { Badge } from '@/components/ui/badge';
 import { getDifficultyFromPathname } from '@/lib/db';
 import { source } from '@/lib/source';
+import { getCategoryFromPath, shouldShowFavoriteButton } from '@/lib/utils';
 import { getMDXComponents } from '@/mdx-components';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 import { createRelativeLink } from 'fumadocs-ui/mdx';
@@ -71,6 +73,9 @@ export default async function Page(props: {
             </Badge>
           )}
         </DocsTitle>
+        {shouldShowFavoriteButton(page.path) ? (
+          <AddToFavoriteBtn problemTitle={page.data.title} topic={getCategoryFromPath(page.path)} />
+        ) : null}
         <DocsDescription>{page.data.description}</DocsDescription>
         {difficulty === 'Easy' && (
           <Link
@@ -87,6 +92,9 @@ export default async function Page(props: {
               a: createRelativeLink(source, page),
               Steps,
               Step,
+              AddToFavoriteBtn: shouldShowFavoriteButton(page.path) ? () => (
+                <AddToFavoriteBtn problemTitle={page.data.title} topic={getCategoryFromPath(page.path)} />
+              ) : () => null,
             })}
           />
         </DocsBody>

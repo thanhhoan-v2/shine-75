@@ -1,5 +1,5 @@
-import AppLogo from "@/components/app-logo";
-import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
+import AppLogo from '@/components/app-logo';
+import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
 
 /**
  * Shared layout configurations
@@ -9,9 +9,8 @@ import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
  * Docs Layout: app/docs/layout.tsx
  */
 export const baseOptions: BaseLayoutProps = {
-	nav: {
-		title: <AppLogo />,
-	},
-	// see https://fumadocs.dev/docs/ui/navigation/links
-	links: [],
+  nav: {
+    title: <AppLogo />,
+  },
+  // see https://fumadocs.dev/docs/ui/navigation/links
 };

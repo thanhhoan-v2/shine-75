@@ -3,7 +3,7 @@ import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 
 export const buttonVariants = cva(
-	"inline-flex justify-center items-center disabled:opacity-50 p-2 rounded-md focus-visible:outline-none font-medium text-sm transition-colors duration-100 disabled:pointer-events-none",
+	"inline-flex justify-center items-center disabled:opacity-50 p-2 rounded-md focus-visible:outline-none font-medium text-sm transition-colors duration-100 cursor-pointer disabled:pointer-events-none",
 	{
 		variants: {
 			color: {
