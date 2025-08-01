@@ -1,9 +1,208 @@
 ---
 title: Trapping Rain Water
-description: Trapping Rain Water
+description: Given n non-negative integers representing an elevation map where the width of each bar is 1, compute how much water it can trap after raining.
 difficulty: Hard
 timeLimit: 35 mins
-week: 4
+week: 3
 tags:
+  - Array
   - Stack
+  - Two Pointers
+  - Dynamic Programming
 ---
+
+```js title="Example"
+Input: height = [0,1,0,2,1,0,1,3,2,1,2,1]
+Output: 6
+Explanation: The elevation map is represented by array [0,1,0,2,1,0,1,3,2,1,2,1]. In this case, 6 units of rain water are being trapped.
+
+Input: height = [4,2,0,3,2,5]
+Output: 9
+```
+
+## Approach
+
+1. **Two Pointers**: Use left and right pointers to track the maximum heights from both sides
+2. **Water Calculation**: At each position, water trapped = min(leftMax, rightMax) - height[i]
+3. **Pointer Movement**: Move the pointer with the smaller maximum height
+4. **Boundary Handling**: Handle edge cases where height array is empty or has less than 3 elements
+5. **Accumulation**: Sum up all the water trapped at each position
+
+## Solution
+
+- Time Complexity: `O(n)`
+  > We traverse the array once with two pointers
+- Space Complexity: `O(1)`
+  > We only use a constant amount of extra space
+
+```js tab="JavaScript"
+/**
+ * @param {number[]} height
+ * @return {number}
+ */
+var trap = function(height) {
+    if (height.length < 3) return 0;
+    
+    let left = 0;
+    let right = height.length - 1;
+    let leftMax = 0;
+    let rightMax = 0;
+    let water = 0;
+    
+    while (left < right) {
+        if (height[left] < height[right]) {
+            if (height[left] >= leftMax) {
+                leftMax = height[left];
+            } else {
+                water += leftMax - height[left];
+            }
+            left++;
+        } else {
+            if (height[right] >= rightMax) {
+                rightMax = height[right];
+            } else {
+                water += rightMax - height[right];
+            }
+            right--;
+        }
+    }
+    
+    return water;
+};
+```
+
+```java tab="Java"
+class Solution {
+    public int trap(int[] height) {
+        if (height.length < 3) return 0;
+        
+        int left = 0;
+        int right = height.length - 1;
+        int leftMax = 0;
+        int rightMax = 0;
+        int water = 0;
+        
+        while (left < right) {
+            if (height[left] < height[right]) {
+                if (height[left] >= leftMax) {
+                    leftMax = height[left];
+                } else {
+                    water += leftMax - height[left];
+                }
+                left++;
+            } else {
+                if (height[right] >= rightMax) {
+                    rightMax = height[right];
+                } else {
+                    water += rightMax - height[right];
+                }
+                right--;
+            }
+        }
+        
+        return water;
+    }
+}
+```
+
+## Alternative Approach: Dynamic Programming
+
+```js tab="JavaScript (DP)"
+/**
+ * @param {number[]} height
+ * @return {number}
+ */
+var trap = function(height) {
+    if (height.length < 3) return 0;
+    
+    const n = height.length;
+    const leftMax = new Array(n).fill(0);
+    const rightMax = new Array(n).fill(0);
+    
+    // Calculate left max for each position
+    leftMax[0] = height[0];
+    for (let i = 1; i < n; i++) {
+        leftMax[i] = Math.max(leftMax[i - 1], height[i]);
+    }
+    
+    // Calculate right max for each position
+    rightMax[n - 1] = height[n - 1];
+    for (let i = n - 2; i >= 0; i--) {
+        rightMax[i] = Math.max(rightMax[i + 1], height[i]);
+    }
+    
+    // Calculate water trapped
+    let water = 0;
+    for (let i = 0; i < n; i++) {
+        water += Math.min(leftMax[i], rightMax[i]) - height[i];
+    }
+    
+    return water;
+};
+```
+
+## Alternative Approach: Stack
+
+```js tab="JavaScript (Stack)"
+/**
+ * @param {number[]} height
+ * @return {number}
+ */
+var trap = function(height) {
+    const stack = [];
+    let water = 0;
+    
+    for (let i = 0; i < height.length; i++) {
+        while (stack.length > 0 && height[i] > height[stack[stack.length - 1]]) {
+            const top = stack.pop();
+            
+            if (stack.length === 0) break;
+            
+            const distance = i - stack[stack.length - 1] - 1;
+            const boundedHeight = Math.min(height[i], height[stack[stack.length - 1]]) - height[top];
+            water += distance * boundedHeight;
+        }
+        
+        stack.push(i);
+    }
+    
+    return water;
+};
+```
+
+## Key Insights
+
+1. **Two Pointers**: Most efficient approach, O(n) time and O(1) space
+2. **Water Formula**: Water trapped = min(leftMax, rightMax) - currentHeight
+3. **Pointer Strategy**: Move the pointer with the smaller maximum height
+4. **Boundary Conditions**: Water can only be trapped if there are walls on both sides
+5. **Multiple Approaches**: Can be solved with DP, Stack, or Two Pointers
+
+## Common Mistakes
+
+1. **Not handling edge cases**: Array with less than 3 elements cannot trap water
+2. **Incorrect water calculation**: Must use min(leftMax, rightMax) - currentHeight
+3. **Wrong pointer movement**: Should move the pointer with smaller maximum
+4. **Forgetting to update max values**: Need to update leftMax and rightMax as we move
+5. **Not considering negative values**: Water trapped cannot be negative
+
+## Visual Example
+
+```
+     |
+     |     |
+|    |  |  |
+|  | |  |  |
+|__|_|__|__|
+ 0 1 0 2 1 0 1 3 2 1 2 1
+
+Water trapped at each position:
+- Position 2: min(1, 3) - 0 = 1
+- Position 4: min(1, 3) - 0 = 1
+- Position 5: min(1, 3) - 1 = 0
+- Position 6: min(1, 3) - 0 = 1
+- Position 9: min(2, 2) - 1 = 1
+- Position 10: min(2, 1) - 2 = 0
+
+Total water = 1 + 1 + 0 + 1 + 1 + 0 = 6
+```
