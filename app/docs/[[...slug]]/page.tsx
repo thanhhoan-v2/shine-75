@@ -5,6 +5,7 @@ import {
   DocsTitle,
 } from '@/components/layouts/page';
 import AddToFavoriteBtn from '@/components/mdx/add-to-favorite-btn';
+import CompletedBtn from '@/components/mdx/completed-btn';
 import { Badge } from '@/components/ui/badge';
 import { getDifficultyFromPathname } from '@/lib/db';
 import { source } from '@/lib/source';
@@ -74,7 +75,10 @@ export default async function Page(props: {
           )}
         </DocsTitle>
         {shouldShowFavoriteButton(page.path) ? (
-          <AddToFavoriteBtn problemTitle={page.data.title} topic={getCategoryFromPath(page.path)} />
+          <div className="flex gap-2">
+            <AddToFavoriteBtn problemTitle={page.data.title} topic={getCategoryFromPath(page.path)} />
+            <CompletedBtn problemTitle={page.data.title} topic={getCategoryFromPath(page.path)} />
+          </div>
         ) : null}
         <DocsDescription>{page.data.description}</DocsDescription>
         {difficulty === 'Easy' && (
@@ -94,6 +98,9 @@ export default async function Page(props: {
               Step,
               AddToFavoriteBtn: shouldShowFavoriteButton(page.path) ? () => (
                 <AddToFavoriteBtn problemTitle={page.data.title} topic={getCategoryFromPath(page.path)} />
+              ) : () => null,
+              CompletedBtn: shouldShowFavoriteButton(page.path) ? () => (
+                <CompletedBtn problemTitle={page.data.title} topic={getCategoryFromPath(page.path)} />
               ) : () => null,
             })}
           />

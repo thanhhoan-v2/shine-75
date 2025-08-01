@@ -149,12 +149,12 @@ export default function HeroSection({
               asChild
               className="bg-gradient-to-r from-primary hover:from-primary/90 to-rose-500 hover:to-rose-500/90 shadow-md shadow-primary/10 border-none rounded-full"
             >
-              <Link href="/practice">
+              <Link href="/docs">
                 Start practice
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Link>
             </Button>
-            <Button
+            {/* <Button
               asChild
               className="hover:bg-primary/5 shadow-sm border-primary/30 rounded-full"
             >
@@ -171,7 +171,7 @@ export default function HeroSection({
                 My Favorites
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Link>
-            </Button>
+            </Button> */}
           </motion.div>
         </div>
       </div>

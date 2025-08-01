@@ -10,27 +10,27 @@ import { LanguageToggle } from '../layout/language-toggle';
 import { type Option, RootToggle } from '../layout/root-toggle';
 import { LargeSearchToggle, SearchToggle } from '../layout/search-toggle';
 import {
-  Sidebar,
-  SidebarCollapseTrigger,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarPageTree,
-  SidebarViewport,
+    Sidebar,
+    SidebarCollapseTrigger,
+    SidebarFooter,
+    SidebarHeader,
+    SidebarPageTree,
+    SidebarViewport,
 } from '../layout/sidebar';
 import { ThemeToggle } from '../layout/theme-toggle';
 import { buttonVariants } from '../ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import {
-  getSidebarTabsFromOptions,
-  SidebarLinkItem,
-  type SidebarOptions,
+    getSidebarTabsFromOptions,
+    SidebarLinkItem,
+    type SidebarOptions,
 } from './docs/shared';
 import { BaseLinkItem, type LinkItemType } from './links';
 import {
-  LayoutBody,
-  LayoutTabs,
-  Navbar,
-  NavbarSidebarTrigger,
+    LayoutBody,
+    LayoutTabs,
+    Navbar,
+    NavbarSidebarTrigger,
 } from './notebook-client';
 import { type BaseLayoutProps, getLinks } from './shared';
 
@@ -146,40 +146,42 @@ export function DocsLayout(props: DocsLayoutProps) {
               <SidebarPageTree components={sidebarComponents} />
             </SidebarViewport>
             <HideIfEmpty>
-              <SidebarFooter className="data-[empty=true]:hidden flex flex-row justify-end items-center">
-                <div className="empty:hidden lg:hidden flex flex-1 items-center">
-                  {links
-                    .filter((item) => item.type === 'icon')
-                    .map((item, i) => (
-                      <BaseLinkItem
-                        key={i}
-                        item={item}
-                        className={cn(
-                          buttonVariants({
-                            size: 'icon-sm',
-                            color: 'ghost',
-                            className: 'text-fd-muted-foreground',
-                          })
-                        )}
-                        aria-label={item.label}
-                      >
-                        {item.icon}
-                      </BaseLinkItem>
+              <SidebarFooter className="data-[empty=true]:hidden flex flex-col">
+                <div className="flex flex-row justify-end items-center">
+                  <div className="empty:hidden lg:hidden flex flex-1 items-center">
+                    {links
+                      .filter((item) => item.type === 'icon')
+                      .map((item, i) => (
+                        <BaseLinkItem
+                          key={i}
+                          item={item}
+                          className={cn(
+                            buttonVariants({
+                              size: 'icon-sm',
+                              color: 'ghost',
+                              className: 'text-fd-muted-foreground',
+                            })
+                          )}
+                          aria-label={item.label}
+                        >
+                          {item.icon}
+                        </BaseLinkItem>
+                      ))}
+                  </div>
+                  {i18n ? (
+                    <LanguageToggle className="md:hidden me-auto">
+                      <Languages className="size-4.5 text-fd-muted-foreground" />
+                    </LanguageToggle>
+                  ) : null}
+                  {themeSwitch.enabled !== false &&
+                    (themeSwitch.component ?? (
+                      <ThemeToggle
+                        className="md:hidden"
+                        mode={themeSwitch?.mode ?? 'light-dark-system'}
+                      />
                     ))}
+                  {sidebarFooter}
                 </div>
-                {i18n ? (
-                  <LanguageToggle className="md:hidden me-auto">
-                    <Languages className="size-4.5 text-fd-muted-foreground" />
-                  </LanguageToggle>
-                ) : null}
-                {themeSwitch.enabled !== false &&
-                  (themeSwitch.component ?? (
-                    <ThemeToggle
-                      className="md:hidden"
-                      mode={themeSwitch?.mode ?? 'light-dark-system'}
-                    />
-                  ))}
-                {sidebarFooter}
               </SidebarFooter>
             </HideIfEmpty>
           </Sidebar>
