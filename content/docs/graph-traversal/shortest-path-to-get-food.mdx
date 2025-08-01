@@ -1,32 +1,37 @@
 ---
 title: Shortest Path to Get Food
-description: You are starving and you want to eat food as quickly as possible. You want to find the shortest path to arrive at any food cell.
+description: You are starving and you want to eat food as quickly as possible. You want to find the shortest path to arrive at any food cell. You are given an m x n grid of characters 'W', 'E', 'S', 'X', 'O', and '#'. You can only walk on 'O' cells and cannot walk on 'X' cells. Return the length of the shortest path for you to reach any food, or -1 if you cannot reach any food.
 difficulty: Medium
 timeLimit: 30 mins
 week: 2
 tags:
   - Graph
+  - BFS
 ---
 
 ```js title="Example"
 Input: grid = [["X","X","X","X","X","X"],["X","*","O","O","O","X"],["X","O","O","#","O","X"],["X","X","X","X","X","X"]]
 Output: 3
-Explanation: The shortest path to get food is shown.
+Explanation: The shortest path to get food is: [1,1] → [1,2] → [2,2]
+
+Input: grid = [["X","X","X","X","X"],["X","*","X","O","X"],["X","O","X","#","X"],["X","X","X","X","X"]]
+Output: -1
+Explanation: You cannot reach the food.
 ```
 
 ## Approach
 
-1. **Breadth-First Search**: Use BFS to find the shortest path from starting position to food
-2. **Queue Initialization**: Start from the position marked with '*'
-3. **BFS Traversal**: For each position, explore all four directions
-4. **Food Detection**: When we encounter '#', we've found food
-5. **Distance Tracking**: Track the distance from starting position
-6. **Return Result**: Return the minimum distance to reach food
+1. **Breadth-First Search**: Use BFS to find the shortest path from start to food
+2. **Find Start Position**: Locate the starting position ('*')
+3. **Queue Initialization**: Start BFS from the starting position
+4. **BFS Traversal**: Explore all valid adjacent cells (only 'O' cells)
+5. **Food Detection**: When a '#' cell is reached, return the path length
+6. **Return Result**: Return the shortest path length or -1 if no path exists
 
 ## Solution
 
 - Time Complexity: `O(m*n)`
-  > Where m and n are the dimensions of the grid
+  > We visit each cell at most once
 - Space Complexity: `O(m*n)`
   > We use a queue and visited matrix
 
@@ -38,37 +43,41 @@ Explanation: The shortest path to get food is shown.
 var getFood = function(grid) {
     const m = grid.length;
     const n = grid[0].length;
-    const queue = [];
-    const visited = Array(m).fill().map(() => Array(n).fill(false));
     
     // Find starting position
+    let startRow = -1, startCol = -1;
     for (let i = 0; i < m; i++) {
         for (let j = 0; j < n; j++) {
             if (grid[i][j] === '*') {
-                queue.push([i, j, 0]);
-                visited[i][j] = true;
+                startRow = i;
+                startCol = j;
                 break;
             }
         }
+        if (startRow !== -1) break;
     }
+    
+    const queue = [[startRow, startCol, 0]];
+    const visited = Array(m).fill().map(() => Array(n).fill(false));
+    visited[startRow][startCol] = true;
     
     const directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
     
     while (queue.length > 0) {
-        const [i, j, distance] = queue.shift();
+        const [row, col, distance] = queue.shift();
         
-        if (grid[i][j] === '#') {
+        if (grid[row][col] === '#') {
             return distance;
         }
         
-        for (const [di, dj] of directions) {
-            const ni = i + di;
-            const nj = j + dj;
+        for (const [dr, dc] of directions) {
+            const newRow = row + dr;
+            const newCol = col + dc;
             
-            if (ni >= 0 && ni < m && nj >= 0 && nj < n && 
-                !visited[ni][nj] && grid[ni][nj] !== 'X') {
-                visited[ni][nj] = true;
-                queue.push([ni, nj, distance + 1]);
+            if (newRow >= 0 && newRow < m && newCol >= 0 && newCol < n && 
+                !visited[newRow][newCol] && grid[newRow][newCol] !== 'X') {
+                visited[newRow][newCol] = true;
+                queue.push([newRow, newCol, distance + 1]);
             }
         }
     }
@@ -82,38 +91,43 @@ class Solution {
     public int getFood(char[][] grid) {
         int m = grid.length;
         int n = grid[0].length;
-        Queue<int[]> queue = new LinkedList<>();
-        boolean[][] visited = new boolean[m][n];
         
         // Find starting position
+        int startRow = -1, startCol = -1;
         for (int i = 0; i < m; i++) {
             for (int j = 0; j < n; j++) {
                 if (grid[i][j] == '*') {
-                    queue.offer(new int[]{i, j, 0});
-                    visited[i][j] = true;
+                    startRow = i;
+                    startCol = j;
                     break;
                 }
             }
+            if (startRow != -1) break;
         }
+        
+        Queue<int[]> queue = new LinkedList<>();
+        queue.offer(new int[]{startRow, startCol, 0});
+        boolean[][] visited = new boolean[m][n];
+        visited[startRow][startCol] = true;
         
         int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
         
         while (!queue.isEmpty()) {
             int[] curr = queue.poll();
-            int i = curr[0], j = curr[1], distance = curr[2];
+            int row = curr[0], col = curr[1], distance = curr[2];
             
-            if (grid[i][j] == '#') {
+            if (grid[row][col] == '#') {
                 return distance;
             }
             
             for (int[] dir : directions) {
-                int ni = i + dir[0];
-                int nj = j + dir[1];
+                int newRow = row + dir[0];
+                int newCol = col + dir[1];
                 
-                if (ni >= 0 && ni < m && nj >= 0 && nj < n && 
-                    !visited[ni][nj] && grid[ni][nj] != 'X') {
-                    visited[ni][nj] = true;
-                    queue.offer(new int[]{ni, nj, distance + 1});
+                if (newRow >= 0 && newRow < m && newCol >= 0 && newCol < n && 
+                    !visited[newRow][newCol] && grid[newRow][newCol] != 'X') {
+                    visited[newRow][newCol] = true;
+                    queue.offer(new int[]{newRow, newCol, distance + 1});
                 }
             }
         }

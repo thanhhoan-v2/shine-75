@@ -2,9 +2,12 @@
 
 import { Button } from '@/components/ui/button';
 import { getAllPatterns, studyPlan } from '@/lib/db';
+import { ArrowRightIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { useCompleted } from '../layout/sidebar/completed-context';
 import { Badge } from '../ui/badge';
+import AddToFavoriteBtn from './add-to-favorite-btn';
 import CompletedBtn from './completed-btn';
 
 interface Problem {
@@ -29,10 +32,32 @@ const transformProblems = (): Topic[] => {
 
   return patterns.map((patternName) => {
     const pattern = studyPlan[patternName];
-    const slug = patternName
-      .toLowerCase()
-      .replace(/\s+/g, '-')
-      .replace(/[&()]/g, '');
+
+    const patternSlugMap: Record<string, string> = {
+      Backtracking: 'backtracking',
+      'Bit Manipulation': 'bit-manipulation',
+      'Cyclic Sort': 'cyclic-sort',
+      'Fast & Slow Pointers': 'fast-slow-pointers',
+      'Graph Traversal': 'graph-traversal',
+      'Hash Table': 'hash-table',
+      'Heap': 'heap',
+      'Linked List': 'linked-list',
+      'Merge Intervals': 'merge-intervals',
+      'Sliding Window': 'sliding-window',
+      'Stack': 'stack',
+      'Topological Sort': 'topological-sort',
+      'Tree Traversal': 'tree-traversal',
+      'Two Pointers': 'two-pointers',
+    };
+
+    const slug =
+      patternSlugMap[patternName] ||
+      patternName
+        .toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[&]/g, '')
+        .replace(/[()]/g, '') // Remove parentheses
+        .replace(/--/g, '-');
 
     // Transform problems to match our interface
     const problems: Problem[] = pattern.problems.map((problem, index) => ({
@@ -47,7 +72,7 @@ const transformProblems = (): Topic[] => {
           : '35 mins',
       week: Math.floor(index / 3) + 1, // Distribute across weeks
       tags: [problem.category, patternName],
-      slug: problem.name.toLowerCase().replace(/\s+/g, '-'),
+      slug: `${slug}/${problem.name.toLowerCase().replace(/\s+/g, '-')}`,
     }));
 
     return {
@@ -65,6 +90,7 @@ const ProblemGenerator = () => {
   const [selectedTopic, setSelectedTopic] = useState<string>('');
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('');
   const [generatedProblems, setGeneratedProblems] = useState<Problem[]>([]);
+  const { isCompleted, toggleCompleted, isLoaded } = useCompleted();
 
   // Automatically generate problems when both topic and difficulty are selected
   useEffect(() => {
@@ -176,25 +202,46 @@ const ProblemGenerator = () => {
               ? ` (${selectedDifficulty}) across all topics`
               : ''}
           </Badge>
-          <div className="space-y-3">
+          <div className="flex flex-col gap-2 max-h-[500px] overflow-y-auto">
             {generatedProblems.map((problem, index) => (
-              <div key={`${selectedTopic || 'all'}-${problem.slug}-${index}`} className="flex items-center gap-2">
-                <Link
-                  href={`/docs/${problem.slug}`}
-                  className="block hover:bg-gray-800/50 p-4 border rounded-lg w-[500px] transition-colors"
-                >
-                  <div className="flex justify-between items-start">
-                    <h5 className="font-medium">{problem.title}</h5>
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(
-                        problem.difficulty
-                      )}`}
-                    >
-                      {problem.difficulty}
-                    </span>
+              <div
+                key={`${selectedTopic || 'all'}-${problem.slug}-${index}`}
+                className="flex items-center gap-2"
+              >
+                <div className="block hover:bg-gray-800/50 p-4 border rounded-lg w-full transition-colors">
+                  <div className="flex justify-between items-center">
+                    <h5 className="flex items-center gap-2 font-medium">
+                      {problem.title}
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(
+                          problem.difficulty
+                        )}`}
+                      >
+                        {problem.difficulty}
+                      </span>
+                    </h5>
+                    <div className="flex items-center gap-2">
+                      <CompletedBtn
+                        problemTitle={problem.title}
+                        variant="just-icon"
+                      />
+                      <AddToFavoriteBtn
+                        problemTitle={problem.title}
+                        variant="just-icon"
+                      />
+                      <Button asChild>
+                        <Link
+                          href={`/docs/${problem.slug}`}
+                          target="_blank"
+                          className="flex items-center gap-1"
+                        >
+                          View Problem
+                          <ArrowRightIcon className="w-4 h-4" />
+                        </Link>
+                      </Button>
+                    </div>
                   </div>
-                </Link>
-                <CompletedBtn problemTitle={problem.title} />
+                </div>
               </div>
             ))}
           </div>

@@ -1,30 +1,462 @@
 {
-  "title": "Shine75",
-  "root": true,
-  "pages": [
-    "!template",
-    "index",
-    "problem-generator",
-    "easy-problems",
-    "---Two Pointers---",
-    "...two-pointers",
-    "---Fast & Slow Pointers---",
-    "...fast-slow-pointers",
-    "---Sliding Window---",
-    "...sliding-window",
-    "---Tree Traversal---",
-    "...tree-traversal",
-    "---Cyclic Sort---",
-    "...cyclic-sort",
-    "---Merge Intervals---",
-    "...merge-intervals",
-    "---Bit Manipulation---",
-    "...bit-manipulation",
-    "---Graph Traversal (BFS/DFS)---",
-    "...graph-traversal",
-    "---Topological Sort---",
-    "...topological-sort",
-    "---Backtracking---",
-    "...backtracking"
+  "title": "Algorithm Patterns",
+  "description": "A comprehensive collection of algorithmic problems organized by patterns and techniques",
+  "icon": "Brain",
+  "sections": [
+    {
+      "title": "Getting Started",
+      "items": [
+        {
+          "title": "Algorithm Patterns",
+          "href": "/docs"
+        },
+        {
+          "title": "Problem Generator",
+          "href": "/docs/problem-generator"
+        }
+      ]
+    },
+    {
+      "title": "Two Pointers",
+      "items": [
+        {
+          "title": "Two Sum",
+          "href": "/docs/two-pointers/two-sum"
+        },
+        {
+          "title": "Valid Palindrome",
+          "href": "/docs/two-pointers/valid-palindrome"
+        },
+        {
+          "title": "Container With Most Water",
+          "href": "/docs/two-pointers/container-with-most-water"
+        },
+        {
+          "title": "3Sum",
+          "href": "/docs/two-pointers/3sum"
+        },
+        {
+          "title": "Move Zeroes",
+          "href": "/docs/two-pointers/move-zeroes"
+        },
+        {
+          "title": "Squares of a Sorted Array",
+          "href": "/docs/two-pointers/squares-of-a-sorted-array"
+        },
+        {
+          "title": "Sort Colors",
+          "href": "/docs/two-pointers/sort-colors"
+        },
+        {
+          "title": "Remove Nth Node From End of List",
+          "href": "/docs/two-pointers/remove-nth-node-from-end-of-list"
+        },
+        {
+          "title": "Reorder List",
+          "href": "/docs/two-pointers/reorder-list"
+        },
+        {
+          "title": "Rotate Array",
+          "href": "/docs/two-pointers/rotate-array"
+        },
+        {
+          "title": "3Sum Closest",
+          "href": "/docs/two-pointers/3sum-closest"
+        },
+        {
+          "title": "Trapping Rain Water",
+          "href": "/docs/stack/trapping-rain-water"
+        }
+      ]
+    },
+    {
+      "title": "Fast & Slow Pointers",
+      "items": [
+        {
+          "title": "Linked List Cycle",
+          "href": "/docs/fast-slow-pointers/linked-list-cycle"
+        },
+        {
+          "title": "Middle of the Linked List",
+          "href": "/docs/fast-slow-pointers/middle-of-the-linked-list"
+        },
+        {
+          "title": "Palindrome Linked List",
+          "href": "/docs/fast-slow-pointers/palindrome-linked-list"
+        },
+        {
+          "title": "Find the Duplicate Number",
+          "href": "/docs/fast-slow-pointers/find-the-duplicate-number"
+        },
+        {
+          "title": "Longest Consecutive Sequence",
+          "href": "/docs/fast-slow-pointers/longest-consecutive-sequence"
+        },
+        {
+          "title": "Reverse Nodes in k-Group",
+          "href": "/docs/fast-slow-pointers/reverse-nodes-in-k-group"
+        }
+      ]
+    },
+    {
+      "title": "Sliding Window",
+      "items": [
+        {
+          "title": "Best Time to Buy and Sell Stock",
+          "href": "/docs/sliding-window/best-time-to-buy-and-sell-stock"
+        },
+        {
+          "title": "Longest Substring Without Repeating Characters",
+          "href": "/docs/sliding-window/longest-substring-without-repeating-characters"
+        },
+        {
+          "title": "Minimum Window Substring",
+          "href": "/docs/sliding-window/minimum-window-substring"
+        },
+        {
+          "title": "Longest Repeating Character Replacement",
+          "href": "/docs/sliding-window/longest-repeating-character-replacement"
+        },
+        {
+          "title": "Find All Anagrams in a String",
+          "href": "/docs/sliding-window/find-all-anagrams-in-a-string"
+        },
+        {
+          "title": "Find K Closest Elements",
+          "href": "/docs/heap/find-k-closest-elements"
+        },
+        {
+          "title": "Sliding Window Maximum",
+          "href": "/docs/sliding-window/sliding-window-maximum"
+        },
+        {
+          "title": "Subarray Sum Equals K",
+          "href": "/docs/sliding-window/subarray-sum-equals-k"
+        }
+      ]
+    },
+    {
+      "title": "Tree Traversal",
+      "items": [
+        {
+          "title": "Invert Binary Tree",
+          "href": "/docs/tree-traversal/invert-binary-tree"
+        },
+        {
+          "title": "Balanced Binary Tree",
+          "href": "/docs/tree-traversal/balanced-binary-tree"
+        },
+        {
+          "title": "Diameter of Binary Tree",
+          "href": "/docs/tree-traversal/diameter-of-binary-tree"
+        },
+        {
+          "title": "Maximum Depth of Binary Tree",
+          "href": "/docs/tree-traversal/maximum-depth-of-binary-tree"
+        },
+        {
+          "title": "Same Tree",
+          "href": "/docs/tree-traversal/same-tree"
+        },
+        {
+          "title": "Symmetric Tree",
+          "href": "/docs/tree-traversal/symmetric-tree"
+        },
+        {
+          "title": "Subtree of Another Tree",
+          "href": "/docs/tree-traversal/subtree-of-another-tree"
+        },
+        {
+          "title": "Lowest Common Ancestor of a Binary Search Tree",
+          "href": "/docs/tree-traversal/lowest-common-ancestor-of-a-binary-search-tree"
+        },
+        {
+          "title": "Convert Sorted Array to Binary Search Tree",
+          "href": "/docs/tree-traversal/convert-sorted-array-to-binary-search-tree"
+        },
+        {
+          "title": "Binary Tree Level Order Traversal",
+          "href": "/docs/tree-traversal/binary-tree-level-order-traversal"
+        },
+        {
+          "title": "Binary Tree Maximum Path Sum",
+          "href": "/docs/tree-traversal/binary-tree-maximum-path-sum"
+        },
+        {
+          "title": "Binary Tree Right Side View",
+          "href": "/docs/tree-traversal/binary-tree-right-side-view"
+        },
+        {
+          "title": "Construct Binary Tree from Preorder and Inorder Traversal",
+          "href": "/docs/tree-traversal/construct-binary-tree-from-preorder-and-inorder-traversal"
+        },
+        {
+          "title": "Kth Smallest Element in a BST",
+          "href": "/docs/tree-traversal/kth-smallest-element-in-an-bst"
+        },
+        {
+          "title": "Lowest Common Ancestor of a Binary Tree",
+          "href": "/docs/tree-traversal/lowest-common-ancestor-of-a-binary-tree"
+        },
+        {
+          "title": "Path Sum II",
+          "href": "/docs/tree-traversal/path-sum-ii"
+        },
+        {
+          "title": "Serialize and Deserialize Binary Tree",
+          "href": "/docs/tree-traversal/serialize-and-deserialize-binary-tree"
+        },
+        {
+          "title": "Validate Binary Search Tree",
+          "href": "/docs/tree-traversal/validate-binary-search-tree"
+        }
+      ]
+    },
+    {
+      "title": "Graph Traversal",
+      "items": [
+        {
+          "title": "Flood Fill",
+          "href": "/docs/graph-traversal/flood-fill"
+        },
+        {
+          "title": "Clone Graph",
+          "href": "/docs/graph-traversal/clone-graph"
+        },
+        {
+          "title": "01 Matrix",
+          "href": "/docs/graph-traversal/01-matrix"
+        },
+        {
+          "title": "Accounts Merge",
+          "href": "/docs/graph-traversal/accounts-merge"
+        },
+        {
+          "title": "Bus Routes",
+          "href": "/docs/graph-traversal/bus-routes"
+        },
+        {
+          "title": "Graph Valid Tree",
+          "href": "/docs/graph-traversal/graph-valid-tree"
+        },
+        {
+          "title": "Longest Increasing Path in a Matrix",
+          "href": "/docs/graph-traversal/longest-increasing-path-in-a-matrix"
+        },
+        {
+          "title": "Minimum Knight Moves",
+          "href": "/docs/graph-traversal/minimum-knight-moves"
+        },
+        {
+          "title": "Number of Connected Components in an Undirected Graph",
+          "href": "/docs/graph-traversal/number-of-connected-components-in-an-undirected-graph"
+        },
+        {
+          "title": "Number of Islands",
+          "href": "/docs/graph-traversal/number-of-islands"
+        },
+        {
+          "title": "Pacific Atlantic Water Flow",
+          "href": "/docs/graph-traversal/pacific-atlantic-water-flow"
+        },
+        {
+          "title": "Rotting Oranges",
+          "href": "/docs/graph-traversal/rotting-oranges"
+        },
+        {
+          "title": "Shortest Path to Get Food",
+          "href": "/docs/graph-traversal/shortest-path-to-get-food"
+        },
+        {
+          "title": "Word Ladder",
+          "href": "/docs/graph-traversal/word-ladder"
+        },
+        {
+          "title": "Word Search",
+          "href": "/docs/graph-traversal/word-search"
+        }
+      ]
+    },
+    {
+      "title": "Merge Intervals",
+      "items": [
+        {
+          "title": "Meeting Rooms",
+          "href": "/docs/merge-intervals/meeting-rooms"
+        },
+        {
+          "title": "Meeting Rooms II",
+          "href": "/docs/merge-intervals/meeting-rooms-ii"
+        },
+        {
+          "title": "Merge Intervals",
+          "href": "/docs/merge-intervals/merge-intervals"
+        },
+        {
+          "title": "Insert Interval",
+          "href": "/docs/merge-intervals/insert-interval"
+        },
+        {
+          "title": "Non-overlapping Intervals",
+          "href": "/docs/merge-intervals/non-overlapping-intervals"
+        },
+        {
+          "title": "Employee Free Time",
+          "href": "/docs/merge-intervals/employee-free-time"
+        }
+      ]
+    },
+    {
+      "title": "Cyclic Sort",
+      "items": [
+        {
+          "title": "Contains Duplicate",
+          "href": "/docs/cyclic-sort/contains-duplicate"
+        },
+        {
+          "title": "Missing Number",
+          "href": "/docs/cyclic-sort/missing-number"
+        },
+        {
+          "title": "First Missing Positive",
+          "href": "/docs/cyclic-sort/first-missing-positive"
+        }
+      ]
+    },
+    {
+      "title": "Bit Manipulation",
+      "items": [
+        {
+          "title": "Add Binary",
+          "href": "/docs/bit-manipulation/add-binary"
+        },
+        {
+          "title": "Counting Bits",
+          "href": "/docs/bit-manipulation/counting-bits"
+        },
+        {
+          "title": "Number of 1 Bits",
+          "href": "/docs/bit-manipulation/number-of-1-bits"
+        },
+        {
+          "title": "Reverse Bits",
+          "href": "/docs/bit-manipulation/reverse-bits"
+        },
+        {
+          "title": "Single Number",
+          "href": "/docs/bit-manipulation/single-number"
+        }
+      ]
+    },
+    {
+      "title": "Hash Table",
+      "items": [
+        {
+          "title": "Valid Anagram",
+          "href": "/docs/hash-table/valid-anagram"
+        }
+      ]
+    },
+    {
+      "title": "Heap",
+      "items": [
+        {
+          "title": "Find K Closest Elements",
+          "href": "/docs/heap/find-k-closest-elements"
+        }
+      ]
+    },
+    {
+      "title": "Linked List",
+      "items": [
+        {
+          "title": "Linked List Cycle",
+          "href": "/docs/linked-list/linked-list-cycle"
+        },
+        {
+          "title": "Middle of the Linked List",
+          "href": "/docs/linked-list/middle-of-the-linked-list"
+        },
+        {
+          "title": "Palindrome Linked List",
+          "href": "/docs/linked-list/palindrome-linked-list"
+        },
+        {
+          "title": "Remove Nth Node From End of List",
+          "href": "/docs/linked-list/remove-nth-node-from-end-of-list"
+        },
+        {
+          "title": "Reorder List",
+          "href": "/docs/linked-list/reorder-list"
+        },
+        {
+          "title": "Reverse Nodes in k-Group",
+          "href": "/docs/linked-list/reverse-nodes-in-k-group"
+        }
+      ]
+    },
+    {
+      "title": "Stack",
+      "items": [
+        {
+          "title": "Trapping Rain Water",
+          "href": "/docs/stack/trapping-rain-water"
+        }
+      ]
+    },
+    {
+      "title": "Topological Sort",
+      "items": [
+        {
+          "title": "Course Schedule",
+          "href": "/docs/topological-sort/course-schedule"
+        },
+        {
+          "title": "Course Schedule II",
+          "href": "/docs/topological-sort/course-schedule-ii"
+        },
+        {
+          "title": "Alien Dictionary",
+          "href": "/docs/topological-sort/alien-dictionary"
+        }
+      ]
+    },
+    {
+      "title": "Backtracking",
+      "items": [
+        {
+          "title": "Combination Sum",
+          "href": "/docs/backtracking/combination-sum"
+        },
+        {
+          "title": "Generate Parentheses",
+          "href": "/docs/backtracking/generate-parentheses"
+        },
+        {
+          "title": "Letter Combinations of a Phone Number",
+          "href": "/docs/backtracking/letter-combinations-of-a-phone-number"
+        },
+        {
+          "title": "N-Queens",
+          "href": "/docs/backtracking/n-queens"
+        },
+        {
+          "title": "Permutations",
+          "href": "/docs/backtracking/permutations"
+        },
+        {
+          "title": "Subsets",
+          "href": "/docs/backtracking/subsets"
+        },
+        {
+          "title": "Sudoku Solver",
+          "href": "/docs/backtracking/sudoku-solver"
+        },
+        {
+          "title": "Word Search II",
+          "href": "/docs/backtracking/word-search-ii"
+        }
+      ]
+    }
   ]
 }

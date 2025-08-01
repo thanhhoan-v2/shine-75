@@ -1,32 +1,34 @@
 ---
 title: Pacific Atlantic Water Flow
-description: There is an m x n rectangular island that borders both the Pacific Ocean and Atlantic Ocean. The Pacific Ocean touches the island's left and top edges, and the Atlantic Ocean touches the island's right and bottom edges.
+description: There is an m x n rectangular island that borders both the Pacific Ocean and Atlantic Ocean. The Pacific Ocean touches the island's left and top edges, and the Atlantic Ocean touches the island's right and bottom edges. Water can only flow in four directions - up, down, left, and right. Find the list of grid coordinates where water can flow to both the Pacific and Atlantic oceans.
 difficulty: Medium
-timeLimit: 30 mins
-week: 2
+timeLimit: 35 mins
+week: 3
 tags:
   - Graph
+  - DFS
 ---
 
 ```js title="Example"
 Input: heights = [[1,2,2,3,5],[3,2,3,4,4],[2,4,5,3,1],[6,7,1,4,5],[5,1,1,2,4]]
 Output: [[0,4],[1,3],[1,4],[2,2],[3,0],[3,1],[4,0]]
+Explanation: The following cells can flow to both oceans: [0,4], [1,3], [1,4], [2,2], [3,0], [3,1], and [4,0].
 ```
 
 ## Approach
 
 1. **Reverse DFS**: Start from ocean borders and work backwards to find reachable cells
-2. **Two Passes**: One pass for Pacific Ocean (left and top borders), one for Atlantic (right and bottom borders)
-3. **Height Comparison**: Water can only flow from higher or equal height to lower height
+2. **Two Passes**: One pass for Pacific Ocean (left and top borders), one for Atlantic (right and bottom)
+3. **Height Comparison**: Water can only flow from higher or equal height to lower
 4. **Intersection**: Find cells that can reach both oceans
-5. **Return Result**: Return the intersection of Pacific and Atlantic reachable cells
+5. **Return Result**: Return the intersection of cells reachable from both oceans
 
 ## Solution
 
 - Time Complexity: `O(m*n)`
   > We visit each cell at most twice (once for each ocean)
 - Space Complexity: `O(m*n)`
-  > We use two boolean matrices to track reachability
+  > We use two visited matrices
 
 ```js tab="JavaScript"
 /**
@@ -41,35 +43,35 @@ var pacificAtlantic = function(heights) {
     const pacific = Array(m).fill().map(() => Array(n).fill(false));
     const atlantic = Array(m).fill().map(() => Array(n).fill(false));
     
-    const dfs = (i, j, ocean) => {
+    const dfs = (i, j, ocean, prevHeight) => {
+        if (i < 0 || i >= m || j < 0 || j >= n || 
+            ocean[i][j] || heights[i][j] < prevHeight) {
+            return;
+        }
+        
         ocean[i][j] = true;
         
-        const directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
-        for (const [di, dj] of directions) {
-            const ni = i + di;
-            const nj = j + dj;
-            
-            if (ni >= 0 && ni < m && nj >= 0 && nj < n && 
-                !ocean[ni][nj] && heights[ni][nj] >= heights[i][j]) {
-                dfs(ni, nj, ocean);
-            }
-        }
+        // Explore all four directions
+        dfs(i - 1, j, ocean, heights[i][j]); // up
+        dfs(i + 1, j, ocean, heights[i][j]); // down
+        dfs(i, j - 1, ocean, heights[i][j]); // left
+        dfs(i, j + 1, ocean, heights[i][j]); // right
     };
     
     // Pacific Ocean (left and top borders)
     for (let i = 0; i < m; i++) {
-        dfs(i, 0, pacific);
+        dfs(i, 0, pacific, -Infinity);
     }
     for (let j = 0; j < n; j++) {
-        dfs(0, j, pacific);
+        dfs(0, j, pacific, -Infinity);
     }
     
     // Atlantic Ocean (right and bottom borders)
     for (let i = 0; i < m; i++) {
-        dfs(i, n - 1, atlantic);
+        dfs(i, n - 1, atlantic, -Infinity);
     }
     for (let j = 0; j < n; j++) {
-        dfs(m - 1, j, atlantic);
+        dfs(m - 1, j, atlantic, -Infinity);
     }
     
     // Find intersection
@@ -98,18 +100,18 @@ class Solution {
         
         // Pacific Ocean (left and top borders)
         for (int i = 0; i < m; i++) {
-            dfs(heights, pacific, i, 0, m, n);
+            dfs(heights, pacific, i, 0, Integer.MIN_VALUE, m, n);
         }
         for (int j = 0; j < n; j++) {
-            dfs(heights, pacific, 0, j, m, n);
+            dfs(heights, pacific, 0, j, Integer.MIN_VALUE, m, n);
         }
         
         // Atlantic Ocean (right and bottom borders)
         for (int i = 0; i < m; i++) {
-            dfs(heights, atlantic, i, n - 1, m, n);
+            dfs(heights, atlantic, i, n - 1, Integer.MIN_VALUE, m, n);
         }
         for (int j = 0; j < n; j++) {
-            dfs(heights, atlantic, m - 1, j, m, n);
+            dfs(heights, atlantic, m - 1, j, Integer.MIN_VALUE, m, n);
         }
         
         // Find intersection
@@ -125,19 +127,19 @@ class Solution {
         return result;
     }
     
-    private void dfs(int[][] heights, boolean[][] ocean, int i, int j, int m, int n) {
+    private void dfs(int[][] heights, boolean[][] ocean, int i, int j, int prevHeight, int m, int n) {
+        if (i < 0 || i >= m || j < 0 || j >= n || 
+            ocean[i][j] || heights[i][j] < prevHeight) {
+            return;
+        }
+        
         ocean[i][j] = true;
         
-        int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
-        for (int[] dir : directions) {
-            int ni = i + dir[0];
-            int nj = j + dir[1];
-            
-            if (ni >= 0 && ni < m && nj >= 0 && nj < n && 
-                !ocean[ni][nj] && heights[ni][nj] >= heights[i][j]) {
-                dfs(heights, ocean, ni, nj, m, n);
-            }
-        }
+        // Explore all four directions
+        dfs(heights, ocean, i - 1, j, heights[i][j], m, n); // up
+        dfs(heights, ocean, i + 1, j, heights[i][j], m, n); // down
+        dfs(heights, ocean, i, j - 1, heights[i][j], m, n); // left
+        dfs(heights, ocean, i, j + 1, heights[i][j], m, n); // right
     }
 }
 ```

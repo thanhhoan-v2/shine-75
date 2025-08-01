@@ -1,12 +1,12 @@
 ---
 title: Valid Anagram
-description: Given two strings s and t, return true if t is an anagram of s, and false otherwise.
+description: Given two strings s and t, return true if t is an anagram of s, and false otherwise. An Anagram is a word or phrase formed by rearranging the letters of a different word or phrase, typically using all the original letters exactly once.
 difficulty: Easy
-timeLimit: 30 mins
-week: 2
+timeLimit: 15 mins
+week: 1
 tags:
-  - String
   - Hash Table
+  - String
   - Sorting
 ---
 
@@ -21,17 +21,17 @@ Output: false
 ## Approach
 
 1. **Hash Table Method**: Use a hash table to count character frequencies
-2. **Count Characters**: Count the frequency of each character in both strings
-3. **Compare Frequencies**: Check if the character frequencies match
-4. **Length Check**: First check if the strings have the same length
-5. **Return Result**: Return true if all frequencies match, false otherwise
+2. **Character Counting**: Count occurrences of each character in both strings
+3. **Frequency Comparison**: Compare the character frequencies between the two strings
+4. **Return Result**: Return true if frequencies match, false otherwise
+5. **Edge Case**: Check if strings have the same length
 
 ## Solution
 
 - Time Complexity: `O(n)`
   > Where n is the length of the strings
 - Space Complexity: `O(1)`
-  > Since we use a fixed-size array for character counts
+  > We use a fixed-size array for character counts
 
 ```js tab="JavaScript"
 /**
@@ -49,13 +49,14 @@ var isAnagram = function(s, t) {
         charCount[char.charCodeAt(0) - 'a'.charCodeAt(0)]++;
     }
     
-    // Decrement counts for characters in t
+    // Decrement characters in t
     for (let char of t) {
-        const index = char.charCodeAt(0) - 'a'.charCodeAt(0);
-        charCount[index]--;
-        if (charCount[index] < 0) {
-            return false;
-        }
+        charCount[char.charCodeAt(0) - 'a'.charCodeAt(0)]--;
+    }
+    
+    // Check if all counts are zero
+    for (let count of charCount) {
+        if (count !== 0) return false;
     }
     
     return true;
@@ -74,12 +75,14 @@ class Solution {
             charCount[c - 'a']++;
         }
         
-        // Decrement counts for characters in t
+        // Decrement characters in t
         for (char c : t.toCharArray()) {
             charCount[c - 'a']--;
-            if (charCount[c - 'a'] < 0) {
-                return false;
-            }
+        }
+        
+        // Check if all counts are zero
+        for (int count : charCount) {
+            if (count != 0) return false;
         }
         
         return true;

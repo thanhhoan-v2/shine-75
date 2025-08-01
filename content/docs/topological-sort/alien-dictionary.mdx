@@ -1,32 +1,43 @@
 ---
 title: Alien Dictionary
-description: There is a new alien language that uses the English alphabet. However, the order among the letters is unknown to you. You are given a list of strings words from the alien language's dictionary, where the strings in words are sorted lexicographically by the rules of this new language.
+description: There is a new alien language that uses the English alphabet. However, the order among the letters is unknown to you. You are given a list of strings words from the alien language's dictionary, where the strings in words are sorted lexicographically by the rules of this new language. Return a string of the unique letters in the new alien language sorted in lexicographically increasing order by the new language's rules.
 difficulty: Hard
 timeLimit: 45 mins
 week: 4
 tags:
   - Graph
+  - Topological Sort
+  - DFS
 ---
 
 ```js title="Example"
 Input: words = ["wrt","wrf","er","ett","rftt"]
 Output: "wertf"
+Explanation: The order of letters in the alien language is: w < e < r < t < f.
+
+Input: words = ["z","x"]
+Output: "zx"
+Explanation: The order of letters in the alien language is: z < x.
+
+Input: words = ["z","x","z"]
+Output: ""
+Explanation: The order is invalid, so return "".
 ```
 
 ## Approach
 
-1. **Build Graph**: Create a graph where nodes are characters and edges represent ordering relationships
-2. **Extract Ordering**: Compare adjacent words to find character ordering relationships
-3. **Topological Sort**: Use Kahn's algorithm to perform topological sorting
-4. **Detect Cycles**: Check for cycles during topological sort (invalid ordering)
-5. **Return Result**: Return the topological order as a string
+1. **Build Graph**: Create a graph where nodes are letters and edges represent order relationships
+2. **Extract Order**: Compare adjacent words to find letter order relationships
+3. **Topological Sort**: Use topological sort to find the correct order
+4. **Cycle Detection**: Detect cycles to determine if order is valid
+5. **Return Result**: Return the sorted order or empty string if invalid
 
 ## Solution
 
-- Time Complexity: `O(n * m)`
-  > Where n is number of words and m is average word length
+- Time Complexity: `O(C)`
+  > Where C is the total number of characters across all words
 - Space Complexity: `O(1)`
-  > Since we have at most 26 characters
+  > We use a fixed-size graph for the alphabet
 
 ```js tab="JavaScript"
 /**
@@ -47,7 +58,7 @@ var alienOrder = function(words) {
         }
     }
     
-    // Build graph
+    // Build graph by comparing adjacent words
     for (let i = 0; i < words.length - 1; i++) {
         const word1 = words[i];
         const word2 = words[i + 1];
@@ -57,6 +68,7 @@ var alienOrder = function(words) {
             return "";
         }
         
+        // Find first different character
         for (let j = 0; j < Math.min(word1.length, word2.length); j++) {
             if (word1[j] !== word2[j]) {
                 if (!graph.get(word1[j]).has(word2[j])) {
@@ -89,12 +101,8 @@ var alienOrder = function(words) {
         }
     }
     
-    // Check for cycles
-    if (result.length !== graph.size) {
-        return "";
-    }
-    
-    return result.join('');
+    // Check if all characters were processed
+    return result.length === graph.size ? result.join('') : "";
 };
 ```
 
@@ -112,7 +120,7 @@ class Solution {
             }
         }
         
-        // Build graph
+        // Build graph by comparing adjacent words
         for (int i = 0; i < words.length - 1; i++) {
             String word1 = words[i];
             String word2 = words[i + 1];
@@ -122,6 +130,7 @@ class Solution {
                 return "";
             }
             
+            // Find first different character
             for (int j = 0; j < Math.min(word1.length(), word2.length()); j++) {
                 if (word1.charAt(j) != word2.charAt(j)) {
                     if (!graph.get(word1.charAt(j)).contains(word2.charAt(j))) {
@@ -154,12 +163,8 @@ class Solution {
             }
         }
         
-        // Check for cycles
-        if (result.length() != graph.size()) {
-            return "";
-        }
-        
-        return result.toString();
+        // Check if all characters were processed
+        return result.length() == graph.size() ? result.toString() : "";
     }
 }
 ```

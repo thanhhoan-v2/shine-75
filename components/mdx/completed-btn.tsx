@@ -7,9 +7,10 @@ import { CheckCircleIcon, CircleIcon } from 'lucide-react';
 interface CompletedBtnProps {
   problemTitle: string;
   topic?: string;
+  variant?: 'just-icon' | 'icon-text';
 }
 
-const CompletedBtn = ({ problemTitle, topic }: CompletedBtnProps) => {
+const CompletedBtn = ({ problemTitle, topic, variant }: CompletedBtnProps) => {
   const { isCompleted, toggleCompleted, isLoaded } = useCompleted();
   const isProblemCompleted = isCompleted(problemTitle);
 
@@ -20,6 +21,18 @@ const CompletedBtn = ({ problemTitle, topic }: CompletedBtnProps) => {
   // Don't render until the context is loaded to prevent hydration mismatches
   if (!isLoaded) {
     return null;
+  }
+
+  if (variant === 'just-icon') {
+    return (
+      <Button onClick={handleToggleCompleted} color="outline" size="sm">
+        {isProblemCompleted ? (
+          <CheckCircleIcon className="w-4 h-4 text-green-600" />
+        ) : (
+          <CircleIcon className="w-4 h-4 text-gray-400" />
+        )}
+      </Button>
+    );
   }
 
   return (
@@ -44,4 +57,4 @@ const CompletedBtn = ({ problemTitle, topic }: CompletedBtnProps) => {
   );
 };
 
-export default CompletedBtn; 
+export default CompletedBtn;

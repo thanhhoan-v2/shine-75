@@ -25,13 +25,14 @@ export default function Layout({ children }: { children: ReactNode }) {
               <div className="flex items-center gap-2">
                 <Link
                   href="/favorites"
-                  className="flex items-center gap-2 bg-accent p-2 rounded-md font-medium text-muted-foreground hover:text-foreground text-sm transition-colors"
+                  className="flex items-center gap-2 p-2 font-medium text-muted-foreground hover:text-foreground text-sm transition-colors"
                 >
-                  <HeartIcon fill="red" className="w-4 h-4" /> Your Favorites
+                  <HeartIcon fill="red" className="w-4 h-4" /> Your Favorites{' '}
                 </Link>
+                <span className="text-muted-foreground">|</span>
                 <Link
                   href="/complete"
-                  className="flex items-center gap-2 bg-accent p-2 rounded-md font-medium text-muted-foreground hover:text-foreground text-sm transition-colors"
+                  className="flex items-center gap-2 p-2 font-medium text-muted-foreground hover:text-foreground text-sm transition-colors"
                 >
                   <CheckCircleIcon className="w-4 h-4 text-green-500" />{' '}
                   Completed Problems

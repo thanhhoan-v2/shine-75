@@ -1,14 +1,19 @@
 ---
 title: Minimum Knight Moves
-description: In an infinite chess board with coordinates from -infinity to +infinity, you have a knight at square [0, 0]. A knight has 8 possible moves it can make, as illustrated below.
+description: In an infinite chess board with coordinates from -infinity to +infinity, you have a knight at square [0, 0]. A knight has 8 possible moves it can make. Return the minimum number of steps needed to move the knight to the square [x, y].
 difficulty: Medium
-timeLimit: 35 mins
+timeLimit: 30 mins
 week: 3
 tags:
   - Graph
+  - BFS
 ---
 
 ```js title="Example"
+Input: x = 2, y = 1
+Output: 1
+Explanation: [0, 0] → [2, 1]
+
 Input: x = 5, y = 5
 Output: 4
 Explanation: [0, 0] → [2, 1] → [4, 2] → [3, 4] → [5, 5]
@@ -16,18 +21,18 @@ Explanation: [0, 0] → [2, 1] → [4, 2] → [3, 4] → [5, 5]
 
 ## Approach
 
-1. **Breadth-First Search**: Use BFS to find the shortest path from origin to target
+1. **Breadth-First Search**: Use BFS to find the shortest path from [0, 0] to [x, y]
 2. **Knight Moves**: Define all 8 possible knight moves
-3. **Queue Initialization**: Start from origin (0, 0) with distance 0
+3. **Queue Initialization**: Start with [0, 0] and distance 0
 4. **BFS Traversal**: For each position, try all 8 knight moves
-5. **Visited Tracking**: Use a set to track visited positions
-6. **Return Result**: Return the distance when target is reached
+5. **Visited Set**: Keep track of visited positions to avoid cycles
+6. **Return Result**: Return the minimum steps when target is reached
 
 ## Solution
 
-- Time Complexity: `O(x*y)`
-  > In worst case, we visit all positions in the bounded area
-- Space Complexity: `O(x*y)`
+- Time Complexity: `O((|x| + |y|)²)`
+  > We explore positions within a bounded area around the target
+- Space Complexity: `O((|x| + |y|)²)`
   > We store visited positions in a set
 
 ```js tab="JavaScript"
@@ -37,73 +42,72 @@ Explanation: [0, 0] → [2, 1] → [4, 2] → [3, 4] → [5, 5]
  * @return {number}
  */
 var minKnightMoves = function(x, y) {
-    const directions = [
+    const moves = [
         [-2, -1], [-2, 1], [-1, -2], [-1, 2],
         [1, -2], [1, 2], [2, -1], [2, 1]
     ];
     
-    const queue = [[0, 0, 0]]; // [x, y, distance]
+    const queue = [[0, 0, 0]]; // [row, col, steps]
     const visited = new Set();
     visited.add('0,0');
     
     while (queue.length > 0) {
-        const [currX, currY, distance] = queue.shift();
+        const [row, col, steps] = queue.shift();
         
-        if (currX === x && currY === y) {
-            return distance;
+        if (row === x && col === y) {
+            return steps;
         }
         
-        for (const [dx, dy] of directions) {
-            const newX = currX + dx;
-            const newY = currY + dy;
-            const key = `${newX},${newY}`;
+        for (const [dr, dc] of moves) {
+            const newRow = row + dr;
+            const newCol = col + dc;
+            const key = `${newRow},${newCol}`;
             
             if (!visited.has(key)) {
                 visited.add(key);
-                queue.push([newX, newY, distance + 1]);
+                queue.push([newRow, newCol, steps + 1]);
             }
         }
     }
     
-    return -1;
+    return -1; // Should never reach here for valid inputs
 };
 ```
 
 ```java tab="Java"
 class Solution {
     public int minKnightMoves(int x, int y) {
-        int[][] directions = {
+        int[][] moves = {
             {-2, -1}, {-2, 1}, {-1, -2}, {-1, 2},
             {1, -2}, {1, 2}, {2, -1}, {2, 1}
         };
         
         Queue<int[]> queue = new LinkedList<>();
+        queue.offer(new int[]{0, 0, 0}); // [row, col, steps]
         Set<String> visited = new HashSet<>();
-        
-        queue.offer(new int[]{0, 0, 0}); // [x, y, distance]
         visited.add("0,0");
         
         while (!queue.isEmpty()) {
             int[] curr = queue.poll();
-            int currX = curr[0], currY = curr[1], distance = curr[2];
+            int row = curr[0], col = curr[1], steps = curr[2];
             
-            if (currX == x && currY == y) {
-                return distance;
+            if (row == x && col == y) {
+                return steps;
             }
             
-            for (int[] dir : directions) {
-                int newX = currX + dir[0];
-                int newY = currY + dir[1];
-                String key = newX + "," + newY;
+            for (int[] move : moves) {
+                int newRow = row + move[0];
+                int newCol = col + move[1];
+                String key = newRow + "," + newCol;
                 
                 if (!visited.contains(key)) {
                     visited.add(key);
-                    queue.offer(new int[]{newX, newY, distance + 1});
+                    queue.offer(new int[]{newRow, newCol, steps + 1});
                 }
             }
         }
         
-        return -1;
+        return -1; // Should never reach here for valid inputs
     }
 }
 ```

@@ -1,24 +1,31 @@
 ---
 title: Number of Connected Components in an Undirected Graph
-description: You have a graph of n nodes. You are given an integer n and an array edges where edges[i] = [ai, bi] indicates that there is an edge between nodes ai and bi in the graph.
+description: Given n nodes labeled from 0 to n-1 and a list of undirected edges (each edge is a pair of nodes), write a function to find the number of connected components in an undirected graph.
 difficulty: Medium
-timeLimit: 30 mins
-week: 3
+timeLimit: 25 mins
+week: 2
 tags:
   - Graph
+  - DFS
+  - Union Find
 ---
 
 ```js title="Example"
 Input: n = 5, edges = [[0,1],[1,2],[3,4]]
 Output: 2
+Explanation: There are 2 connected components: [0,1,2] and [3,4]
+
+Input: n = 5, edges = [[0,1],[1,2],[2,3],[3,4]]
+Output: 1
+Explanation: All nodes are connected, so there is only 1 component.
 ```
 
 ## Approach
 
-1. **Union-Find Data Structure**: Use Union-Find to group connected nodes
+1. **Union-Find Data Structure**: Use Union-Find to track connected components
 2. **Initialize**: Create parent array where each node is its own parent initially
 3. **Process Edges**: For each edge, union the two nodes
-4. **Count Components**: Count the number of unique root nodes
+4. **Count Components**: Count the number of unique roots (representatives)
 5. **Return Result**: Return the count of connected components
 
 ## Solution
@@ -58,12 +65,12 @@ var countComponents = function(n, edges) {
     }
     
     // Count unique roots
-    const roots = new Set();
+    const components = new Set();
     for (let i = 0; i < n; i++) {
-        roots.add(find(i));
+        components.add(find(i));
     }
     
-    return roots.size;
+    return components.size;
 };
 ```
 
@@ -76,17 +83,16 @@ class Solution {
         }
         
         for (int[] edge : edges) {
-            int u = edge[0], v = edge[1];
-            union(parent, u, v);
+            union(parent, edge[0], edge[1]);
         }
         
         // Count unique roots
-        Set<Integer> roots = new HashSet<>();
+        Set<Integer> components = new HashSet<>();
         for (int i = 0; i < n; i++) {
-            roots.add(find(parent, i));
+            components.add(find(parent, i));
         }
         
-        return roots.size();
+        return components.size();
     }
     
     private int find(int[] parent, int x) {

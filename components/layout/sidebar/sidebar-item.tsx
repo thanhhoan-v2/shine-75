@@ -7,8 +7,9 @@ import { CheckCircleIcon, ExternalLink, FileIcon, HeartIcon } from 'lucide-react
 import { usePathname } from 'next/navigation';
 import { isValidElement, ReactNode } from 'react';
 import { useCompleted } from './completed-context';
+import { useInternalContext } from './contexts';
 import { useFavorites } from './favorites-context';
-import { itemVariants, useInternalContext } from './index';
+import { itemVariants } from './variants';
 
 // Helper function to extract text content from React children
 function getTextFromChildren(children: ReactNode): string {

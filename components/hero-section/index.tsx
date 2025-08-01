@@ -147,7 +147,7 @@ export default function HeroSection({
           >
             <Button
               asChild
-              className="bg-gradient-to-r from-primary hover:from-primary/90 to-rose-500 hover:to-rose-500/90 shadow-md shadow-primary/10 border-none rounded-full"
+              className="bg-accent hover:from-primary/90 shadow-md shadow-primary/10 px-4 border-none rounded-full"
             >
               <Link href="/docs">
                 Start practice

@@ -2,38 +2,41 @@
 title: Meeting Rooms II
 description: Given an array of meeting time intervals intervals where intervals[i] = [starti, endi], return the minimum number of conference rooms required.
 difficulty: Medium
-timeLimit: 25 mins
-week: 3
+timeLimit: 30 mins
+week: 2
 tags:
   - Array
   - Sorting
   - Heap
-  - Greedy
+  - Merge Intervals
 ---
 
 ```js title="Example"
-Input: intervals = [[0, 30], [5, 10], [15, 20]]
+Input: intervals = [[0,30],[5,10],[15,20]]
 Output: 2
-Explanation: We need two conference rooms: room 1 for [0, 30] and room 2 for [5, 10] and [15, 20].
+Explanation: We need two conference rooms:
+- Room 1: [0,30]
+- Room 2: [5,10],[15,20]
 
-Input: intervals = [[7, 10], [2, 4]]
+Input: intervals = [[7,10],[2,4]]
 Output: 1
+Explanation: We only need one conference room.
 ```
 
 ## Approach
 
-1. **Sort Start and End Times**: Sort all start and end times separately.
-2. **Two Pointers**: Use two pointers to track start and end times.
-3. **Increment on Start**: When we encounter a start time, increment room count.
-4. **Decrement on End**: When we encounter an end time, decrement room count.
-5. **Track Maximum**: Keep track of the maximum number of rooms needed.
+1. **Separate Start and End Times**: Create separate arrays for start and end times
+2. **Sort Both Arrays**: Sort start times and end times separately
+3. **Two Pointers**: Use two pointers to track current meetings
+4. **Count Overlaps**: Count how many meetings overlap at any given time
+5. **Return Result**: Return the maximum number of overlapping meetings
 
 ## Solution
 
 - Time Complexity: `O(n log n)`
-  > Where n is the number of intervals. We need to sort the start and end times, which takes O(n log n).
+  > We need to sort the start and end times
 - Space Complexity: `O(n)`
-  > We create arrays to store start and end times.
+  > We store separate arrays for start and end times
 
 ```js tab="JavaScript"
 /**
@@ -41,60 +44,54 @@ Output: 1
  * @return {number}
  */
 var minMeetingRooms = function(intervals) {
-    const starts = intervals.map(interval => interval[0]).sort((a, b) => a - b);
-    const ends = intervals.map(interval => interval[1]).sort((a, b) => a - b);
+    if (intervals.length === 0) return 0;
+    
+    const startTimes = intervals.map(interval => interval[0]).sort((a, b) => a - b);
+    const endTimes = intervals.map(interval => interval[1]).sort((a, b) => a - b);
     
     let rooms = 0;
-    let maxRooms = 0;
-    let startIndex = 0;
-    let endIndex = 0;
+    let endPointer = 0;
     
-    while (startIndex < starts.length) {
-        if (starts[startIndex] < ends[endIndex]) {
-            rooms++;
-            maxRooms = Math.max(maxRooms, rooms);
-            startIndex++;
+    for (let startPointer = 0; startPointer < intervals.length; startPointer++) {
+        if (startTimes[startPointer] >= endTimes[endPointer]) {
+            endPointer++;
         } else {
-            rooms--;
-            endIndex++;
+            rooms++;
         }
     }
     
-    return maxRooms;
+    return rooms;
 };
 ```
 
 ```java tab="Java"
 class Solution {
     public int minMeetingRooms(int[][] intervals) {
-        int[] starts = new int[intervals.length];
-        int[] ends = new int[intervals.length];
+        if (intervals.length == 0) return 0;
+        
+        int[] startTimes = new int[intervals.length];
+        int[] endTimes = new int[intervals.length];
         
         for (int i = 0; i < intervals.length; i++) {
-            starts[i] = intervals[i][0];
-            ends[i] = intervals[i][1];
+            startTimes[i] = intervals[i][0];
+            endTimes[i] = intervals[i][1];
         }
         
-        Arrays.sort(starts);
-        Arrays.sort(ends);
+        Arrays.sort(startTimes);
+        Arrays.sort(endTimes);
         
         int rooms = 0;
-        int maxRooms = 0;
-        int startIndex = 0;
-        int endIndex = 0;
+        int endPointer = 0;
         
-        while (startIndex < starts.length) {
-            if (starts[startIndex] < ends[endIndex]) {
-                rooms++;
-                maxRooms = Math.max(maxRooms, rooms);
-                startIndex++;
+        for (int startPointer = 0; startPointer < intervals.length; startPointer++) {
+            if (startTimes[startPointer] >= endTimes[endPointer]) {
+                endPointer++;
             } else {
-                rooms--;
-                endIndex++;
+                rooms++;
             }
         }
         
-        return maxRooms;
+        return rooms;
     }
 }
 ```

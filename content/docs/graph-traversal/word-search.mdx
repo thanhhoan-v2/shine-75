@@ -1,32 +1,41 @@
 ---
 title: Word Search
-description: Given an m x n grid of characters board and a string word, return true if word exists in the grid. The word can be constructed from letters of sequentially adjacent cells, where adjacent cells are horizontally or vertically neighboring.
+description: Given an m x n grid of characters board and a string word, return true if word exists in the grid. The word can be constructed from letters of sequentially adjacent cells, where adjacent cells are horizontally or vertically neighboring. The same letter cell may not be used more than once.
 difficulty: Medium
 timeLimit: 30 mins
 week: 2
 tags:
   - Graph
+  - DFS
+  - Backtracking
 ---
 
 ```js title="Example"
 Input: board = [["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]], word = "ABCCED"
 Output: true
+
+Input: board = [["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]], word = "SEE"
+Output: true
+
+Input: board = [["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]], word = "ABCB"
+Output: false
 ```
 
 ## Approach
 
-1. **Depth-First Search**: Use DFS to explore all possible paths on the board
-2. **Backtracking**: Mark visited cells and restore them after exploration
-3. **Word Matching**: Check if the current path matches the target word
-4. **Boundary Check**: Ensure we stay within the board boundaries
-5. **Return Result**: Return true if word is found, false otherwise
+1. **Depth-First Search**: Use DFS to search for the word in the grid
+2. **Grid Traversal**: Start DFS from each cell in the grid
+3. **Backtracking**: Mark visited cells and restore them after exploration
+4. **Word Matching**: Check if the current path matches the word
+5. **Direction Exploration**: Explore all four directions (up, down, left, right)
+6. **Return Result**: Return true if word is found, false otherwise
 
 ## Solution
 
 - Time Complexity: `O(m*n*4^L)`
-  > Where m*n is board size and L is word length
+  > Where m*n is grid size and L is word length
 - Space Complexity: `O(L)`
-  > Recursion stack depth equals word length
+  > Space for the recursion stack
 
 ```js tab="JavaScript"
 /**
@@ -39,21 +48,24 @@ var exist = function(board, word) {
     const n = board[0].length;
     
     const dfs = (i, j, index) => {
-        if (index === word.length) return true;
+        if (index === word.length) {
+            return true;
+        }
         
-        if (i < 0 || i >= m || j < 0 || j >= n || board[i][j] !== word[index]) {
+        if (i < 0 || i >= m || j < 0 || j >= n || 
+            board[i][j] !== word[index]) {
             return false;
         }
         
         const temp = board[i][j];
-        board[i][j] = '#';
+        board[i][j] = '#'; // Mark as visited
         
-        const result = dfs(i - 1, j, index + 1) ||
-                      dfs(i + 1, j, index + 1) ||
-                      dfs(i, j - 1, index + 1) ||
-                      dfs(i, j + 1, index + 1);
+        const result = dfs(i - 1, j, index + 1) || // up
+                      dfs(i + 1, j, index + 1) || // down
+                      dfs(i, j - 1, index + 1) || // left
+                      dfs(i, j + 1, index + 1);   // right
         
-        board[i][j] = temp;
+        board[i][j] = temp; // Restore
         return result;
     };
     
@@ -87,21 +99,24 @@ class Solution {
     }
     
     private boolean dfs(char[][] board, String word, int i, int j, int index, int m, int n) {
-        if (index == word.length()) return true;
+        if (index == word.length()) {
+            return true;
+        }
         
-        if (i < 0 || i >= m || j < 0 || j >= n || board[i][j] != word.charAt(index)) {
+        if (i < 0 || i >= m || j < 0 || j >= n || 
+            board[i][j] != word.charAt(index)) {
             return false;
         }
         
         char temp = board[i][j];
-        board[i][j] = '#';
+        board[i][j] = '#'; // Mark as visited
         
-        boolean result = dfs(board, word, i - 1, j, index + 1, m, n) ||
-                        dfs(board, word, i + 1, j, index + 1, m, n) ||
-                        dfs(board, word, i, j - 1, index + 1, m, n) ||
-                        dfs(board, word, i, j + 1, index + 1, m, n);
+        boolean result = dfs(board, word, i - 1, j, index + 1, m, n) || // up
+                        dfs(board, word, i + 1, j, index + 1, m, n) || // down
+                        dfs(board, word, i, j - 1, index + 1, m, n) || // left
+                        dfs(board, word, i, j + 1, index + 1, m, n);   // right
         
-        board[i][j] = temp;
+        board[i][j] = temp; // Restore
         return result;
     }
 }

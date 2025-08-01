@@ -7,43 +7,45 @@ week: 4
 tags:
   - Array
   - Sorting
-  - Heap
+  - Merge Intervals
 ---
 
 ```js title="Example"
-Input: schedule = [[[1,2],[5,6]], [[1,3]], [[4,10]]]
+Input: schedule = [[[1,2],[5,6]],[[1,3]],[[4,10]]]
 Output: [[3,4]]
-Explanation: There are three employees, and their common free time is [3,4].
+Explanation: There are a total of three employees, and all common free time intervals would be [-inf, 1], [3, 4], [10, inf]. We only return the finite intervals.
 
-Input: schedule = [[[1,3],[6,7]], [[2,4]], [[2,5],[9,12]]]
+Input: schedule = [[[1,3],[6,7]],[[2,4]],[[2,5],[9,12]]]
 Output: [[5,6],[7,9]]
 ```
 
 ## Approach
 
-1. **Flatten Intervals**: Flatten all intervals from all employees into a single list.
-2. **Sort by Start Time**: Sort all intervals by start time.
-3. **Merge Overlapping**: Merge overlapping intervals to get consolidated working times.
-4. **Find Gaps**: Find gaps between merged intervals.
-5. **Return Free Time**: Return the gaps as free time intervals.
+1. **Flatten Schedule**: Collect all intervals from all employees into a single list
+2. **Sort Intervals**: Sort all intervals by start time
+3. **Merge Overlapping**: Merge overlapping intervals to find busy time
+4. **Find Gaps**: Find gaps between merged intervals (free time)
+5. **Return Result**: Return the list of free time intervals
 
 ## Solution
 
 - Time Complexity: `O(n log n)`
-  > Where n is the total number of intervals across all employees. We need to sort all intervals, which takes O(n log n).
+  > Where n is the total number of intervals across all employees
 - Space Complexity: `O(n)`
-  > We store all intervals in a list, which can grow up to n elements.
+  > We store all intervals in a list
 
 ```js tab="JavaScript"
 /**
- * @param {number[][]} schedule
- * @return {number[][]}
+ * @param {Interval[][]} schedule
+ * @return {Interval[]}
  */
 var employeeFreeTime = function(schedule) {
     // Flatten all intervals
     const allIntervals = [];
-    for (let employee of schedule) {
-        allIntervals.push(...employee);
+    for (const employee of schedule) {
+        for (const interval of employee) {
+            allIntervals.push([interval.start, interval.end]);
+        }
     }
     
     // Sort by start time
@@ -51,7 +53,7 @@ var employeeFreeTime = function(schedule) {
     
     // Merge overlapping intervals
     const merged = [];
-    for (let interval of allIntervals) {
+    for (const interval of allIntervals) {
         if (merged.length === 0 || merged[merged.length - 1][1] < interval[0]) {
             merged.push(interval);
         } else {
@@ -59,10 +61,10 @@ var employeeFreeTime = function(schedule) {
         }
     }
     
-    // Find gaps between merged intervals
+    // Find free time intervals
     const freeTime = [];
     for (let i = 1; i < merged.length; i++) {
-        freeTime.push([merged[i - 1][1], merged[i][0]]);
+        freeTime.push(new Interval(merged[i - 1][1], merged[i][0]));
     }
     
     return freeTime;
@@ -72,30 +74,31 @@ var employeeFreeTime = function(schedule) {
 ```java tab="Java"
 class Solution {
     public List<Interval> employeeFreeTime(List<List<Interval>> schedule) {
-        List<Interval> allIntervals = new ArrayList<>();
-        
         // Flatten all intervals
+        List<int[]> allIntervals = new ArrayList<>();
         for (List<Interval> employee : schedule) {
-            allIntervals.addAll(employee);
-        }
-        
-        // Sort by start time
-        Collections.sort(allIntervals, (a, b) -> a.start - b.start);
-        
-        // Merge overlapping intervals
-        List<Interval> merged = new ArrayList<>();
-        for (Interval interval : allIntervals) {
-            if (merged.isEmpty() || merged.get(merged.size() - 1).end < interval.start) {
-                merged.add(interval);
-            } else {
-                merged.get(merged.size() - 1).end = Math.max(merged.get(merged.size() - 1).end, interval.end);
+            for (Interval interval : employee) {
+                allIntervals.add(new int[]{interval.start, interval.end});
             }
         }
         
-        // Find gaps between merged intervals
+        // Sort by start time
+        Collections.sort(allIntervals, (a, b) -> a[0] - b[0]);
+        
+        // Merge overlapping intervals
+        List<int[]> merged = new ArrayList<>();
+        for (int[] interval : allIntervals) {
+            if (merged.isEmpty() || merged.get(merged.size() - 1)[1] < interval[0]) {
+                merged.add(interval);
+            } else {
+                merged.get(merged.size() - 1)[1] = Math.max(merged.get(merged.size() - 1)[1], interval[1]);
+            }
+        }
+        
+        // Find free time intervals
         List<Interval> freeTime = new ArrayList<>();
         for (int i = 1; i < merged.size(); i++) {
-            freeTime.add(new Interval(merged.get(i - 1).end, merged.get(i).start));
+            freeTime.add(new Interval(merged.get(i - 1)[1], merged.get(i)[0]));
         }
         
         return freeTime;

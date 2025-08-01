@@ -1,33 +1,42 @@
 ---
 title: Course Schedule II
-description: There are a total of numCourses courses you have to take, labeled from 0 to numCourses - 1. You are given an array prerequisites where prerequisites[i] = [ai, bi] indicates that you must take course bi first if you want to take course ai.
+description: There are a total of numCourses courses you have to take, labeled from 0 to numCourses - 1. You are given an array prerequisites where prerequisites[i] = [ai, bi] indicates that you must take course bi first if you want to take course ai. Return the ordering of courses you should take to finish all courses.
 difficulty: Medium
 timeLimit: 35 mins
-week: 2
+week: 3
 tags:
   - Graph
+  - Topological Sort
+  - DFS
 ---
 
 ```js title="Example"
 Input: numCourses = 4, prerequisites = [[1,0],[2,0],[3,1],[3,2]]
 Output: [0,1,2,3]
 Explanation: One valid course order is [0,1,2,3]. Another valid course order is [0,2,1,3].
+
+Input: numCourses = 2, prerequisites = [[1,0]]
+Output: [0,1]
+Explanation: There are a total of 2 courses to take. To take course 1 you should have finished course 0. So the correct course order is [0,1].
+
+Input: numCourses = 2, prerequisites = [[1,0],[0,1]]
+Output: []
+Explanation: It is impossible to finish all courses.
 ```
 
 ## Approach
 
 1. **Build Graph**: Create an adjacency list representation of the course dependencies
-2. **Calculate In-Degrees**: Count the number of prerequisites for each course
-3. **Topological Sort**: Use Kahn's algorithm to perform topological sorting
-4. **Queue Initialization**: Add all courses with 0 prerequisites to the queue
-5. **Process Queue**: For each course, reduce in-degree of its dependent courses
-6. **Return Result**: Return the topological order or empty array if cycle exists
+2. **Topological Sort**: Use Kahn's algorithm to find a valid course order
+3. **In-Degree Tracking**: Track the in-degree of each course
+4. **Queue Processing**: Process courses with zero in-degree
+5. **Cycle Detection**: Detect cycles to determine if ordering is possible
 
 ## Solution
 
-- Time Complexity: `O(n + m)`
-  > Where n is number of courses and m is number of prerequisites
-- Space Complexity: `O(n + m)`
+- Time Complexity: `O(V + E)`
+  > Where V is the number of courses and E is the number of prerequisites
+- Space Complexity: `O(V + E)`
   > We store the graph and in-degree counts
 
 ```js tab="JavaScript"
@@ -46,22 +55,23 @@ var findOrder = function(numCourses, prerequisites) {
         inDegree[course]++;
     }
     
-    // Topological sort
+    // Find courses with no prerequisites
     const queue = [];
-    const result = [];
-    
-    // Add courses with 0 prerequisites
     for (let i = 0; i < numCourses; i++) {
         if (inDegree[i] === 0) {
             queue.push(i);
         }
     }
     
+    const result = [];
+    let count = 0;
+    
     while (queue.length > 0) {
         const course = queue.shift();
         result.push(course);
+        count++;
         
-        // Reduce in-degree of dependent courses
+        // Reduce in-degree for dependent courses
         for (const dependent of graph[course]) {
             inDegree[dependent]--;
             if (inDegree[dependent] === 0) {
@@ -70,8 +80,8 @@ var findOrder = function(numCourses, prerequisites) {
         }
     }
     
-    // Check if all courses can be taken
-    return result.length === numCourses ? result : [];
+    // Check if all courses can be completed
+    return count === numCourses ? result : [];
 };
 ```
 
@@ -89,27 +99,28 @@ class Solution {
         // Build graph and calculate in-degrees
         for (int[] prereq : prerequisites) {
             int course = prereq[0];
-            int prereqCourse = prereq[1];
-            graph.get(prereqCourse).add(course);
+            int prerequisite = prereq[1];
+            graph.get(prerequisite).add(course);
             inDegree[course]++;
         }
         
-        // Topological sort
+        // Find courses with no prerequisites
         Queue<Integer> queue = new LinkedList<>();
-        List<Integer> result = new ArrayList<>();
-        
-        // Add courses with 0 prerequisites
         for (int i = 0; i < numCourses; i++) {
             if (inDegree[i] == 0) {
                 queue.offer(i);
             }
         }
         
+        List<Integer> result = new ArrayList<>();
+        int count = 0;
+        
         while (!queue.isEmpty()) {
             int course = queue.poll();
             result.add(course);
+            count++;
             
-            // Reduce in-degree of dependent courses
+            // Reduce in-degree for dependent courses
             for (int dependent : graph.get(course)) {
                 inDegree[dependent]--;
                 if (inDegree[dependent] == 0) {
@@ -118,12 +129,12 @@ class Solution {
             }
         }
         
-        // Check if all courses can be taken
-        if (result.size() != numCourses) {
+        // Check if all courses can be completed
+        if (count == numCourses) {
+            return result.stream().mapToInt(Integer::intValue).toArray();
+        } else {
             return new int[0];
         }
-        
-        return result.stream().mapToInt(Integer::intValue).toArray();
     }
 }
 ```

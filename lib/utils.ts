@@ -60,7 +60,6 @@ export function removeFromFavorites(title: string): void {
 
 export function isFavorite(title: string): boolean {
   if (typeof window === 'undefined') return false;
-
   const favorites = getFavoriteProblems();
   return favorites.some((fav) => fav.title === title);
 }
@@ -137,7 +136,7 @@ const EXCLUDED_FROM_FAVORITES = [
 
 export function shouldShowFavoriteButton(pagePath: string): boolean {
   if (!pagePath) return false;
-  
+
   // Check if the page path matches any excluded pages
   const pathParts = pagePath.split('/');
   const pageName = pathParts[0]; // Get the first part of the path

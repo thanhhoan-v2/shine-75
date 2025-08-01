@@ -13,7 +13,7 @@ import { getCategoryFromPath, shouldShowFavoriteButton } from '@/lib/utils';
 import { getMDXComponents } from '@/mdx-components';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 import { createRelativeLink } from 'fumadocs-ui/mdx';
-import { BrainIcon } from 'lucide-react';
+import { ExternalLinkIcon } from 'lucide-react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -50,7 +50,6 @@ export default async function Page(props: {
         // }}
         // lastUpdate={new Date(time)}
         full={page.data.full}
-        breadcrumb={{ includeSeparator: true }}
         editOnGithub={{
           owner: 'thanhhoan-v2',
           repo: 'shine-75',
@@ -76,19 +75,27 @@ export default async function Page(props: {
         </DocsTitle>
         {shouldShowFavoriteButton(page.path) ? (
           <div className="flex gap-2">
-            <AddToFavoriteBtn problemTitle={page.data.title} topic={getCategoryFromPath(page.path)} />
-            <CompletedBtn problemTitle={page.data.title} topic={getCategoryFromPath(page.path)} />
+            <AddToFavoriteBtn
+              problemTitle={page.data.title}
+              topic={getCategoryFromPath(page.path)}
+            />
+            <CompletedBtn
+              problemTitle={page.data.title}
+              topic={getCategoryFromPath(page.path)}
+            />
           </div>
         ) : null}
         <DocsDescription>{page.data.description}</DocsDescription>
-        {difficulty === 'Easy' && (
-          <Link
-            href="/docs/easy-problems"
-            className="flex items-center gap-1 font-bold hover:underline transition-all duration-500"
-          >
-            <BrainIcon className="size-4" /> Easy Problems
-          </Link>
-        )}
+        <Link
+          href={`https://leetcode.com/problems/${page.path
+            .split('/')
+            .pop()
+            ?.replace('.mdx', '')}/`}
+          target="_blank"
+          className="flex items-center gap-2 font-bold hover:underline transition-all duration-500"
+        >
+          <ExternalLinkIcon className="size-4" /><span>View on LeetCode</span>
+        </Link>
         <DocsBody>
           <MDXContent
             components={getMDXComponents({
@@ -96,12 +103,22 @@ export default async function Page(props: {
               a: createRelativeLink(source, page),
               Steps,
               Step,
-              AddToFavoriteBtn: shouldShowFavoriteButton(page.path) ? () => (
-                <AddToFavoriteBtn problemTitle={page.data.title} topic={getCategoryFromPath(page.path)} />
-              ) : () => null,
-              CompletedBtn: shouldShowFavoriteButton(page.path) ? () => (
-                <CompletedBtn problemTitle={page.data.title} topic={getCategoryFromPath(page.path)} />
-              ) : () => null,
+              AddToFavoriteBtn: shouldShowFavoriteButton(page.path)
+                ? () => (
+                    <AddToFavoriteBtn
+                      problemTitle={page.data.title}
+                      topic={getCategoryFromPath(page.path)}
+                    />
+                  )
+                : () => null,
+              CompletedBtn: shouldShowFavoriteButton(page.path)
+                ? () => (
+                    <CompletedBtn
+                      problemTitle={page.data.title}
+                      topic={getCategoryFromPath(page.path)}
+                    />
+                  )
+                : () => null,
             })}
           />
         </DocsBody>
