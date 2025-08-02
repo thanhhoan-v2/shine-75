@@ -7,6 +7,7 @@ import {
 import AddToFavoriteBtn from '@/components/mdx/add-to-favorite-btn';
 import CompletedBtn from '@/components/mdx/completed-btn';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { getDifficultyFromPathname } from '@/lib/db';
 import { source } from '@/lib/source';
 import { getCategoryFromPath, shouldShowFavoriteButton } from '@/lib/utils';
@@ -83,19 +84,22 @@ export default async function Page(props: {
               problemTitle={page.data.title}
               topic={getCategoryFromPath(page.path)}
             />
+            <Button asChild>
+              <Link
+                href={`https://leetcode.com/problems/${page.path
+                  .split('/')
+                  .pop()
+                  ?.replace('.mdx', '')}/`}
+                target="_blank"
+                className="flex items-center gap-2 px-3 border font-bold hover:underline transition-all duration-500"
+              >
+                <span>View on LeetCode</span>
+                <ExternalLinkIcon className="size-4" />
+              </Link>
+            </Button>
           </div>
         ) : null}
         <DocsDescription>{page.data.description}</DocsDescription>
-        <Link
-          href={`https://leetcode.com/problems/${page.path
-            .split('/')
-            .pop()
-            ?.replace('.mdx', '')}/`}
-          target="_blank"
-          className="flex items-center gap-2 font-bold hover:underline transition-all duration-500"
-        >
-          <ExternalLinkIcon className="size-4" /><span>View on LeetCode</span>
-        </Link>
         <DocsBody>
           <MDXContent
             components={getMDXComponents({

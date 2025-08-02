@@ -2,10 +2,15 @@
 
 import { Button } from '@/components/ui/button';
 import { getAllPatterns, studyPlan } from '@/lib/db';
-import { ArrowRightIcon } from 'lucide-react';
+import {
+  ArrowRightIcon,
+  CheckCircleIcon,
+  ExternalLinkIcon,
+  SaveIcon,
+} from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { useCompleted } from '../layout/sidebar/completed-context';
+import { useProblemSets } from '../layout/sidebar/problem-sets-context';
 import { Badge } from '../ui/badge';
 import AddToFavoriteBtn from './add-to-favorite-btn';
 import CompletedBtn from './completed-btn';
@@ -40,11 +45,11 @@ const transformProblems = (): Topic[] => {
       'Fast & Slow Pointers': 'fast-slow-pointers',
       'Graph Traversal': 'graph-traversal',
       'Hash Table': 'hash-table',
-      'Heap': 'heap',
+      Heap: 'heap',
       'Linked List': 'linked-list',
       'Merge Intervals': 'merge-intervals',
       'Sliding Window': 'sliding-window',
-      'Stack': 'stack',
+      Stack: 'stack',
       'Topological Sort': 'topological-sort',
       'Tree Traversal': 'tree-traversal',
       'Two Pointers': 'two-pointers',
@@ -90,7 +95,8 @@ const ProblemGenerator = () => {
   const [selectedTopic, setSelectedTopic] = useState<string>('');
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('');
   const [generatedProblems, setGeneratedProblems] = useState<Problem[]>([]);
-  const { isCompleted, toggleCompleted, isLoaded } = useCompleted();
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const { addProblemSet } = useProblemSets();
 
   // Automatically generate problems when both topic and difficulty are selected
   useEffect(() => {
@@ -137,6 +143,31 @@ const ProblemGenerator = () => {
     }
   };
 
+  const handleSaveProblemSet = () => {
+    const topicName = selectedTopic
+      ? topics.find((t) => t.slug === selectedTopic)?.name || 'Unknown Topic'
+      : 'All Topics';
+    const difficultyText = selectedDifficulty || 'All Difficulties';
+    const problemCount = generatedProblems.length;
+
+    const problemSetName = `${topicName} - ${difficultyText} - ${problemCount} Problem${
+      problemCount !== 1 ? 's' : ''
+    }`;
+
+    addProblemSet({
+      name: problemSetName,
+      problems: generatedProblems,
+      topic: selectedTopic
+        ? topics.find((t) => t.slug === selectedTopic)?.name
+        : undefined,
+      difficulty: selectedDifficulty || undefined,
+    });
+
+    // Show success message
+    setShowSuccessMessage(true);
+    setTimeout(() => setShowSuccessMessage(false), 3000);
+  };
+
   return (
     <div>
       <div className="space-y-4 p-4 border rounded-lg">
@@ -148,7 +179,6 @@ const ProblemGenerator = () => {
               <Button
                 key={topic.slug}
                 color={selectedTopic === topic.slug ? 'primary' : 'outline'}
-                size="sm"
                 onClick={() =>
                   setSelectedTopic(
                     selectedTopic === topic.slug ? '' : topic.slug
@@ -172,7 +202,6 @@ const ProblemGenerator = () => {
                 color={
                   selectedDifficulty === difficulty ? 'primary' : 'outline'
                 }
-                size="sm"
                 onClick={() =>
                   setSelectedDifficulty(
                     selectedDifficulty === difficulty ? '' : difficulty
@@ -189,19 +218,35 @@ const ProblemGenerator = () => {
       {/* Generated Problems */}
       {generatedProblems.length > 0 && (
         <div className="space-y-4">
-          <Badge className="mt-5 font-semibold text-md">
-            {generatedProblems.length} Problem
-            {generatedProblems.length !== 1 ? 's' : ''}
-            {selectedTopic && selectedDifficulty
-              ? ` in ${
-                  topics.find((t) => t.slug === selectedTopic)?.name
-                } (${selectedDifficulty})`
-              : selectedTopic
-              ? ` in ${topics.find((t) => t.slug === selectedTopic)?.name}`
-              : selectedDifficulty
-              ? ` (${selectedDifficulty}) across all topics`
-              : ''}
-          </Badge>
+          <div className="flex justify-between items-center mt-5">
+            <Badge className="font-semibold text-md">
+              {generatedProblems.length} Problem
+              {generatedProblems.length !== 1 ? 's' : ''}
+              {selectedTopic && selectedDifficulty
+                ? ` in ${
+                    topics.find((t) => t.slug === selectedTopic)?.name
+                  } (${selectedDifficulty})`
+                : selectedTopic
+                ? ` in ${topics.find((t) => t.slug === selectedTopic)?.name}`
+                : selectedDifficulty
+                ? ` (${selectedDifficulty}) across all topics`
+                : ''}
+            </Badge>
+            {showSuccessMessage ? (
+              <Button className="flex items-center gap-2">
+                <CheckCircleIcon className="w-4 h-4" />
+                Saved! View in <Link href="/problem-set">Problem Sets</Link>
+              </Button>
+            ) : (
+              <Button
+                onClick={handleSaveProblemSet}
+                className="flex items-center gap-2"
+              >
+                <SaveIcon className="w-4 h-4" />
+                Save as Problem Set
+              </Button>
+            )}
+          </div>
           <div className="flex flex-col gap-2 max-h-[500px] overflow-y-auto">
             {generatedProblems.map((problem, index) => (
               <div
@@ -237,6 +282,19 @@ const ProblemGenerator = () => {
                         >
                           View Problem
                           <ArrowRightIcon className="w-4 h-4" />
+                        </Link>
+                      </Button>
+                      <Button asChild>
+                        <Link
+                          href={`https://leetcode.com/problems/${problem.slug
+                            .split('/')
+                            .pop()
+                            ?.replace('.mdx', '')}/`}
+                          target="_blank"
+                          className="flex items-center gap-2 font-bold hover:underline transition-all duration-500"
+                        >
+                          <span>View on LeetCode</span>
+                          <ExternalLinkIcon className="size-4" />
                         </Link>
                       </Button>
                     </div>
