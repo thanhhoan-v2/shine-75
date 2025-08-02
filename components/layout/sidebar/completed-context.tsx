@@ -17,42 +17,71 @@ export const CompletedProvider = ({ children }: { children: React.ReactNode }) =
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    // Load completed problems from localStorage
-    const stored = localStorage.getItem('completed-problems');
-    if (stored) {
+    // Load completed problems from API
+    const loadCompletedProblems = async () => {
       try {
-        setCompletedProblems(JSON.parse(stored));
+        const response = await fetch('/api/completed');
+        if (response.ok) {
+          const problems = await response.json();
+          setCompletedProblems(problems);
+        }
       } catch (error) {
-        console.error('Error parsing completed problems:', error);
+        console.error('Error loading completed problems from API:', error);
         setCompletedProblems([]);
+      } finally {
+        setIsLoaded(true);
       }
-    }
-    setIsLoaded(true);
-  }, []);
+    };
 
-  useEffect(() => {
-    // Save completed problems to localStorage whenever it changes
-    if (isLoaded) {
-      localStorage.setItem('completed-problems', JSON.stringify(completedProblems));
-    }
-  }, [completedProblems, isLoaded]);
+    loadCompletedProblems();
+  }, []);
 
   const isCompleted = (problemTitle: string) => {
     return completedProblems.includes(problemTitle);
   };
 
-  const toggleCompleted = (problemTitle: string) => {
-    setCompletedProblems(prev => {
-      if (prev.includes(problemTitle)) {
-        return prev.filter(title => title !== problemTitle);
+  const toggleCompleted = async (problemTitle: string) => {
+    try {
+      if (isCompleted(problemTitle)) {
+        const response = await fetch('/api/completed', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: problemTitle })
+        });
+        
+        if (response.ok) {
+          setCompletedProblems(prev => prev.filter(title => title !== problemTitle));
+        }
       } else {
-        return [...prev, problemTitle];
+        const response = await fetch('/api/completed', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: problemTitle })
+        });
+        
+        if (response.ok) {
+          setCompletedProblems(prev => [...prev, problemTitle]);
+        }
       }
-    });
+    } catch (error) {
+      console.error('Error toggling completed problem:', error);
+    }
   };
 
-  const removeCompleted = (problemTitle: string) => {
-    setCompletedProblems(prev => prev.filter(title => title !== problemTitle));
+  const removeCompleted = async (problemTitle: string) => {
+    try {
+      const response = await fetch('/api/completed', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: problemTitle })
+      });
+      
+      if (response.ok) {
+        setCompletedProblems(prev => prev.filter(title => title !== problemTitle));
+      }
+    } catch (error) {
+      console.error('Error removing completed problem:', error);
+    }
   };
 
   return (

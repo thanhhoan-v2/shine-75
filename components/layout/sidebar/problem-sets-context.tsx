@@ -13,91 +13,98 @@ interface Problem {
 }
 
 interface ProblemSet {
-  id: string;
+  id: number;
   name: string;
   problems: Problem[];
   createdAt: string;
   topic?: string;
   difficulty?: string;
+  description?: string;
 }
 
 interface ProblemSetsContextType {
   problemSets: ProblemSet[];
-  addProblemSet: (problemSet: Omit<ProblemSet, 'id' | 'createdAt'>) => void;
-  removeProblemSet: (id: string) => void;
-  getProblemSet: (id: string) => ProblemSet | undefined;
+  addProblemSet: (problemSet: Omit<ProblemSet, 'id' | 'createdAt'>) => Promise<void>;
+  removeProblemSet: (id: number) => Promise<void>;
+  getProblemSet: (id: number) => ProblemSet | undefined;
   isLoaded: boolean;
 }
 
 const ProblemSetsContext = createContext<ProblemSetsContextType | null>(null);
 
-const STORAGE_KEY = 'shine75-problem-sets';
-
-// Helper function to load problem sets from localStorage
-function loadProblemSetsFromStorage(): ProblemSet[] {
-  if (typeof window === 'undefined') {
-    return [];
-  }
-  
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      const problemSetsArray = JSON.parse(stored);
-      return Array.isArray(problemSetsArray) ? problemSetsArray : [];
-    }
-  } catch (error) {
-    console.error('Failed to load problem sets from localStorage:', error);
-  }
-  
-  return [];
-}
-
-// Helper function to save problem sets to localStorage
-function saveProblemSetsToStorage(problemSets: ProblemSet[]): void {
-  if (typeof window === 'undefined') {
-    return;
-  }
-  
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(problemSets));
-  } catch (error) {
-    console.error('Failed to save problem sets to localStorage:', error);
-  }
-}
-
 export function ProblemSetsProvider({ children }: { children: ReactNode }) {
   const [problemSets, setProblemSets] = useState<ProblemSet[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Load problem sets from localStorage on mount (client-side only)
+  // Load problem sets from API on mount
   useEffect(() => {
-    const storedProblemSets = loadProblemSetsFromStorage();
-    setProblemSets(storedProblemSets);
-    setIsLoaded(true);
+    const loadProblemSets = async () => {
+      try {
+        const response = await fetch('/api/problem-sets');
+        if (response.ok) {
+          const dbProblemSets = await response.json();
+          const formattedProblemSets: ProblemSet[] = dbProblemSets.map((dbSet: any) => ({
+            id: dbSet.id,
+            name: dbSet.name,
+            problems: [], // We'll store just the titles in DB, so we'll need to reconstruct Problem objects
+            createdAt: new Date().toISOString(), // We'll use current time as fallback
+            description: dbSet.description
+          }));
+          setProblemSets(formattedProblemSets);
+        }
+      } catch (error) {
+        console.error('Failed to load problem sets from API:', error);
+      } finally {
+        setIsLoaded(true);
+      }
+    };
+
+    loadProblemSets();
   }, []);
 
-  // Save to localStorage whenever problem sets change
-  useEffect(() => {
-    if (isLoaded && typeof window !== 'undefined') {
-      saveProblemSetsToStorage(problemSets);
+  const addProblemSet = async (problemSetData: Omit<ProblemSet, 'id' | 'createdAt'>) => {
+    try {
+      const problemTitles = problemSetData.problems.map(p => p.title);
+      const response = await fetch('/api/problem-sets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: problemSetData.name,
+          description: problemSetData.description,
+          problems: problemTitles
+        })
+      });
+      
+      if (response.ok) {
+        const { id } = await response.json();
+        const newProblemSet: ProblemSet = {
+          ...problemSetData,
+          id,
+          createdAt: new Date().toISOString(),
+        };
+        
+        setProblemSets(prev => [newProblemSet, ...prev]);
+      }
+    } catch (error) {
+      console.error('Failed to add problem set via API:', error);
     }
-  }, [problemSets, isLoaded]);
-
-  const addProblemSet = (problemSetData: Omit<ProblemSet, 'id' | 'createdAt'>) => {
-    const newProblemSet: ProblemSet = {
-      ...problemSetData,
-      id: `problem-set-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      createdAt: new Date().toISOString(),
-    };
-    
-    setProblemSets(prev => [newProblemSet, ...prev]);
   };
 
-  const removeProblemSet = (id: string) => {
-    setProblemSets(prev => prev.filter(problemSet => problemSet.id !== id));
+  const removeProblemSet = async (id: number) => {
+    try {
+      const response = await fetch(`/api/problem-sets/${id}`, {
+        method: 'DELETE'
+      });
+      
+      if (response.ok) {
+        setProblemSets(prev => prev.filter(problemSet => problemSet.id !== id));
+      }
+    } catch (error) {
+      console.error('Failed to remove problem set via API:', error);
+    }
   };
 
-  const getProblemSet = (id: string) => {
+  const getProblemSet = (id: number) => {
     return problemSets.find(problemSet => problemSet.id === id);
   };
 

@@ -1,3 +1,4 @@
+// Export existing data utilities
 export { studyPlan } from './data/patterns';
 export type { Pattern, Problem } from './data/patterns';
 export {
@@ -11,3 +12,4 @@ export {
     getTotalProblems,
     getTotalProblemsByPattern
 } from './data/utils';
+

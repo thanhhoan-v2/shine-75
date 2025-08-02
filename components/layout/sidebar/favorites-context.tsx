@@ -13,79 +13,74 @@ interface FavoritesContextType {
 
 const FavoritesContext = createContext<FavoritesContextType | null>(null);
 
-const STORAGE_KEY = 'shine75-favorites';
-
-// Helper function to load favorites from localStorage
-function loadFavoritesFromStorage(): Set<string> {
-  if (typeof window === 'undefined') {
-    return new Set();
-  }
-  
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      const favoritesArray = JSON.parse(stored);
-      return new Set(Array.isArray(favoritesArray) ? favoritesArray : []);
-    }
-  } catch (error) {
-    console.error('Failed to load favorites from localStorage:', error);
-  }
-  
-  return new Set();
-}
-
-// Helper function to save favorites to localStorage
-function saveFavoritesToStorage(favorites: Set<string>): void {
-  if (typeof window === 'undefined') {
-    return;
-  }
-  
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(favorites)));
-  } catch (error) {
-    console.error('Failed to save favorites to localStorage:', error);
-  }
-}
-
 export function FavoritesProvider({ children }: { children: ReactNode }) {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Load favorites from localStorage on mount (client-side only)
+  // Load favorites from API on mount
   useEffect(() => {
-    const storedFavorites = loadFavoritesFromStorage();
-    setFavorites(storedFavorites);
-    setIsLoaded(true);
+    const loadFavorites = async () => {
+      try {
+        const response = await fetch('/api/favorites');
+        if (response.ok) {
+          const favoritesArray = await response.json();
+          setFavorites(new Set(favoritesArray));
+        }
+      } catch (error) {
+        console.error('Failed to load favorites from API:', error);
+      } finally {
+        setIsLoaded(true);
+      }
+    };
+
+    loadFavorites();
   }, []);
 
-  // Save to localStorage whenever favorites change
-  useEffect(() => {
-    if (isLoaded) {
-      saveFavoritesToStorage(favorites);
+  const addFavorite = async (title: string) => {
+    try {
+      const response = await fetch('/api/favorites', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, topic: 'General' })
+      });
+      
+      if (response.ok) {
+        setFavorites(prev => new Set([...prev, title]));
+      }
+    } catch (error) {
+      console.error('Failed to add favorite via API:', error);
     }
-  }, [favorites, isLoaded]);
-
-  const addFavorite = (title: string) => {
-    setFavorites(prev => new Set([...prev, title]));
   };
 
-  const removeFavorite = (title: string) => {
-    setFavorites(prev => {
-      const newSet = new Set(prev);
-      newSet.delete(title);
-      return newSet;
-    });
+  const removeFavorite = async (title: string) => {
+    try {
+      const response = await fetch('/api/favorites', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title })
+      });
+      
+      if (response.ok) {
+        setFavorites(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(title);
+          return newSet;
+        });
+      }
+    } catch (error) {
+      console.error('Failed to remove favorite via API:', error);
+    }
   };
 
   const isFavorite = (title: string) => {
     return favorites.has(title);
   };
 
-  const toggleFavorite = (title: string) => {
+  const toggleFavorite = async (title: string) => {
     if (isFavorite(title)) {
-      removeFavorite(title);
+      await removeFavorite(title);
     } else {
-      addFavorite(title);
+      await addFavorite(title);
     }
   };
 
