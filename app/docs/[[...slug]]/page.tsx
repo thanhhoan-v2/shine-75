@@ -1,3 +1,4 @@
+import { DocsPageButtons } from '@/components/docs/docs-page-buttons';
 import {
   DocsBody,
   DocsDescription,
@@ -7,16 +8,13 @@ import {
 import AddToFavoriteBtn from '@/components/mdx/add-to-favorite-btn';
 import CompletedBtn from '@/components/mdx/completed-btn';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { getDifficultyFromPathname } from '@/lib/db';
 import { source } from '@/lib/source';
 import { getCategoryFromPath, shouldShowFavoriteButton } from '@/lib/utils';
 import { getMDXComponents } from '@/mdx-components';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 import { createRelativeLink } from 'fumadocs-ui/mdx';
-import { ExternalLinkIcon } from 'lucide-react';
 import Head from 'next/head';
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 export default async function Page(props: {
@@ -75,29 +73,11 @@ export default async function Page(props: {
           )}
         </DocsTitle>
         {shouldShowFavoriteButton(page.path) ? (
-          <div className="flex gap-2">
-            <AddToFavoriteBtn
-              problemTitle={page.data.title}
-              topic={getCategoryFromPath(page.path)}
-            />
-            <CompletedBtn
-              problemTitle={page.data.title}
-              topic={getCategoryFromPath(page.path)}
-            />
-            <Button asChild>
-              <Link
-                href={`https://leetcode.com/problems/${page.path
-                  .split('/')
-                  .pop()
-                  ?.replace('.mdx', '')}/`}
-                target="_blank"
-                className="flex items-center gap-2 px-3 border font-bold hover:underline transition-all duration-500"
-              >
-                <span>View on LeetCode</span>
-                <ExternalLinkIcon className="size-4" />
-              </Link>
-            </Button>
-          </div>
+          <DocsPageButtons
+            problemTitle={page.data.title}
+            topic={getCategoryFromPath(page.path)}
+            leetcodePath={page.path}
+          />
         ) : null}
         <DocsDescription>{page.data.description}</DocsDescription>
         <DocsBody>

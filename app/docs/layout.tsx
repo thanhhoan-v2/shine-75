@@ -33,7 +33,7 @@ export default function Layout({ children }: { children: ReactNode }) {
             </Link>
             <span className="text-muted-foreground">|</span>
             <Link
-              href="/problem-set"
+              href="/problem-sets"
               className="gap-2 p-2 font-medium text-blue-400 hover:text-foreground text-sm text-center transition-colors"
             >
               Problem Sets

@@ -8,17 +8,24 @@ interface AddToFavoriteBtnProps {
   problemTitle: string;
   topic?: string;
   variant?: 'just-icon' | 'icon-text';
+  onAuthRequired?: () => boolean;
 }
 
 const AddToFavoriteBtn = ({
   problemTitle,
   topic,
   variant,
+  onAuthRequired,
 }: AddToFavoriteBtnProps) => {
   const { isFavorite, toggleFavorite, isLoaded } = useFavorites();
   const isItemFavorite = isFavorite(problemTitle);
 
   const handleToggleFavorite = () => {
+    // Check if authentication is required
+    if (onAuthRequired && onAuthRequired()) {
+      return; // Authentication dialog was shown, don't proceed
+    }
+    
     toggleFavorite(problemTitle);
   };
 

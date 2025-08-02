@@ -8,13 +8,24 @@ interface CompletedBtnProps {
   problemTitle: string;
   topic?: string;
   variant?: 'just-icon' | 'icon-text';
+  onAuthRequired?: () => boolean;
 }
 
-const CompletedBtn = ({ problemTitle, topic, variant }: CompletedBtnProps) => {
+const CompletedBtn = ({ 
+  problemTitle, 
+  topic, 
+  variant, 
+  onAuthRequired 
+}: CompletedBtnProps) => {
   const { isCompleted, toggleCompleted, isLoaded } = useCompleted();
   const isProblemCompleted = isCompleted(problemTitle);
 
   const handleToggleCompleted = () => {
+    // Check if authentication is required
+    if (onAuthRequired && onAuthRequired()) {
+      return; // Authentication dialog was shown, don't proceed
+    }
+    
     toggleCompleted(problemTitle);
   };
 

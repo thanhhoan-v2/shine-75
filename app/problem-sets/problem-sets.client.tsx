@@ -6,15 +6,15 @@ import CompletedBtn from '@/components/mdx/completed-btn';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
-    ArrowLeft,
-    ArrowRightIcon,
-    ExternalLinkIcon,
-    Trash2Icon,
+  ArrowLeft,
+  ArrowRightIcon,
+  ExternalLinkIcon,
+  Trash2Icon,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 
-export default function ProblemSetClient() {
+export default function ProblemSetsClient() {
   const { problemSets, removeProblemSet, isLoaded } = useProblemSets();
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
 

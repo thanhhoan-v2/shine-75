@@ -1,68 +1,68 @@
 'use client';
 
-import { useFavorites } from '@/components/layout/sidebar/favorites-context';
+import { useCompleted } from '@/components/layout/sidebar/completed-context';
 import { Button } from '@/components/ui/button';
 import { getAvailableCategories, getCategoryFromTitle } from '@/lib/utils';
 import {
   ArrowLeft,
+  CheckCircle,
+  CheckCircleIcon,
+  CircleIcon,
   Filter,
-  Heart,
-  HeartCrackIcon,
-  HeartIcon,
   Trash2,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 
-interface FavoriteProblem {
+interface CompletedPageProblem {
   title: string;
-  addedAt: string;
+  completedAt: string;
   topic?: string;
 }
 
-export default function FavoriteProblemsClient() {
-  const { favorites, removeFavorite, toggleFavorite, isLoaded } =
-    useFavorites();
-  const [filteredFavorites, setFilteredFavorites] = useState<FavoriteProblem[]>(
-    []
-  );
+export default function CompletedPageClient() {
+  const { completedProblems, removeCompleted, toggleCompleted, isLoaded } =
+    useCompleted();
+  const [filteredCompleted, setFilteredCompleted] = useState<
+    CompletedPageProblem[]
+  >([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [showCategoryFilter, setShowCategoryFilter] = useState(false);
 
-  // Convert Set<string> to FavoriteProblem[] format - memoized to prevent infinite loops
-  const favoritesList: FavoriteProblem[] = useMemo(
+  // Convert Set<string> to CompletedProblem[] format - memoized to prevent infinite loops
+  const completedList: CompletedPageProblem[] = useMemo(
     () =>
-      Array.from(favorites).map((title) => ({
+      Array.from(completedProblems).map((title) => ({
         title,
-        addedAt: new Date().toISOString(), // Since we don't store timestamps in context, use current time
+        completedAt: new Date().toISOString(), // Since we don't store timestamps in context, use current time
         topic: getCategoryFromTitle(title),
       })),
-    [favorites]
+    [completedProblems]
   );
 
   useEffect(() => {
     if (selectedCategory === 'All') {
-      setFilteredFavorites(favoritesList);
+      setFilteredCompleted(completedList);
     } else {
-      setFilteredFavorites(
-        favoritesList.filter(
-          (favorite) =>
-            (favorite.topic || getCategoryFromTitle(favorite.title)) ===
+      setFilteredCompleted(
+        completedList.filter(
+          (completed) =>
+            (completed.topic || getCategoryFromTitle(completed.title)) ===
             selectedCategory
         )
       );
     }
-  }, [favoritesList, selectedCategory]);
+  }, [completedList, selectedCategory]);
 
   const handleRemoveAll = () => {
     if (
       confirm(
-        'Are you sure you want to remove all favorites? This action cannot be undone.'
+        'Are you sure you want to remove all completed problems? This action cannot be undone.'
       )
     ) {
-      // Remove all favorites by clearing the Set
-      favorites.forEach((title) => {
-        removeFavorite(title);
+      // Remove all completed problems by clearing the Set
+      completedProblems.forEach((title) => {
+        removeCompleted(title);
       });
     }
   };
@@ -82,8 +82,10 @@ export default function FavoriteProblemsClient() {
           </Link>
         </div>
         <div className="py-12 text-center">
-          <Heart className="mx-auto mb-4 w-12 h-12 text-muted-foreground animate-pulse" />
-          <h3 className="mb-2 font-semibold text-lg">Loading favorites...</h3>
+          <CheckCircle className="mx-auto mb-4 w-12 h-12 text-muted-foreground animate-pulse" />
+          <h3 className="mb-2 font-semibold text-lg">
+            Loading completed problems...
+          </h3>
         </div>
       </div>
     );
@@ -104,14 +106,14 @@ export default function FavoriteProblemsClient() {
         <div className="flex justify-between items-start">
           <div>
             <h1 className="flex items-center gap-2 font-bold text-3xl">
-              <HeartIcon className="w-8 h-8 text-red-500" />
-              Favorite Problems
+              <CheckCircleIcon className="w-8 h-8 text-green-500" />
+              Completed Problems
             </h1>
             <p className="mt-2 text-muted-foreground">
-              Your saved problems for quick access
+              Your completed problems for tracking progress
             </p>
           </div>
-          {favoritesList.length > 0 && (
+          {completedList.length > 0 && (
             <div className="flex gap-2">
               <Button
                 color="outline"
@@ -135,7 +137,7 @@ export default function FavoriteProblemsClient() {
           )}
         </div>
 
-        {showCategoryFilter && favoritesList.length > 0 && (
+        {showCategoryFilter && completedList.length > 0 && (
           <div className="bg-muted/50 mt-4 p-4 border rounded-lg">
             <div className="flex flex-wrap gap-2">
               {categories.map((category) => (
@@ -153,55 +155,55 @@ export default function FavoriteProblemsClient() {
         )}
       </div>
 
-      {favoritesList.length === 0 ? (
+      {completedList.length === 0 ? (
         <div className="py-12 text-center">
-          <Heart className="mx-auto mb-4 w-12 h-12 text-muted-foreground" />
+          <CheckCircle className="mx-auto mb-4 w-12 h-12 text-muted-foreground" />
           <h3 className="mb-2 font-semibold text-lg">
-            No favorite problems yet
+            No completed problems yet
           </h3>
           <p className="mb-4 text-muted-foreground">
-            Start exploring problems and add them to your favorites!
+            Start solving problems and mark them as completed!
           </p>
           <Link href="/docs">
             <Button>Browse Problems</Button>
           </Link>
         </div>
-      ) : filteredFavorites.length === 0 ? (
+      ) : filteredCompleted.length === 0 ? (
         <div className="py-12 text-center">
           <Filter className="mx-auto mb-4 w-12 h-12 text-muted-foreground" />
           <h3 className="mb-2 font-semibold text-lg">
             No problems in this category
           </h3>
           <p className="mb-4 text-muted-foreground">
-            Try selecting a different category or add more problems to your
-            favorites.
+            Try selecting a different category or complete more problems.
           </p>
         </div>
       ) : (
         <div className="gap-4 grid">
-          {filteredFavorites.map((favorite, index) => (
+          {filteredCompleted.map((completed, index) => (
             <div
               key={index}
               className="hover:bg-accent/50 p-4 border rounded-lg transition-colors"
             >
               <div className="flex justify-between items-center">
                 <div>
-                  <h3 className="font-semibold text-lg">{favorite.title}</h3>
+                  <h3 className="font-semibold text-lg">{completed.title}</h3>
                   <div className="flex items-center gap-2 mt-1">
-                    <span className="bg-blue-100 px-2 py-1 rounded-full text-blue-800 text-xs">
-                      {favorite.topic || getCategoryFromTitle(favorite.title)}
+                    <span className="bg-green-100 px-2 py-1 rounded-full text-green-800 text-xs">
+                      {completed.topic || getCategoryFromTitle(completed.title)}
                     </span>
                     <p className="text-muted-foreground text-sm">
-                      Added on {new Date(favorite.addedAt).toLocaleDateString()}
+                      Completed on{' '}
+                      {new Date(completed.completedAt).toLocaleDateString()}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Button onClick={() => toggleFavorite(favorite.title)}>
-                    <HeartCrackIcon className="w-5 h-5" fill="red" />
+                  <Button onClick={() => toggleCompleted(completed.title)}>
+                    <CircleIcon className="w-5 h-5" />
                   </Button>
                   <Link
-                    href={`/docs/${favorite.title
+                    href={`/docs/${completed.title
                       .toLowerCase()
                       .replace(/\s+/g, '-')}`}
                   >
