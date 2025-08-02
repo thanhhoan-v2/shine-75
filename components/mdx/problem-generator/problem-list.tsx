@@ -2,6 +2,7 @@
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { routes } from '@/lib/routes';
 import { useUser } from '@stackframe/stack';
 import {
   ArrowRightIcon,
@@ -78,7 +79,7 @@ const ProblemList = ({
         {showSuccessMessage ? (
           <Button className="flex items-center gap-2">
             <CheckCircleIcon className="w-4 h-4" />
-            Saved! View in <Link href="/problem-set">Problem Sets</Link>
+            Saved! View in <Link href={routes.problemSets}>Problem Sets</Link>
           </Button>
         ) : (
           <Button
@@ -164,4 +165,4 @@ const ProblemList = ({
   );
 };
 
-export default ProblemList; 
+export default ProblemList;

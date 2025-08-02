@@ -5,12 +5,15 @@ const sql = neon(process.env.DATABASE_URL!);
 
 export async function GET() {
   try {
-    const result = await sql`SELECT id, name, description, problems FROM problem_sets ORDER BY created_at DESC`;
+    const result = await sql`SELECT id, name, description, problems, topic, difficulty, created_at FROM problem_sets ORDER BY created_at DESC`;
     return NextResponse.json(result.map(row => ({
       id: row.id,
       name: row.name,
       description: row.description,
-      problems: row.problems || []
+      problems: row.problems || [],
+      topic: row.topic,
+      difficulty: row.difficulty,
+      created_at: row.created_at
     })));
   } catch (error) {
     console.error('Error fetching problem sets:', error);
@@ -20,8 +23,8 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const { name, description, problems } = await request.json();
-    const result = await sql`INSERT INTO problem_sets (name, description, problems) VALUES (${name}, ${description}, ${JSON.stringify(problems)}) RETURNING id`;
+    const { name, description, problems, topic, difficulty } = await request.json();
+    const result = await sql`INSERT INTO problem_sets (name, description, problems, topic, difficulty) VALUES (${name}, ${description}, ${JSON.stringify(problems)}, ${topic}, ${difficulty}) RETURNING id`;
     return NextResponse.json({ id: result[0]?.id || 0 });
   } catch (error) {
     console.error('Error creating problem set:', error);

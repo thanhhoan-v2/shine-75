@@ -5,6 +5,7 @@ export const routes = {
   favorites: '/favorites',
   completed: '/completed',
   problemSets: '/problem-sets',
+  problemGenerator: '/docs/problem-generator',
   docsSlugWithTopic: (slug: string, topic: string) =>
     `/docs/${slug}?topic=${topic}`,
   docsSlugWithTopicAndDifficulty: (

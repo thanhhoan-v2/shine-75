@@ -79,4 +79,4 @@ const ProblemGenerator = () => {
   );
 };
 
-export default ProblemGenerator; 
+export default ProblemGenerator;

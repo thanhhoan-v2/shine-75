@@ -19,21 +19,21 @@ export default function Layout({ children }: { children: ReactNode }) {
         footer: (
           <div className="flex items-center gap-2">
             <Link
-              href="/favorite-problems"
+              href={routes.favorites}
               className="gap-2 p-2 font-medium text-red-400 hover:text-foreground text-sm text-center transition-colors"
             >
               Favorites Problems
             </Link>
             <span className="text-muted-foreground">|</span>
             <Link
-              href="/completed-problems"
+              href={routes.completed}
               className="gap-2 p-2 font-medium text-green-400 hover:text-foreground text-sm text-center transition-colors"
             >
               Completed Problems
             </Link>
             <span className="text-muted-foreground">|</span>
             <Link
-              href="/problem-sets"
+              href={routes.problemSets}
               className="gap-2 p-2 font-medium text-blue-400 hover:text-foreground text-sm text-center transition-colors"
             >
               Problem Sets

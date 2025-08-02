@@ -2,13 +2,17 @@
 
 import { useProblemSets } from '@/components/layout/sidebar/problem-sets-context';
 import AddToFavoriteBtn from '@/components/mdx/add-to-favorite-btn';
+import AddToFavoriteProblemSetBtn from '@/components/mdx/add-to-favorite-problem-set-btn';
 import CompletedBtn from '@/components/mdx/completed-btn';
+import CompletedProblemSetBtn from '@/components/mdx/completed-problem-set-btn';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { routes } from '@/lib/routes';
 import {
   ArrowLeft,
   ArrowRightIcon,
   ExternalLinkIcon,
+  Share,
   Trash2Icon,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -93,12 +97,12 @@ export default function ProblemSetsClient() {
       <div className="mx-auto px-4 py-8 container">
         <div className="flex flex-col gap-6">
           <div className="mb-8">
-            <Link href="/docs">
-              <Button color="ghost" size="sm" className="gap-2">
-                <ArrowLeft className="w-4 h-4" />
-                Back to Problems
-              </Button>
-            </Link>
+                      <Link href={routes.docs}>
+            <Button color="ghost" size="sm" className="gap-2">
+              <ArrowLeft className="w-4 h-4" />
+              Back to Problems
+            </Button>
+          </Link>
           </div>
           <div className="flex flex-col gap-4">
             <div className="flex justify-between items-center">
@@ -182,14 +186,40 @@ export default function ProblemSetsClient() {
                         )}
                       </div>
                     </div>
-                    <Button
-                      color="outline"
-                      size="sm"
-                      onClick={() => removeProblemSet(problemSet.id)}
-                      className="hover:bg-red-50 text-red-600 hover:text-red-700"
-                    >
-                      <Trash2Icon className="w-4 h-4" />
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        size="sm"
+                        color="outline"
+                        onClick={() => {
+                          const url = `/?topic=${problemSet.topic || 'all'}&difficulty=${problemSet.difficulty || 'all'}`;
+                          navigator.clipboard.writeText(window.location.origin + url);
+                        }}
+                      >
+                        <Share className="w-4 h-4" />
+                      </Button>
+                      <CompletedProblemSetBtn
+                        problemSetId={problemSet.id}
+                        problemSetName={problemSet.name}
+                        problemSetDescription={problemSet.description}
+                        problems={problemSet.problems}
+                        variant="just-icon"
+                      />
+                      <AddToFavoriteProblemSetBtn
+                        problemSetId={problemSet.id}
+                        problemSetName={problemSet.name}
+                        problemSetDescription={problemSet.description}
+                        problems={problemSet.problems}
+                        variant="just-icon"
+                      />
+                      <Button
+                        color="outline"
+                        size="sm"
+                        onClick={() => removeProblemSet(problemSet.id)}
+                        className="hover:bg-red-50 text-red-600 hover:text-red-700"
+                      >
+                        <Trash2Icon className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
 
                   {/* Problems List */}
@@ -278,7 +308,7 @@ export default function ProblemSetsClient() {
                   : `No problem sets found for ${selectedCategory}.`}
               </p>
               <Button asChild>
-                <Link href="/docs/problem-generator">
+                <Link href={routes.problemGenerator}>
                   Create Your First Problem Set
                 </Link>
               </Button>

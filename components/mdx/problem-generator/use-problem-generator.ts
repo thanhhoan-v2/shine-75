@@ -113,6 +113,7 @@ export const useProblemGenerator = () => {
         ? topics.find((t) => t.slug === selectedTopic)?.name
         : undefined,
       difficulty: selectedDifficulty || undefined,
+      description: `Generated problem set for ${selectedTopic ? topics.find((t) => t.slug === selectedTopic)?.name : 'All Topics'} with ${selectedDifficulty || 'All'} difficulty problems.`
     });
 
     // Show success message

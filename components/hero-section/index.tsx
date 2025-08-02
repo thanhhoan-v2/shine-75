@@ -2,6 +2,7 @@
 
 import HeroShape from '@/components/hero-section/hero-shape';
 import { Button } from '@/components/ui/button';
+import { routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import { ArrowRight } from 'lucide-react';
 import { easeInOut, motion } from 'motion/react';
@@ -149,7 +150,7 @@ export default function HeroSection({
               asChild
               className="bg-accent hover:from-primary/90 shadow-md shadow-primary/10 px-4 border-none rounded-full"
             >
-              <Link href="/docs">
+              <Link href={routes.docs}>
                 Start practice
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Link>

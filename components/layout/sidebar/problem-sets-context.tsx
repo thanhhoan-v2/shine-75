@@ -43,13 +43,28 @@ export function ProblemSetsProvider({ children }: { children: ReactNode }) {
         const response = await fetch('/api/problem-sets');
         if (response.ok) {
           const dbProblemSets = await response.json();
-          const formattedProblemSets: ProblemSet[] = dbProblemSets.map((dbSet: any) => ({
-            id: dbSet.id,
-            name: dbSet.name,
-            problems: [], // We'll store just the titles in DB, so we'll need to reconstruct Problem objects
-            createdAt: new Date().toISOString(), // We'll use current time as fallback
-            description: dbSet.description
-          }));
+          const formattedProblemSets: ProblemSet[] = dbProblemSets.map((dbSet: any) => {
+            // Reconstruct Problem objects from stored data
+            const problems: Problem[] = (dbSet.problems || []).map((problemTitle: string) => ({
+              title: problemTitle,
+              difficulty: 'Medium', // Default difficulty since we only store titles
+              description: '',
+              timeLimit: '',
+              week: 1,
+              tags: [],
+              slug: problemTitle.toLowerCase().replace(/\s+/g, '-')
+            }));
+            
+            return {
+              id: dbSet.id,
+              name: dbSet.name,
+              problems: problems,
+              createdAt: dbSet.created_at || new Date().toISOString(),
+              description: dbSet.description,
+              topic: dbSet.topic,
+              difficulty: dbSet.difficulty
+            };
+          });
           setProblemSets(formattedProblemSets);
         }
       } catch (error) {
@@ -71,7 +86,9 @@ export function ProblemSetsProvider({ children }: { children: ReactNode }) {
         body: JSON.stringify({
           name: problemSetData.name,
           description: problemSetData.description,
-          problems: problemTitles
+          problems: problemTitles,
+          topic: problemSetData.topic,
+          difficulty: problemSetData.difficulty
         })
       });
       
