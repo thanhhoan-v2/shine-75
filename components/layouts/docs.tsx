@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { UserButton } from '@stackframe/stack';
 import { HideIfEmpty } from 'fumadocs-core/hide-if-empty';
 import Link from 'fumadocs-core/link';
 import type { PageTree } from 'fumadocs-core/server';
@@ -10,27 +11,27 @@ import { LanguageToggle } from '../layout/language-toggle';
 import { type Option, RootToggle } from '../layout/root-toggle';
 import { LargeSearchToggle, SearchToggle } from '../layout/search-toggle';
 import {
-    Sidebar,
-    SidebarCollapseTrigger,
-    SidebarFooter,
-    SidebarHeader,
-    SidebarPageTree,
-    SidebarViewport,
+  Sidebar,
+  SidebarCollapseTrigger,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarPageTree,
+  SidebarViewport,
 } from '../layout/sidebar';
 import { ThemeToggle } from '../layout/theme-toggle';
 import { buttonVariants } from '../ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import {
-    getSidebarTabsFromOptions,
-    SidebarLinkItem,
-    type SidebarOptions,
+  getSidebarTabsFromOptions,
+  SidebarLinkItem,
+  type SidebarOptions,
 } from './docs/shared';
 import { BaseLinkItem, type LinkItemType } from './links';
 import {
-    LayoutBody,
-    LayoutTabs,
-    Navbar,
-    NavbarSidebarTrigger,
+  LayoutBody,
+  LayoutTabs,
+  Navbar,
+  NavbarSidebarTrigger,
 } from './notebook-client';
 import { type BaseLayoutProps, getLinks } from './shared';
 
@@ -316,6 +317,9 @@ function DocsNavbar({
                 mode={themeSwitch.mode ?? 'light-dark-system'}
               />
             ))}
+          <div className="ml-3">
+            <UserButton />
+          </div>
           {sidebarCollapsible && navMode === 'top' ? (
             <SidebarCollapseTrigger
               className={cn(

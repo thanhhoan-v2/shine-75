@@ -1,5 +1,9 @@
-import SignInPageClient from '@/app/(auth)/sign-in/sign-in.client';
+import { SignIn } from '@stackframe/stack';
 
 export default function SignInPage() {
-  return <SignInPageClient />;
+  return (
+    <>
+      <SignIn />
+    </>
+  );
 }

@@ -1,5 +1,9 @@
-import SignUpPageClient from '@/app/(auth)/sign-up/sign-up.client';
+import { SignUp } from '@stackframe/stack';
 
 export default function SignUpPage() {
-  return <SignUpPageClient />;
+  return (
+    <>
+      <SignUp />
+    </>
+  );
 }

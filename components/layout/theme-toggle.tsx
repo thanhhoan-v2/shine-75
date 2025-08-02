@@ -14,7 +14,7 @@ const itemVariants = cva(
         false: 'text-fd-muted-foreground',
       },
     },
-  },
+  }
 );
 
 const full = [
@@ -39,7 +39,7 @@ export function ThemeToggle({
 
   const container = cn(
     'inline-flex items-center rounded-full border p-1',
-    className,
+    className
   );
 
   if (mode === 'light-dark') {

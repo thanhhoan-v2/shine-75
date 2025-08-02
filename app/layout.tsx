@@ -1,4 +1,6 @@
 import '@/app/global.css';
+import { StackProvider, StackTheme } from "@stackframe/stack";
+import { stackServerApp } from "../stack";
 import { CompletedProvider } from '@/components/layout/sidebar/completed-context';
 import { FavoritesProvider } from '@/components/layout/sidebar/favorites-context';
 import { ProblemSetsProvider } from '@/components/layout/sidebar/problem-sets-context';
@@ -13,7 +15,7 @@ const inter = Inter({
 export default function Layout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={inter.className} suppressHydrationWarning>
-      <body className="flex flex-col min-h-screen">
+      <body className="flex flex-col min-h-screen"><StackProvider app={stackServerApp}><StackTheme>
         <RootProvider>
           <FavoritesProvider>
             <CompletedProvider>
@@ -21,7 +23,7 @@ export default function Layout({ children }: { children: ReactNode }) {
             </CompletedProvider>
           </FavoritesProvider>
         </RootProvider>
-      </body>
+      </StackTheme></StackProvider></body>
     </html>
   );
 }
