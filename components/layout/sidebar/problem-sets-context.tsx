@@ -21,6 +21,7 @@ interface ProblemSet {
   topic?: string;
   difficulty?: string;
   description?: string;
+  userId?: string;
 }
 
 interface ProblemSetsContextType {
@@ -74,10 +75,14 @@ export function ProblemSetsProvider({ children }: { children: ReactNode }) {
               createdAt: dbSet.created_at || new Date().toISOString(),
               description: dbSet.description,
               topic: dbSet.topic,
-              difficulty: dbSet.difficulty
+              difficulty: dbSet.difficulty,
+              userId: dbSet.user_id
             };
           });
           setProblemSets(formattedProblemSets);
+        } else if (response.status === 401) {
+          // User is not authenticated, set empty problem sets
+          setProblemSets([]);
         }
       } catch (error) {
         console.error('Failed to load problem sets from API:', error);
@@ -100,7 +105,8 @@ export function ProblemSetsProvider({ children }: { children: ReactNode }) {
           description: problemSetData.description,
           problems: problemTitles,
           topic: problemSetData.topic,
-          difficulty: problemSetData.difficulty
+          difficulty: problemSetData.difficulty,
+          userId: problemSetData.userId
         })
       });
       
@@ -113,6 +119,8 @@ export function ProblemSetsProvider({ children }: { children: ReactNode }) {
         };
         
         setProblemSets(prev => [newProblemSet, ...prev]);
+      } else if (response.status === 401) {
+        console.log('User needs to authenticate to create problem sets');
       }
     } catch (error) {
       console.error('Failed to add problem set via API:', error);
@@ -127,6 +135,8 @@ export function ProblemSetsProvider({ children }: { children: ReactNode }) {
       
       if (response.ok) {
         setProblemSets(prev => prev.filter(problemSet => problemSet.id !== id));
+      } else if (response.status === 401) {
+        console.log('User needs to authenticate to manage problem sets');
       }
     } catch (error) {
       console.error('Failed to remove problem set via API:', error);

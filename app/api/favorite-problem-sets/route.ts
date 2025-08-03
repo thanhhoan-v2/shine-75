@@ -1,3 +1,4 @@
+import { stackServerApp } from '@/stack';
 import { neon } from '@neondatabase/serverless';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -5,6 +6,11 @@ const sql = neon(process.env.DATABASE_URL!);
 
 export async function GET() {
   try {
+    const user = await stackServerApp.getUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    
     const result = await sql`
       SELECT 
         id,
@@ -17,6 +23,7 @@ export async function GET() {
         updated_at,
         user_id
       FROM favorite_problem_sets 
+      WHERE user_id = ${user.id}
       ORDER BY added_at DESC
     `;
     return NextResponse.json(result);
@@ -28,10 +35,15 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const { problem_set_id, name, description, problems, user_id } = await request.json();
+    const user = await stackServerApp.getUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    
+    const { problem_set_id, name, description, problems } = await request.json();
     await sql`
       INSERT INTO favorite_problem_sets (problem_set_id, name, description, problems, user_id) 
-      VALUES (${problem_set_id}, ${name}, ${description}, ${problems}, ${user_id}) 
+      VALUES (${problem_set_id}, ${name}, ${description}, ${JSON.stringify(problems)}, ${user.id}) 
       ON CONFLICT (problem_set_id, user_id) DO NOTHING
     `;
     return NextResponse.json({ success: true });
@@ -43,8 +55,13 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const { problem_set_id, user_id } = await request.json();
-    await sql`DELETE FROM favorite_problem_sets WHERE problem_set_id = ${problem_set_id} AND user_id = ${user_id}`;
+    const user = await stackServerApp.getUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    
+    const { problem_set_id } = await request.json();
+    await sql`DELETE FROM favorite_problem_sets WHERE problem_set_id = ${problem_set_id} AND user_id = ${user.id}`;
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error removing favorite problem set:', error);

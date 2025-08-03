@@ -1,3 +1,4 @@
+import { stackServerApp } from '@/stack';
 import { neon } from '@neondatabase/serverless';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -5,7 +6,12 @@ const sql = neon(process.env.DATABASE_URL!);
 
 export async function GET() {
   try {
-    const result = await sql`SELECT id, name, description, problems, topic, difficulty, created_at FROM all_problem_sets ORDER BY created_at DESC`;
+    const user = await stackServerApp.getUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    
+    const result = await sql`SELECT id, name, description, problems, topic, difficulty, created_at FROM all_problem_sets WHERE user_id = ${user.id} ORDER BY created_at DESC`;
     return NextResponse.json(result.map(row => ({
       id: row.id,
       name: row.name,
@@ -23,8 +29,13 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    const user = await stackServerApp.getUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    
     const { name, description, problems, topic, difficulty } = await request.json();
-    const result = await sql`INSERT INTO all_problem_sets (name, description, problems, topic, difficulty) VALUES (${name}, ${description}, ${JSON.stringify(problems)}, ${topic}, ${difficulty}) RETURNING id`;
+    const result = await sql`INSERT INTO all_problem_sets (name, description, problems, topic, difficulty, user_id) VALUES (${name}, ${description}, ${JSON.stringify(problems)}, ${topic}, ${difficulty}, ${user.id}) RETURNING id`;
     return NextResponse.json({ id: result[0]?.id || 0 });
   } catch (error) {
     console.error('Error creating problem set:', error);

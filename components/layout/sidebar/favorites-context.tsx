@@ -25,6 +25,9 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
         if (response.ok) {
           const favoritesArray = await response.json();
           setFavorites(new Set(favoritesArray));
+        } else if (response.status === 401) {
+          // User is not authenticated, set empty favorites
+          setFavorites(new Set());
         }
       } catch (error) {
         console.error('Failed to load favorites from API:', error);
@@ -46,6 +49,9 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
       
       if (response.ok) {
         setFavorites(prev => new Set([...prev, title]));
+      } else if (response.status === 401) {
+        // User is not authenticated, show auth dialog or redirect
+        console.log('User needs to authenticate to add favorites');
       }
     } catch (error) {
       console.error('Failed to add favorite via API:', error);
@@ -66,6 +72,9 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
           newSet.delete(title);
           return newSet;
         });
+      } else if (response.status === 401) {
+        // User is not authenticated, show auth dialog or redirect
+        console.log('User needs to authenticate to remove favorites');
       }
     } catch (error) {
       console.error('Failed to remove favorite via API:', error);

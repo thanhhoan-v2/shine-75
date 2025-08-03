@@ -107,13 +107,18 @@ export const useProblemGenerator = () => {
     }`;
 
     addProblemSet({
+      userId: user?.id,
       name: problemSetName,
       problems: generatedProblems,
       topic: selectedTopic
         ? topics.find((t) => t.slug === selectedTopic)?.name
         : undefined,
       difficulty: selectedDifficulty || undefined,
-      description: `Generated problem set for ${selectedTopic ? topics.find((t) => t.slug === selectedTopic)?.name : 'All Topics'} with ${selectedDifficulty || 'All'} difficulty problems.`
+      description: `Generated problem set for ${
+        selectedTopic
+          ? topics.find((t) => t.slug === selectedTopic)?.name
+          : 'All Topics'
+      } with ${selectedDifficulty || 'All'} difficulty problems.`,
     });
 
     // Show success message
@@ -138,4 +143,4 @@ export const useProblemGenerator = () => {
     handleSaveProblemSet,
     handleAuthRequired,
   };
-}; 
+};

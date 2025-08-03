@@ -54,7 +54,6 @@ export default function CompletedProblemSetBtn({
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             problem_set_id: problemSetId,
-            user_id: userId,
           }),
         });
         setIsCompleted(false);
@@ -68,7 +67,6 @@ export default function CompletedProblemSetBtn({
             name: problemSetName,
             description: problemSetDescription,
             problems: problems,
-            user_id: userId,
           }),
         });
         setIsCompleted(true);

@@ -52,7 +52,7 @@ export default function AddToFavoriteProblemSetBtn({
         await fetch('/api/favorite-problem-sets', {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ problem_set_id: problemSetId, user_id: userId }),
+          body: JSON.stringify({ problem_set_id: problemSetId }),
         });
         setIsFavorite(false);
       } else {
@@ -65,7 +65,6 @@ export default function AddToFavoriteProblemSetBtn({
             name: problemSetName,
             description: problemSetDescription,
             problems: problems,
-            user_id: userId,
           }),
         });
         setIsFavorite(true);

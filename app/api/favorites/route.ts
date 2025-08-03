@@ -1,3 +1,4 @@
+import { stackServerApp } from '@/stack';
 import { neon } from '@neondatabase/serverless';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -5,7 +6,12 @@ const sql = neon(process.env.DATABASE_URL!);
 
 export async function GET() {
   try {
-    const result = await sql`SELECT problem_title FROM favorites ORDER BY created_at DESC`;
+    const user = await stackServerApp.getUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    
+    const result = await sql`SELECT problem_title FROM favorites WHERE user_id = ${user.id} ORDER BY created_at DESC`;
     return NextResponse.json(result.map(row => row.problem_title));
   } catch (error) {
     console.error('Error fetching favorites:', error);
@@ -15,10 +21,13 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    const user = await stackServerApp.getUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    
     const { title, topic } = await request.json();
-    // For now, using a default user_id. In a real app, this would come from authentication
-    const userId = 'default-user';
-    await sql`INSERT INTO favorites (problem_title, user_id) VALUES (${title}, ${userId}) ON CONFLICT (problem_title, user_id) DO NOTHING`;
+    await sql`INSERT INTO favorites (problem_title, user_id) VALUES (${title}, ${user.id}) ON CONFLICT (problem_title, user_id) DO NOTHING`;
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error adding favorite:', error);
@@ -28,9 +37,13 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
+    const user = await stackServerApp.getUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    
     const { title } = await request.json();
-    const userId = 'default-user';
-    await sql`DELETE FROM favorites WHERE problem_title = ${title} AND user_id = ${userId}`;
+    await sql`DELETE FROM favorites WHERE problem_title = ${title} AND user_id = ${user.id}`;
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error removing favorite:', error);

@@ -24,6 +24,9 @@ export const CompletedProvider = ({ children }: { children: React.ReactNode }) =
         if (response.ok) {
           const problems = await response.json();
           setCompletedProblems(problems);
+        } else if (response.status === 401) {
+          // User is not authenticated, set empty completed problems
+          setCompletedProblems([]);
         }
       } catch (error) {
         console.error('Error loading completed problems from API:', error);
@@ -51,6 +54,8 @@ export const CompletedProvider = ({ children }: { children: React.ReactNode }) =
         
         if (response.ok) {
           setCompletedProblems(prev => prev.filter(title => title !== problemTitle));
+        } else if (response.status === 401) {
+          console.log('User needs to authenticate to manage completed problems');
         }
       } else {
         const response = await fetch('/api/completed', {
@@ -61,6 +66,8 @@ export const CompletedProvider = ({ children }: { children: React.ReactNode }) =
         
         if (response.ok) {
           setCompletedProblems(prev => [...prev, problemTitle]);
+        } else if (response.status === 401) {
+          console.log('User needs to authenticate to manage completed problems');
         }
       }
     } catch (error) {
@@ -78,6 +85,8 @@ export const CompletedProvider = ({ children }: { children: React.ReactNode }) =
       
       if (response.ok) {
         setCompletedProblems(prev => prev.filter(title => title !== problemTitle));
+      } else if (response.status === 401) {
+        console.log('User needs to authenticate to manage completed problems');
       }
     } catch (error) {
       console.error('Error removing completed problem:', error);
