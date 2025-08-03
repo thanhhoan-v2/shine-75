@@ -11,8 +11,8 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     
-    const result = await sql`SELECT problem_title FROM favorites WHERE user_id = ${user.id} ORDER BY created_at DESC`;
-    return NextResponse.json(result.map(row => row.problem_title));
+    const result = await sql`SELECT title FROM favorite_problems WHERE user_id = ${user.id} ORDER BY added_at DESC`;
+    return NextResponse.json(result.map(row => row.title));
   } catch (error) {
     console.error('Error fetching favorites:', error);
     return NextResponse.json({ error: 'Failed to fetch favorites' }, { status: 500 });
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     }
     
     const { title, topic } = await request.json();
-    await sql`INSERT INTO favorites (problem_title, user_id) VALUES (${title}, ${user.id}) ON CONFLICT (problem_title, user_id) DO NOTHING`;
+    await sql`INSERT INTO favorite_problems (title, topic, user_id) VALUES (${title}, ${topic}, ${user.id}) ON CONFLICT (title, user_id) DO NOTHING`;
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error adding favorite:', error);
@@ -43,7 +43,7 @@ export async function DELETE(request: NextRequest) {
     }
     
     const { title } = await request.json();
-    await sql`DELETE FROM favorites WHERE problem_title = ${title} AND user_id = ${user.id}`;
+    await sql`DELETE FROM favorite_problems WHERE title = ${title} AND user_id = ${user.id}`;
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error removing favorite:', error);
