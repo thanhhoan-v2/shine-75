@@ -168,9 +168,23 @@ export async function updateProblemSet(id: number, data: Partial<CreateProblemSe
       return;
     }
     
-    values.push(id, user.id);
-    const query = `UPDATE all_problem_sets SET ${updates.join(', ')} WHERE id = $${values.length - 1} AND user_id = $${values.length}`;
-    await sql.unsafe(query, ...(values as any[]));
+    // Use template literal syntax for dynamic updates
+    if (name !== undefined) {
+      await sql`UPDATE all_problem_sets SET name = ${name} WHERE id = ${id} AND user_id = ${user.id}`;
+    }
+    if (description !== undefined) {
+      await sql`UPDATE all_problem_sets SET description = ${description} WHERE id = ${id} AND user_id = ${user.id}`;
+    }
+    if (problems !== undefined) {
+      const problemTitles = problems.map(p => p.title);
+      await sql`UPDATE all_problem_sets SET problems = ${JSON.stringify(problemTitles)} WHERE id = ${id} AND user_id = ${user.id}`;
+    }
+    if (topic !== undefined) {
+      await sql`UPDATE all_problem_sets SET topic = ${topic} WHERE id = ${id} AND user_id = ${user.id}`;
+    }
+    if (difficulty !== undefined) {
+      await sql`UPDATE all_problem_sets SET difficulty = ${difficulty} WHERE id = ${id} AND user_id = ${user.id}`;
+    }
   } catch (error) {
     console.error('Error updating problem set:', error);
     throw new Error('Failed to update problem set');
