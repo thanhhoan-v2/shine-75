@@ -15,14 +15,14 @@ export async function getCompletedProblems(): Promise<string[]> {
   try {
     const user = await stackServerApp.getUser();
     if (!user) {
-      throw new Error('Unauthorized');
+      return [];
     }
     
     const result = await sql`SELECT title FROM completed_problems WHERE user_id = ${user.id} ORDER BY completed_at DESC`;
     return result.map(row => row.title);
   } catch (error) {
     console.error('Error fetching completed problems:', error);
-    throw new Error('Failed to fetch completed problems');
+    return [];
   }
 }
 
@@ -30,7 +30,7 @@ export async function getCompletedProblemsWithDetails(): Promise<CompletedProble
   try {
     const user = await stackServerApp.getUser();
     if (!user) {
-      throw new Error('Unauthorized');
+      return [];
     }
     
     const result = await sql`SELECT title, topic, completed_at FROM completed_problems WHERE user_id = ${user.id} ORDER BY completed_at DESC`;
@@ -41,7 +41,7 @@ export async function getCompletedProblemsWithDetails(): Promise<CompletedProble
     }));
   } catch (error) {
     console.error('Error fetching completed problems with details:', error);
-    throw new Error('Failed to fetch completed problems');
+    return [];
   }
 }
 
@@ -92,7 +92,7 @@ export async function getCompletedProblemSets(): Promise<any[]> {
   try {
     const user = await stackServerApp.getUser();
     if (!user) {
-      throw new Error('Unauthorized');
+      return [];
     }
     
     const result = await sql`SELECT id, name, description, problems, topic, difficulty, created_at FROM completed_problem_sets WHERE user_id = ${user.id} ORDER BY created_at DESC`;
@@ -107,7 +107,7 @@ export async function getCompletedProblemSets(): Promise<any[]> {
     }));
   } catch (error) {
     console.error('Error fetching completed problem sets:', error);
-    throw new Error('Failed to fetch completed problem sets');
+    return [];
   }
 }
 

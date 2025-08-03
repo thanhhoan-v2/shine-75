@@ -8,7 +8,7 @@ export async function GET() {
   try {
     const user = await stackServerApp.getUser();
     if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json([]);
     }
     
     const result = await sql`

@@ -50,7 +50,7 @@ export async function getProblemSets(): Promise<ProblemSet[]> {
   try {
     const user = await stackServerApp.getUser();
     if (!user) {
-      throw new Error('Unauthorized');
+      return [];
     }
     
     console.log('getProblemSets called for user:', user.id);
@@ -80,7 +80,7 @@ export async function getProblemSets(): Promise<ProblemSet[]> {
     });
   } catch (error) {
     console.error('Error fetching problem sets:', error);
-    throw new Error('Failed to fetch problem sets');
+    return [];
   }
 }
 

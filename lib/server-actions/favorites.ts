@@ -15,14 +15,14 @@ export async function getFavorites(): Promise<string[]> {
   try {
     const user = await stackServerApp.getUser();
     if (!user) {
-      throw new Error('Unauthorized');
+      return [];
     }
     
     const result = await sql`SELECT title FROM favorite_problems WHERE user_id = ${user.id} ORDER BY added_at DESC`;
     return result.map(row => row.title);
   } catch (error) {
     console.error('Error fetching favorites:', error);
-    throw new Error('Failed to fetch favorites');
+    return [];
   }
 }
 
@@ -30,7 +30,7 @@ export async function getFavoritesWithDetails(): Promise<FavoriteProblem[]> {
   try {
     const user = await stackServerApp.getUser();
     if (!user) {
-      throw new Error('Unauthorized');
+      return [];
     }
     
     const result = await sql`SELECT title, topic, added_at FROM favorite_problems WHERE user_id = ${user.id} ORDER BY added_at DESC`;
@@ -41,7 +41,7 @@ export async function getFavoritesWithDetails(): Promise<FavoriteProblem[]> {
     }));
   } catch (error) {
     console.error('Error fetching favorites with details:', error);
-    throw new Error('Failed to fetch favorites');
+    return [];
   }
 }
 
