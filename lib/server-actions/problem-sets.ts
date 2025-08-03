@@ -170,7 +170,7 @@ export async function updateProblemSet(id: number, data: Partial<CreateProblemSe
     
     values.push(id, user.id);
     const query = `UPDATE all_problem_sets SET ${updates.join(', ')} WHERE id = $${values.length - 1} AND user_id = $${values.length}`;
-    await sql.unsafe(query, ...values);
+    await sql.unsafe(query, ...(values as any[]));
   } catch (error) {
     console.error('Error updating problem set:', error);
     throw new Error('Failed to update problem set');
