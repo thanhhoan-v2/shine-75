@@ -1,17 +1,22 @@
 'use client';
 
-import { useProblemSets } from '@/components/layout/sidebar/problem-sets-context';
 import AddToFavoriteBtn from '@/components/mdx/add-to-favorite-btn';
 import AddToFavoriteProblemSetBtn from '@/components/mdx/add-to-favorite-problem-set-btn';
 import CompletedBtn from '@/components/mdx/completed-btn';
 import CompletedProblemSetBtn from '@/components/mdx/completed-problem-set-btn';
+import { getDifficultyColor } from '@/components/mdx/problem-generator/data-transformer';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { useDeleteProblemSet, useProblemSets } from '@/lib/hooks';
 import { routes } from '@/lib/routes';
 import {
   ArrowLeft,
   ArrowRightIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
   ExternalLinkIcon,
+  Filter,
+  Loader2,
   Share,
   Trash2Icon,
 } from 'lucide-react';
@@ -20,8 +25,17 @@ import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
 export default function ProblemSetsClient() {
-  const { problemSets, removeProblemSet, isLoaded } = useProblemSets();
+  const { data: problemSets = [], isLoading, error } = useProblemSets();
+  const deleteProblemSetMutation = useDeleteProblemSet();
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [expandedProblemSets, setExpandedProblemSets] = useState<Set<number>>(new Set());
+
+  // Debug logging
+  console.log('ProblemSetsClient render:', { 
+    problemSetsCount: problemSets.length, 
+    isLoading, 
+    error: error?.message 
+  });
 
   // Get unique categories from problem sets
   const categories = useMemo(() => {
@@ -45,283 +59,328 @@ export default function ProblemSetsClient() {
   }, [problemSets, selectedCategory]);
 
   const handleRemoveAll = () => {
-    if (
-      confirm(
-        'Are you sure you want to remove all problem sets? This action cannot be undone.'
-      )
-    ) {
-      problemSets.forEach((problemSet) => {
-        removeProblemSet(problemSet.id);
+    if (filteredProblemSets.length === 0) {
+      toast.error('No problem sets to remove');
+      return;
+    }
+
+    const promises = filteredProblemSets.map((problemSet) =>
+      deleteProblemSetMutation.mutateAsync(problemSet.id)
+    );
+
+    Promise.all(promises)
+      .then(() => {
+        toast.success('All problem sets removed successfully');
+      })
+      .catch((error) => {
+        console.error('Error removing all problem sets:', error);
+        toast.error('Failed to remove all problem sets');
       });
+  };
+
+  const handleShare = async () => {
+    const shareData = {
+      title: 'My Problem Sets',
+      text: `Check out my problem sets: ${filteredProblemSets
+        .map((ps) => ps.name)
+        .join(', ')}`,
+      url: window.location.href,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(shareData.url);
+        toast.success('Link copied to clipboard');
+      }
+    } catch (error) {
+      console.error('Error sharing:', error);
+      toast.error('Failed to share');
     }
   };
 
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case 'Easy':
-        return 'text-green-600 bg-green-100';
-      case 'Medium':
-        return 'text-yellow-600 bg-yellow-100';
-      case 'Hard':
-        return 'text-red-600 bg-red-100';
-      default:
-        return 'text-gray-600 bg-gray-100';
-    }
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
+  const toggleProblemSetExpansion = (problemSetId: number) => {
+    setExpandedProblemSets(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(problemSetId)) {
+        newSet.delete(problemSetId);
+      } else {
+        newSet.add(problemSetId);
+      }
+      return newSet;
     });
   };
 
-  // Show loading state while context is loading
-  if (!isLoaded) {
+  // Loading state
+  if (isLoading) {
     return (
-      <div className="mx-auto px-4 py-8 container">
-        <div className="flex justify-center items-center min-h-[400px]">
-          <div className="text-center">
-            <div className="mx-auto mb-4 border-primary border-b-2 rounded-full w-8 h-8 animate-spin"></div>
-            <p className="text-muted-foreground">Loading problem sets...</p>
-          </div>
+      <div className="flex justify-center items-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-8 h-8 text-muted-foreground animate-spin" />
+          <p className="text-muted-foreground">Loading problem sets...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="flex justify-center items-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-4">
+          <p className="text-destructive">Error loading problem sets: {error.message}</p>
+          <Button onClick={() => window.location.reload()}>Retry</Button>
         </div>
       </div>
     );
   }
 
   return (
-    <>
-      <div className="mx-auto px-4 py-8 container">
-        <div className="flex flex-col gap-6">
-          <div className="mb-8">
-            <Link href={routes.docs}>
-              <Button color="ghost" size="sm" className="gap-2">
-                <ArrowLeft className="w-4 h-4" />
-                Back to Problems
-              </Button>
-            </Link>
-          </div>
-          <div className="flex flex-col gap-4">
-            <div className="flex justify-between items-center">
-              <div>
-                <h1 className="font-bold text-3xl tracking-tight">
-                  Problem Sets
-                </h1>
-                <p className="mt-2 text-muted-foreground">
-                  Your saved problem sets for focused practice
-                </p>
-              </div>
-              {problemSets.length > 0 && (
-                <Button
-                  color="outline"
-                  onClick={handleRemoveAll}
-                  className="hover:bg-red-50 text-red-600 hover:text-red-700"
-                >
-                  <Trash2Icon className="mr-2 w-4 h-4" />
-                  Remove All
-                </Button>
-              )}
-            </div>
-
-            {/* Category Filter */}
-            {problemSets.length > 0 && (
-              <div className="flex items-center gap-4">
-                <Badge className="font-medium">Filter by Topic</Badge>
-                <div className="flex flex-wrap gap-2">
-                  {categories.map((category) => (
-                    <Button
-                      key={category}
-                      color={
-                        selectedCategory === category ? 'primary' : 'outline'
-                      }
-                      size="sm"
-                      onClick={() => setSelectedCategory(category)}
-                    >
-                      {category}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Problem Sets List */}
-          {filteredProblemSets.length > 0 ? (
-            <div className="space-y-6">
-              {filteredProblemSets.map((problemSet) => (
-                <div
-                  key={problemSet.id}
-                  className="space-y-4 p-6 border rounded-lg"
-                >
-                  {/* Problem Set Header */}
-                  <div className="flex justify-between items-center">
-                    <div className="space-y-1">
-                      <h2 className="font-semibold text-xl">
-                        {problemSet.name}
-                      </h2>
-                      <div className="flex items-center gap-2 text-muted-foreground text-sm">
-                        <span>{problemSet.problems.length} problems</span>
-                        <span>•</span>
-                        <span>Created {formatDate(problemSet.createdAt)}</span>
-                        {problemSet.topic && (
-                          <>
-                            <span>•</span>
-                            <span>{problemSet.topic}</span>
-                          </>
-                        )}
-                        {problemSet.difficulty && (
-                          <>
-                            <span>•</span>
-                            <span
-                              className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(
-                                problemSet.difficulty
-                              )}`}
-                            >
-                              {problemSet.difficulty}
-                            </span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        size="sm"
-                        color="outline"
-                        onClick={() => {
-                          const url = `/?topic=${
-                            problemSet.topic || 'all'
-                          }&difficulty=${problemSet.difficulty || 'all'}`;
-                          navigator.clipboard.writeText(
-                            window.location.origin + url
-                          );
-                          toast.success('Link copied to clipboard');
-                        }}
-                      >
-                        <Share className="w-4 h-4" />
-                      </Button>
-                      <CompletedProblemSetBtn
-                        problemSetId={problemSet.id}
-                        problemSetName={problemSet.name}
-                        problemSetDescription={problemSet.description}
-                        problems={problemSet.problems}
-                        variant="just-icon"
-                      />
-                      <AddToFavoriteProblemSetBtn
-                        problemSetId={problemSet.id}
-                        problemSetName={problemSet.name}
-                        problemSetDescription={problemSet.description}
-                        problems={problemSet.problems}
-                        variant="just-icon"
-                      />
-                      <Button
-                        color="outline"
-                        size="sm"
-                        onClick={() => removeProblemSet(problemSet.id)}
-                        className="hover:bg-red-50 text-red-600 hover:text-red-700"
-                      >
-                        <Trash2Icon className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-
-                  {/* Problems List */}
-                  <div className="space-y-2">
-                    {problemSet.problems.map((problem, index) => (
-                      <div
-                        key={`${problemSet.id}-${problem.slug}-${index}`}
-                        className="flex items-center gap-2"
-                      >
-                        <div className="block hover:bg-gray-800/50 p-4 border rounded-lg w-full transition-colors">
-                          <div className="flex justify-between items-center">
-                            <h5 className="flex items-center gap-2 font-medium">
-                              {problem.title}
-                              <span
-                                className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(
-                                  problem.difficulty
-                                )}`}
-                              >
-                                {problem.difficulty}
-                              </span>
-                            </h5>
-                            <div className="flex items-center gap-2">
-                              <CompletedBtn
-                                problemTitle={problem.title}
-                                variant="just-icon"
-                              />
-                              <AddToFavoriteBtn
-                                problemTitle={problem.title}
-                                variant="just-icon"
-                              />
-                              <Button asChild size="sm">
-                                <Link
-                                  href={`/docs/${problem.slug}`}
-                                  target="_blank"
-                                  className="flex items-center gap-1"
-                                >
-                                  View Problem
-                                  <ArrowRightIcon className="w-4 h-4" />
-                                </Link>
-                              </Button>
-                              <Button asChild size="sm" color="outline">
-                                <Link
-                                  href={`https://leetcode.com/problems/${problem.slug
-                                    .split('/')
-                                    .pop()
-                                    ?.replace('.mdx', '')}/`}
-                                  target="_blank"
-                                  className="flex items-center gap-2 font-bold hover:underline transition-all duration-500"
-                                >
-                                  <span>View on LeetCode</span>
-                                  <ExternalLinkIcon className="size-4" />
-                                </Link>
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="py-12 text-center">
-              <div className="flex justify-center items-center bg-muted mx-auto mb-4 rounded-full w-24 h-24">
-                <svg
-                  className="w-12 h-12 text-muted-foreground"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  />
-                </svg>
-              </div>
-              <h3 className="mb-2 font-semibold text-lg">
-                No problem sets yet
-              </h3>
-              <p className="mb-4 text-muted-foreground">
-                {selectedCategory === 'All'
-                  ? "You haven't created any problem sets yet."
-                  : `No problem sets found for ${selectedCategory}.`}
-              </p>
-              <Button asChild>
-                <Link href={routes.problemGenerator}>
-                  Create Your First Problem Set
-                </Link>
-              </Button>
-            </div>
-          )}
+    <div className="mx-auto px-4 py-8 container">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-8">
+        <div className="flex items-center gap-4">
+          <Link href={routes.home}>
+            <Button color="ghost" size="sm">
+              <ArrowLeft className="mr-2 w-4 h-4" />
+              Back
+            </Button>
+          </Link>
+          <h1 className="font-bold text-3xl">Problem Sets</h1>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button onClick={handleShare} color="outline" size="sm">
+            <Share className="mr-2 w-4 h-4" />
+            Share
+          </Button>
         </div>
       </div>
-    </>
+
+      {/* Category Filter */}
+      <div className="flex justify-between items-center mb-6">
+        <div className="flex items-center gap-4">
+          <Button
+            onClick={() => setSelectedCategory(selectedCategory === 'All' ? 'All' : 'All')}
+            color="outline"
+            size="sm"
+          >
+            <Filter className="mr-2 w-4 h-4" />
+            Filter by Category
+          </Button>
+          {selectedCategory !== 'All' && (
+            <Badge variant="secondary">{selectedCategory}</Badge>
+          )}
+        </div>
+        {filteredProblemSets.length > 0 && (
+          <Button
+            onClick={handleRemoveAll}
+            color="primary"
+            size="sm"
+            disabled={deleteProblemSetMutation.isPending}
+          >
+            {deleteProblemSetMutation.isPending ? (
+              <Loader2 className="mr-2 w-4 h-4 animate-spin" />
+            ) : (
+              <Trash2Icon className="mr-2 w-4 h-4" />
+            )}
+            Remove All
+          </Button>
+        )}
+      </div>
+
+      {/* Category Dropdown */}
+      <div className="bg-muted/50 mb-6 p-4 border rounded-lg">
+        <div className="gap-2 grid grid-cols-2 md:grid-cols-4">
+          {categories.map((category) => (
+            <Button
+              key={category}
+              onClick={() => setSelectedCategory(category)}
+              color={selectedCategory === category ? 'primary' : 'outline'}
+              size="sm"
+              className="justify-start"
+            >
+              {category}
+            </Button>
+          ))}
+        </div>
+      </div>
+
+      {/* Problem Sets List */}
+      {filteredProblemSets.length === 0 ? (
+        <div className="py-12 text-center">
+          <p className="mb-4 text-muted-foreground">
+            {selectedCategory === 'All'
+              ? 'No problem sets yet. Start creating problem sets!'
+              : `No problem sets in the "${selectedCategory}" category.`}
+          </p>
+          <Link href={routes.problemGenerator}>
+            <Button>
+              <ArrowRightIcon className="mr-2 w-4 h-4" />
+              Create Problem Set
+            </Button>
+          </Link>
+        </div>
+      ) : (
+        <div className="gap-4 grid">
+          {filteredProblemSets.map((problemSet) => {
+            const isExpanded = expandedProblemSets.has(problemSet.id);
+            
+            return (
+              <div
+                key={problemSet.id}
+                className="border rounded-lg overflow-hidden"
+              >
+                {/* Problem Set Header */}
+                <div className="flex justify-between items-center hover:bg-muted/50 p-4 transition-colors">
+                  <div className="flex-1">
+                    <h3 className="font-medium">{problemSet.name}</h3>
+                    <div className="flex items-center gap-2 mt-1">
+                      {problemSet.topic && (
+                        <Badge variant="outline">{problemSet.topic}</Badge>
+                      )}
+                      {problemSet.difficulty && (
+                        <Badge variant="outline">{problemSet.difficulty}</Badge>
+                      )}
+                      <span className="text-muted-foreground text-sm">
+                        {problemSet.problems.length} problems
+                      </span>
+                      <span className="text-muted-foreground text-sm">
+                        Created {new Date(problemSet.created_at).toLocaleDateString()}
+                      </span>
+                    </div>
+                    {problemSet.description && (
+                      <p className="mt-2 text-muted-foreground text-sm">
+                        {problemSet.description}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      onClick={() => toggleProblemSetExpansion(problemSet.id)}
+                      color="outline"
+                      size="sm"
+                      className="flex items-center gap-1"
+                    >
+                      {isExpanded ? (
+                        <>
+                          <ChevronUpIcon className="w-4 h-4" />
+                          Hide
+                        </>
+                      ) : (
+                        <>
+                          <ChevronDownIcon className="w-4 h-4" />
+                          Show
+                        </>
+                      )}
+                    </Button>
+                    <Link href={`/problem-sets/${problemSet.id}`}>
+                      <Button color="outline" size="sm">
+                        <ExternalLinkIcon className="mr-2 w-4 h-4" />
+                        View
+                      </Button>
+                    </Link>
+                    <AddToFavoriteProblemSetBtn
+                      problemSetId={problemSet.id}
+                      problemSetName={problemSet.name}
+                      problems={problemSet.problems}
+                      variant="just-icon"
+                    />
+                    <CompletedProblemSetBtn
+                      problemSetId={problemSet.id}
+                      problemSetName={problemSet.name}
+                      problems={problemSet.problems}
+                      variant="just-icon"
+                    />
+                    <Button
+                      onClick={() => deleteProblemSetMutation.mutate(problemSet.id)}
+                      color="outline"
+                      size="sm"
+                      disabled={deleteProblemSetMutation.isPending}
+                    >
+                      {deleteProblemSetMutation.isPending ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Trash2Icon className="w-4 h-4" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Problem List Dropdown */}
+                {isExpanded && (
+                  <div className="bg-muted/30 border-t">
+                    <div className="p-4">
+                      <h4 className="mb-3 font-medium text-muted-foreground text-sm">
+                        Problems in this set:
+                      </h4>
+                                             <div className="flex flex-col gap-2">
+                         {problemSet.problems.map((problem, index) => (
+                           <div
+                             key={`${problemSet.id}-${problem.slug}-${index}`}
+                             className="flex items-center gap-2"
+                           >
+                             <div className="block hover:bg-gray-800/50 p-4 border rounded-lg w-full transition-colors">
+                               <div className="flex justify-between items-center">
+                                 <h5 className="flex items-center gap-2 font-medium">
+                                   <span className="font-mono text-muted-foreground text-sm">
+                                     {String(index + 1).padStart(2, '0')}
+                                   </span>
+                                   {problem.title}
+                                   <span
+                                     className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(
+                                       problem.difficulty
+                                     )}`}
+                                   >
+                                     {problem.difficulty}
+                                   </span>
+                                 </h5>
+                                 <div className="flex items-center gap-2">
+                                   <CompletedBtn
+                                     problemTitle={problem.title}
+                                     variant="just-icon"
+                                   />
+                                   <AddToFavoriteBtn
+                                     problemTitle={problem.title}
+                                     variant="just-icon"
+                                   />
+                                   <Button asChild size="sm">
+                                     <Link
+                                       href={`/docs/${problem.slug}`}
+                                       target="_blank"
+                                       className="flex items-center gap-1"
+                                     >
+                                       View Problem
+                                       <ArrowRightIcon className="w-4 h-4" />
+                                     </Link>
+                                   </Button>
+                                   <Button asChild size="sm">
+                                     <Link
+                                       href={`https://leetcode.com/problems/${problem.slug
+                                         .split('/')
+                                         .pop()
+                                         ?.replace('.mdx', '')}/`}
+                                       target="_blank"
+                                       className="flex items-center gap-2 font-bold hover:underline transition-all duration-500"
+                                     >
+                                       <span>View on LeetCode</span>
+                                       <ExternalLinkIcon className="size-4" />
+                                     </Link>
+                                   </Button>
+                                 </div>
+                               </div>
+                             </div>
+                           </div>
+                         ))}
+                       </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
   );
 }

@@ -1,6 +1,7 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import { useCompletedProblems, useToggleCompletedProblem } from '@/lib/hooks';
+import { createContext, useContext } from 'react';
 
 interface CompletedContextType {
   completedProblems: string[];
@@ -8,102 +9,54 @@ interface CompletedContextType {
   toggleCompleted: (problemTitle: string) => void;
   removeCompleted: (problemTitle: string) => void;
   isLoaded: boolean;
+  isLoading: boolean;
 }
 
 const CompletedContext = createContext<CompletedContextType | undefined>(undefined);
 
 export const CompletedProvider = ({ children }: { children: React.ReactNode }) => {
-  const [completedProblems, setCompletedProblems] = useState<string[]>([]);
-  const [isLoaded, setIsLoaded] = useState(false);
-
-  useEffect(() => {
-    // Load completed problems from API
-    const loadCompletedProblems = async () => {
-      try {
-        const response = await fetch('/api/completed');
-        if (response.ok) {
-          const problems = await response.json();
-          setCompletedProblems(problems);
-        } else if (response.status === 401) {
-          // User is not authenticated, set empty completed problems
-          setCompletedProblems([]);
-        }
-      } catch (error) {
-        console.error('Error loading completed problems from API:', error);
-        setCompletedProblems([]);
-      } finally {
-        setIsLoaded(true);
-      }
-    };
-
-    loadCompletedProblems();
-  }, []);
+  const { data: completedProblems = [], isLoading, error } = useCompletedProblems();
+  const toggleCompletedMutation = useToggleCompletedProblem();
 
   const isCompleted = (problemTitle: string) => {
     return completedProblems.includes(problemTitle);
   };
 
-  const toggleCompleted = async (problemTitle: string) => {
-    try {
-      if (isCompleted(problemTitle)) {
-        const response = await fetch('/api/completed', {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ title: problemTitle })
-        });
-        
-        if (response.ok) {
-          setCompletedProblems(prev => prev.filter(title => title !== problemTitle));
-        } else if (response.status === 401) {
-          console.log('User needs to authenticate to manage completed problems');
-        }
-      } else {
-        const response = await fetch('/api/completed', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ title: problemTitle })
-        });
-        
-        if (response.ok) {
-          setCompletedProblems(prev => [...prev, problemTitle]);
-        } else if (response.status === 401) {
-          console.log('User needs to authenticate to manage completed problems');
-        }
-      }
-    } catch (error) {
-      console.error('Error toggling completed problem:', error);
-    }
+  const toggleCompleted = (problemTitle: string) => {
+    const currentlyCompleted = isCompleted(problemTitle);
+    toggleCompletedMutation.mutate({ 
+      title: problemTitle, 
+      topic: 'General', 
+      isCompleted: currentlyCompleted 
+    });
   };
 
-  const removeCompleted = async (problemTitle: string) => {
-    try {
-      const response = await fetch('/api/completed', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: problemTitle })
-      });
-      
-      if (response.ok) {
-        setCompletedProblems(prev => prev.filter(title => title !== problemTitle));
-      } else if (response.status === 401) {
-        console.log('User needs to authenticate to manage completed problems');
-      }
-    } catch (error) {
-      console.error('Error removing completed problem:', error);
-    }
+  const removeCompleted = (problemTitle: string) => {
+    toggleCompletedMutation.mutate({ 
+      title: problemTitle, 
+      topic: 'General', 
+      isCompleted: true 
+    });
   };
 
   return (
-    <CompletedContext.Provider value={{ completedProblems, isCompleted, toggleCompleted, removeCompleted, isLoaded }}>
+    <CompletedContext.Provider value={{ 
+      completedProblems, 
+      isCompleted, 
+      toggleCompleted, 
+      removeCompleted, 
+      isLoaded: !isLoading && !error,
+      isLoading
+    }}>
       {children}
     </CompletedContext.Provider>
   );
 };
 
-export const useCompleted = () => {
+export const useCompletedContext = () => {
   const context = useContext(CompletedContext);
   if (context === undefined) {
-    throw new Error('useCompleted must be used within a CompletedProvider');
+    throw new Error('useCompletedContext must be used within a CompletedProvider');
   }
   return context;
 }; 

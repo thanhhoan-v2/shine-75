@@ -1,9 +1,9 @@
 'use client';
 
+import { useCreateProblemSet } from '@/lib/hooks';
 import { useUser } from '@stackframe/stack';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
-import { useProblemSets } from '../../layout/sidebar/problem-sets-context';
 import { transformProblems } from './data-transformer';
 import { Problem } from './types';
 
@@ -15,7 +15,7 @@ export const useProblemGenerator = () => {
   const [generatedProblems, setGeneratedProblems] = useState<Problem[]>([]);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
-  const { addProblemSet } = useProblemSets();
+  const createProblemSetMutation = useCreateProblemSet();
   const user = useUser();
 
   // Memoize the transformed topics to prevent infinite re-renders
@@ -106,14 +106,13 @@ export const useProblemGenerator = () => {
       problemCount !== 1 ? 's' : ''
     }`;
 
-    addProblemSet({
-      userId: user?.id,
+    createProblemSetMutation.mutate({
       name: problemSetName,
       problems: generatedProblems,
       topic: selectedTopic
-        ? topics.find((t) => t.slug === selectedTopic)?.name
-        : undefined,
-      difficulty: selectedDifficulty || undefined,
+        ? topics.find((t) => t.slug === selectedTopic)?.name || 'All Topics'
+        : 'All Topics',
+      difficulty: selectedDifficulty || 'All',
       description: `Generated problem set for ${
         selectedTopic
           ? topics.find((t) => t.slug === selectedTopic)?.name

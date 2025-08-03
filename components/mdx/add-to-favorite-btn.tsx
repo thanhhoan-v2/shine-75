@@ -1,8 +1,8 @@
 'use client';
 
-import { useFavorites } from '@/components/layout/sidebar/favorites-context';
 import { Button } from '@/components/ui/button';
-import { HeartIcon } from 'lucide-react';
+import { useFavoriteStatus, useToggleFavorite } from '@/lib/hooks';
+import { HeartIcon, Loader2 } from 'lucide-react';
 
 interface AddToFavoriteBtnProps {
   problemTitle: string;
@@ -17,8 +17,8 @@ const AddToFavoriteBtn = ({
   variant,
   onAuthRequired,
 }: AddToFavoriteBtnProps) => {
-  const { isFavorite, toggleFavorite, isLoaded } = useFavorites();
-  const isItemFavorite = isFavorite(problemTitle);
+  const { data: isFavorite = false, isLoading: statusLoading } = useFavoriteStatus(problemTitle);
+  const toggleFavoriteMutation = useToggleFavorite();
 
   const handleToggleFavorite = () => {
     // Temporarily disable authentication check for testing
@@ -27,18 +27,33 @@ const AddToFavoriteBtn = ({
     //   return; // Authentication dialog was shown, don't proceed
     // }
     
-    toggleFavorite(problemTitle);
+    toggleFavoriteMutation.mutate({ 
+      title: problemTitle, 
+      topic: topic || 'General', 
+      isFavorite 
+    });
   };
 
-  // Don't render until the context is loaded to prevent hydration mismatches
-  if (!isLoaded) {
-    return null;
+  // Don't render until the status is loaded to prevent hydration mismatches
+  if (statusLoading) {
+    return (
+      <Button color="outline" size="sm" disabled>
+        <Loader2 className="w-4 h-4 animate-spin" />
+      </Button>
+    );
   }
 
   if (variant === 'just-icon') {
     return (
-      <Button onClick={handleToggleFavorite} color="outline" size="sm">
-        {isItemFavorite ? (
+      <Button 
+        onClick={handleToggleFavorite} 
+        color="outline" 
+        size="sm"
+        disabled={toggleFavoriteMutation.isPending}
+      >
+        {toggleFavoriteMutation.isPending ? (
+          <Loader2 className="w-4 h-4 animate-spin" />
+        ) : isFavorite ? (
           <HeartIcon fill="red" className="w-4 h-4" />
         ) : (
           <HeartIcon className="w-4 h-4" />
@@ -53,8 +68,14 @@ const AddToFavoriteBtn = ({
       color="outline"
       size="sm"
       className="gap-2 px-2 py-3 w-[200px]"
+      disabled={toggleFavoriteMutation.isPending}
     >
-      {isItemFavorite ? (
+      {toggleFavoriteMutation.isPending ? (
+        <>
+          <Loader2 className="w-4 h-4 animate-spin" />
+          <div>Updating...</div>
+        </>
+      ) : isFavorite ? (
         <>
           <HeartIcon fill="red" className="w-4 h-4" />
           <div>Remove from favorites</div>

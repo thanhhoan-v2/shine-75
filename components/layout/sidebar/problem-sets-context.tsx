@@ -1,7 +1,8 @@
 'use client';
 
 import { studyPlan } from '@/lib/data/patterns';
-import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import { useCreateProblemSet, useDeleteProblemSet, useProblemSets as useProblemSetsQuery } from '@/lib/hooks';
+import { createContext, ReactNode, useContext } from 'react';
 
 interface Problem {
   title: string;
@@ -30,6 +31,7 @@ interface ProblemSetsContextType {
   removeProblemSet: (id: number) => Promise<void>;
   getProblemSet: (id: number) => ProblemSet | undefined;
   isLoaded: boolean;
+  isLoading: boolean;
 }
 
 const ProblemSetsContext = createContext<ProblemSetsContextType | null>(null);
@@ -46,101 +48,47 @@ const findProblemDifficulty = (problemTitle: string): string => {
 };
 
 export function ProblemSetsProvider({ children }: { children: ReactNode }) {
-  const [problemSets, setProblemSets] = useState<ProblemSet[]>([]);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const { data: dbProblemSets = [], isLoading, error } = useProblemSetsQuery();
+  const createProblemSetMutation = useCreateProblemSet();
+  const deleteProblemSetMutation = useDeleteProblemSet();
 
-  // Load problem sets from API on mount
-  useEffect(() => {
-    const loadProblemSets = async () => {
-      try {
-        const response = await fetch('/api/problem-sets');
-        if (response.ok) {
-          const dbProblemSets = await response.json();
-          const formattedProblemSets: ProblemSet[] = dbProblemSets.map((dbSet: any) => {
-            // Reconstruct Problem objects from stored data with actual difficulties
-            const problems: Problem[] = (dbSet.problems || []).map((problemTitle: string) => ({
-              title: problemTitle,
-              difficulty: findProblemDifficulty(problemTitle), // Use actual difficulty
-              description: '',
-              timeLimit: '',
-              week: 1,
-              tags: [],
-              slug: problemTitle.toLowerCase().replace(/\s+/g, '-')
-            }));
-            
-            return {
-              id: dbSet.id,
-              name: dbSet.name,
-              problems: problems,
-              createdAt: dbSet.created_at || new Date().toISOString(),
-              description: dbSet.description,
-              topic: dbSet.topic,
-              difficulty: dbSet.difficulty,
-              userId: dbSet.user_id
-            };
-          });
-          setProblemSets(formattedProblemSets);
-        } else if (response.status === 401) {
-          // User is not authenticated, set empty problem sets
-          setProblemSets([]);
-        }
-      } catch (error) {
-        console.error('Failed to load problem sets from API:', error);
-      } finally {
-        setIsLoaded(true);
-      }
+  // Transform database problem sets to our internal format
+  const problemSets: ProblemSet[] = dbProblemSets.map((dbSet: any) => {
+    // Reconstruct Problem objects from stored data with actual difficulties
+    const problems: Problem[] = (dbSet.problems || []).map((problemTitle: string) => ({
+      title: problemTitle,
+      difficulty: findProblemDifficulty(problemTitle), // Use actual difficulty
+      description: '',
+      timeLimit: '',
+      week: 1,
+      tags: [],
+      slug: problemTitle.toLowerCase().replace(/\s+/g, '-')
+    }));
+    
+    return {
+      id: dbSet.id,
+      name: dbSet.name,
+      problems: problems,
+      createdAt: dbSet.created_at || new Date().toISOString(),
+      description: dbSet.description,
+      topic: dbSet.topic,
+      difficulty: dbSet.difficulty,
+      userId: dbSet.user_id
     };
-
-    loadProblemSets();
-  }, []);
+  });
 
   const addProblemSet = async (problemSetData: Omit<ProblemSet, 'id' | 'createdAt'>) => {
-    try {
-      const problemTitles = problemSetData.problems.map(p => p.title);
-      const response = await fetch('/api/problem-sets', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: problemSetData.name,
-          description: problemSetData.description,
-          problems: problemTitles,
-          topic: problemSetData.topic,
-          difficulty: problemSetData.difficulty,
-          userId: problemSetData.userId
-        })
-      });
-      
-      if (response.ok) {
-        const { id } = await response.json();
-        const newProblemSet: ProblemSet = {
-          ...problemSetData,
-          id,
-          createdAt: new Date().toISOString(),
-        };
-        
-        setProblemSets(prev => [newProblemSet, ...prev]);
-      } else if (response.status === 401) {
-        console.log('User needs to authenticate to create problem sets');
-      }
-    } catch (error) {
-      console.error('Failed to add problem set via API:', error);
-    }
+    await createProblemSetMutation.mutateAsync({
+      name: problemSetData.name,
+      description: problemSetData.description || '',
+      problems: problemSetData.problems,
+      topic: problemSetData.topic || '',
+      difficulty: problemSetData.difficulty || ''
+    });
   };
 
   const removeProblemSet = async (id: number) => {
-    try {
-      const response = await fetch(`/api/problem-sets/${id}`, {
-        method: 'DELETE'
-      });
-      
-      if (response.ok) {
-        setProblemSets(prev => prev.filter(problemSet => problemSet.id !== id));
-      } else if (response.status === 401) {
-        console.log('User needs to authenticate to manage problem sets');
-      }
-    } catch (error) {
-      console.error('Failed to remove problem set via API:', error);
-    }
+    await deleteProblemSetMutation.mutateAsync(id);
   };
 
   const getProblemSet = (id: number) => {
@@ -154,7 +102,8 @@ export function ProblemSetsProvider({ children }: { children: ReactNode }) {
         addProblemSet, 
         removeProblemSet, 
         getProblemSet,
-        isLoaded
+        isLoaded: !isLoading && !error,
+        isLoading
       }}
     >
       {children}
@@ -162,10 +111,10 @@ export function ProblemSetsProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function useProblemSets() {
+export function useProblemSetsContext() {
   const context = useContext(ProblemSetsContext);
   if (!context) {
-    throw new Error('useProblemSets must be used within a ProblemSetsProvider');
+    throw new Error('useProblemSetsContext must be used within a ProblemSetsProvider');
   }
   return context;
 } 

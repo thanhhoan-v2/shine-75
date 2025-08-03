@@ -1,41 +1,46 @@
 'use client';
 
-import { useCompleted } from '@/components/layout/sidebar/completed-context';
+import AddToFavoriteProblemSetBtn from '@/components/mdx/add-to-favorite-problem-set-btn';
+import CompletedProblemSetBtn from '@/components/mdx/completed-problem-set-btn';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { useCompletedProblems, useRemoveCompletedProblem, useToggleCompletedProblem } from '@/lib/hooks';
 import { routes } from '@/lib/routes';
-import { getAvailableCategories, getCategoryFromTitle } from '@/lib/utils';
+import { getCategoryFromTitle } from '@/lib/utils';
 import {
-  ArrowLeft,
-  BookOpen,
-  CheckCircle,
-  CheckCircleIcon,
-  CircleIcon,
-  Filter,
-  Share,
-  Trash2,
+    ArrowLeft,
+    ArrowRightIcon,
+    ExternalLinkIcon,
+    Filter,
+    Loader2,
+    Share,
+    Trash2Icon,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
+import { toast } from 'sonner';
 
 interface CompletedPageProblem {
   title: string;
   completedAt: string;
-  topic?: string;
+  topic: string;
 }
 
 interface CompletedProblemSet {
   id: number;
-  problem_set_id: number;
   name: string;
+  problems: string[];
+  created_at: string;
+  topic?: string;
+  difficulty?: string;
   description?: string;
-  problems: any[];
-  completed_at: string;
   user_id?: string;
 }
 
 export default function CompletedPageClient() {
-  const { completedProblems, removeCompleted, toggleCompleted, isLoaded } =
-    useCompleted();
+  const { data: completedProblems = [], isLoading, error } = useCompletedProblems();
+  const removeCompletedMutation = useRemoveCompletedProblem();
+  const toggleCompletedMutation = useToggleCompletedProblem();
   const [filteredCompleted, setFilteredCompleted] = useState<
     CompletedPageProblem[]
   >([]);
@@ -44,10 +49,10 @@ export default function CompletedPageClient() {
   const [showCategoryFilter, setShowCategoryFilter] = useState(false);
   const [activeTab, setActiveTab] = useState<'problems' | 'problem-sets'>('problems');
 
-  // Convert Set<string> to CompletedProblem[] format - memoized to prevent infinite loops
+  // Convert string array to CompletedProblem[] format - memoized to prevent infinite loops
   const completedList: CompletedPageProblem[] = useMemo(
     () =>
-      Array.from(completedProblems).map((title) => ({
+      completedProblems.map((title) => ({
         title,
         completedAt: new Date().toISOString(), // Since we don't store timestamps in context, use current time
         topic: getCategoryFromTitle(title),
@@ -87,84 +92,130 @@ export default function CompletedPageClient() {
   }, [completedList, selectedCategory]);
 
   const handleRemoveAll = () => {
-    if (
-      confirm(
-        'Are you sure you want to remove all completed problems? This action cannot be undone.'
-      )
-    ) {
-      // Remove all completed problems by clearing the Set
-      completedProblems.forEach((title) => {
-        removeCompleted(title);
+    if (filteredCompleted.length === 0) {
+      toast.error('No completed problems to remove');
+      return;
+    }
+
+    const promises = filteredCompleted.map((completed) =>
+      removeCompletedMutation.mutateAsync(completed.title)
+    );
+
+    Promise.all(promises)
+      .then(() => {
+        toast.success('All completed problems removed successfully');
+      })
+      .catch((error) => {
+        console.error('Error removing all completed problems:', error);
+        toast.error('Failed to remove all completed problems');
       });
-    }
   };
 
-  const handleRemoveAllProblemSets = async () => {
-    if (
-      confirm(
-        'Are you sure you want to remove all completed problem sets? This action cannot be undone.'
-      )
-    ) {
-      try {
-        for (const problemSet of completedProblemSets) {
-          await fetch('/api/completed-problem-sets', {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-              problem_set_id: problemSet.problem_set_id,
-              user_id: problemSet.user_id 
-            }),
-          });
-        }
-        setCompletedProblemSets([]);
-      } catch (error) {
-        console.error('Error removing all completed problem sets:', error);
-      }
+  const handleRemoveAllProblemSets = () => {
+    if (completedProblemSets.length === 0) {
+      toast.error('No completed problem sets to remove');
+      return;
     }
+
+    // TODO: Implement remove all problem sets functionality
+    toast.info('Remove all problem sets functionality not yet implemented');
   };
 
-  const handleRemoveProblemSet = async (problemSet: CompletedProblemSet) => {
+  const handleShare = async () => {
+    const shareData = {
+      title: 'My Completed Problems',
+      text: `Check out my completed problems: ${filteredCompleted
+        .map((c) => c.title)
+        .join(', ')}`,
+      url: window.location.href,
+    };
+
     try {
-      await fetch('/api/completed-problem-sets', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          problem_set_id: problemSet.problem_set_id,
-          user_id: problemSet.user_id 
-        }),
-      });
-      setCompletedProblemSets(prev => 
-        prev.filter(ps => ps.id !== problemSet.id)
-      );
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(shareData.url);
+        toast.success('Link copied to clipboard');
+      }
     } catch (error) {
-      console.error('Error removing completed problem set:', error);
+      console.error('Error sharing:', error);
+      toast.error('Failed to share');
     }
   };
 
-  const handleShareProblemSet = (problemSet: CompletedProblemSet) => {
-    const url = `/?topic=${problemSet.problems[0]?.topic || 'all'}&difficulty=${problemSet.problems[0]?.difficulty || 'all'}`;
-    navigator.clipboard.writeText(window.location.origin + url);
+  const handleShareProblemSets = async () => {
+    const shareData = {
+      title: 'My Completed Problem Sets',
+      text: `Check out my completed problem sets: ${completedProblemSets
+        .map((ps) => ps.name)
+        .join(', ')}`,
+      url: window.location.href,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(shareData.url);
+        toast.success('Link copied to clipboard');
+      }
+    } catch (error) {
+      console.error('Error sharing:', error);
+      toast.error('Failed to share');
+    }
   };
 
-  const categories = ['All', ...getAvailableCategories()];
+  // Get unique categories from completed problems
+  const categories = useMemo(() => {
+    const cats = new Set<string>();
+    completedList.forEach((completed) => {
+      if (completed.topic) {
+        cats.add(completed.topic);
+      }
+    });
+    return ['All', ...Array.from(cats).sort()];
+  }, [completedList]);
 
-  // Show loading state while context is loading
-  if (!isLoaded) {
+  // Get unique categories from problem sets
+  const problemSetCategories = useMemo(() => {
+    const cats = new Set<string>();
+    completedProblemSets.forEach((problemSet) => {
+      if (problemSet.topic) {
+        cats.add(problemSet.topic);
+      }
+    });
+    return ['All', ...Array.from(cats).sort()];
+  }, [completedProblemSets]);
+
+  const filteredProblemSets = useMemo(() => {
+    if (selectedCategory === 'All') {
+      return completedProblemSets;
+    } else {
+      return completedProblemSets.filter(
+        (problemSet) => problemSet.topic === selectedCategory
+      );
+    }
+  }, [completedProblemSets, selectedCategory]);
+
+  // Loading state
+  if (isLoading) {
     return (
-      <div className="mx-auto px-4 py-8 container">
-        <div className="mb-8">
-          <Link href="/docs">
-            <Button color="ghost" size="sm" className="gap-2">
-              <ArrowLeft className="w-4 h-4" />
-              Back to Problems
-            </Button>
-          </Link>
+      <div className="flex justify-center items-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-8 h-8 text-muted-foreground animate-spin" />
+          <p className="text-muted-foreground">Loading completed problems...</p>
         </div>
-        <div className="py-12 text-center">
-          <CheckCircle className="mx-auto mb-4 w-12 h-12 text-muted-foreground animate-pulse" />
-          <h3 className="mb-2 font-semibold text-lg">
-            Loading completed problems...
-          </h3>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="flex justify-center items-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-4">
+          <p className="text-destructive">Error loading completed problems: {error.message}</p>
+          <Button onClick={() => window.location.reload()}>Retry</Button>
         </div>
       </div>
     );
@@ -172,224 +223,285 @@ export default function CompletedPageClient() {
 
   return (
     <div className="mx-auto px-4 py-8 container">
-      <div className="mb-8">
-        <Link href={routes.docs}>
-          <Button color="ghost" size="sm" className="gap-2">
-            <ArrowLeft className="w-4 h-4" />
-            Back to Problems
+      {/* Header */}
+      <div className="flex justify-between items-center mb-8">
+        <div className="flex items-center gap-4">
+          <Link href={routes.home}>
+            <Button color="ghost" size="sm">
+              <ArrowLeft className="mr-2 w-4 h-4" />
+              Back
+            </Button>
+          </Link>
+          <h1 className="font-bold text-3xl">Completed</h1>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button onClick={handleShare} color="outline" size="sm">
+            <Share className="mr-2 w-4 h-4" />
+            Share
           </Button>
-        </Link>
+        </div>
       </div>
 
-      <div className="mb-6">
-        <div className="flex justify-between items-start">
-          <div>
-            <h1 className="flex items-center gap-2 font-bold text-3xl">
-              <CheckCircleIcon className="w-8 h-8 text-green-500" />
-              Completed
-            </h1>
-            <p className="mt-2 text-muted-foreground">
-              Your completed problems and problem sets for tracking progress
-            </p>
-          </div>
-          {(completedList.length > 0 || completedProblemSets.length > 0) && (
-            <div className="flex gap-2">
-              <Button
-                color="outline"
-                size="sm"
-                onClick={() => setShowCategoryFilter(!showCategoryFilter)}
-                className="gap-2"
-              >
-                <Filter className="w-4 h-4" />
-                Filter
-              </Button>
-              {activeTab === 'problems' && completedList.length > 0 && (
-                <Button
-                  color="primary"
-                  size="sm"
-                  onClick={handleRemoveAll}
-                  className="gap-2 bg-red-600 hover:bg-red-700"
-                >
-                  <Trash2 className="w-4 h-4" />
-                  Remove All
-                </Button>
-              )}
-              {activeTab === 'problem-sets' && completedProblemSets.length > 0 && (
-                <Button
-                  color="primary"
-                  size="sm"
-                  onClick={handleRemoveAllProblemSets}
-                  className="gap-2 bg-red-600 hover:bg-red-700"
-                >
-                  <Trash2 className="w-4 h-4" />
-                  Remove All
-                </Button>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Tab Toggle */}
-        <div className="flex gap-2 mb-4">
-          <Button
-            color={activeTab === 'problems' ? 'primary' : 'outline'}
-            size="sm"
-            onClick={() => setActiveTab('problems')}
-          >
-            Problems ({completedList.length})
-          </Button>
-          <Button
-            color={activeTab === 'problem-sets' ? 'primary' : 'outline'}
-            size="sm"
-            onClick={() => setActiveTab('problem-sets')}
-          >
-            Problem Sets ({completedProblemSets.length})
-          </Button>
-        </div>
-
-        {showCategoryFilter && completedList.length > 0 && activeTab === 'problems' && (
-          <div className="bg-muted/50 mt-4 p-4 border rounded-lg">
-            <div className="flex flex-wrap gap-2">
-              {categories.map((category) => (
-                <Button
-                  key={category}
-                  color={selectedCategory === category ? 'primary' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedCategory(category)}
-                >
-                  {category}
-                </Button>
-              ))}
-            </div>
-          </div>
-        )}
+      {/* Tab Navigation */}
+      <div className="flex mb-6 border-b">
+        <button
+          onClick={() => setActiveTab('problems')}
+          className={`px-4 py-2 font-medium ${
+            activeTab === 'problems'
+              ? 'border-b-2 border-primary text-primary'
+              : 'text-muted-foreground'
+          }`}
+        >
+          Problems ({completedList.length})
+        </button>
+        <button
+          onClick={() => setActiveTab('problem-sets')}
+          className={`px-4 py-2 font-medium ${
+            activeTab === 'problem-sets'
+              ? 'border-b-2 border-primary text-primary'
+              : 'text-muted-foreground'
+          }`}
+        >
+          Problem Sets ({completedProblemSets.length})
+        </button>
       </div>
 
       {activeTab === 'problems' ? (
-        // Problems Tab
-        completedList.length === 0 ? (
-          <div className="py-12 text-center">
-            <CheckCircle className="mx-auto mb-4 w-12 h-12 text-muted-foreground" />
-            <h3 className="mb-2 font-semibold text-lg">
-              No completed problems yet
-            </h3>
-            <p className="mb-4 text-muted-foreground">
-              Start solving problems and mark them as completed!
-            </p>
-            <Link href={routes.docs}>
-              <Button>Browse Problems</Button>
-            </Link>
-          </div>
-        ) : filteredCompleted.length === 0 ? (
-          <div className="py-12 text-center">
-            <Filter className="mx-auto mb-4 w-12 h-12 text-muted-foreground" />
-            <h3 className="mb-2 font-semibold text-lg">
-              No problems in this category
-            </h3>
-            <p className="mb-4 text-muted-foreground">
-              Try selecting a different category or complete more problems.
-            </p>
-          </div>
-        ) : (
-          <div className="gap-4 grid">
-            {filteredCompleted.map((completed, index) => (
-              <div
-                key={index}
-                className="hover:bg-accent/50 p-4 border rounded-lg transition-colors"
+        <>
+          {/* Category Filter */}
+          <div className="flex justify-between items-center mb-6">
+            <div className="flex items-center gap-4">
+              <Button
+                onClick={() => setShowCategoryFilter(!showCategoryFilter)}
+                color="outline"
+                size="sm"
               >
-                <div className="flex justify-between items-center">
-                  <div>
-                    <h3 className="font-semibold text-lg">{completed.title}</h3>
+                <Filter className="mr-2 w-4 h-4" />
+                Filter by Category
+              </Button>
+              {selectedCategory !== 'All' && (
+                <Badge variant="secondary">{selectedCategory}</Badge>
+              )}
+            </div>
+            {filteredCompleted.length > 0 && (
+              <Button
+                onClick={handleRemoveAll}
+                color="primary"
+                size="sm"
+                disabled={removeCompletedMutation.isPending}
+              >
+                {removeCompletedMutation.isPending ? (
+                  <Loader2 className="mr-2 w-4 h-4 animate-spin" />
+                ) : (
+                  <Trash2Icon className="mr-2 w-4 h-4" />
+                )}
+                Remove All
+              </Button>
+            )}
+          </div>
+
+          {/* Category Dropdown */}
+          {showCategoryFilter && (
+            <div className="bg-muted/50 mb-6 p-4 border rounded-lg">
+              <div className="gap-2 grid grid-cols-2 md:grid-cols-4">
+                {categories.map((category) => (
+                  <Button
+                    key={category}
+                    onClick={() => {
+                      setSelectedCategory(category);
+                      setShowCategoryFilter(false);
+                    }}
+                    color={selectedCategory === category ? 'primary' : 'outline'}
+                    size="sm"
+                    className="justify-start"
+                  >
+                    {category}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Completed List */}
+          {filteredCompleted.length === 0 ? (
+            <div className="py-12 text-center">
+              <p className="mb-4 text-muted-foreground">
+                {selectedCategory === 'All'
+                  ? 'No completed problems yet. Start solving problems!'
+                  : `No completed problems in the "${selectedCategory}" category.`}
+              </p>
+              <Link href={routes.home}>
+                <Button>
+                  <ArrowRightIcon className="mr-2 w-4 h-4" />
+                  Browse Problems
+                </Button>
+              </Link>
+            </div>
+          ) : (
+            <div className="gap-4 grid">
+              {filteredCompleted.map((completed) => (
+                <div
+                  key={completed.title}
+                  className="flex justify-between items-center hover:bg-muted/50 p-4 border rounded-lg transition-colors"
+                >
+                  <div className="flex-1">
+                    <h3 className="font-medium">{completed.title}</h3>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="bg-green-100 px-2 py-1 rounded-full text-green-800 text-xs">
-                        {completed.topic || getCategoryFromTitle(completed.title)}
+                      <Badge variant="outline">{completed.topic}</Badge>
+                      <span className="text-muted-foreground text-sm">
+                        Completed {new Date(completed.completedAt).toLocaleDateString()}
                       </span>
-                      <p className="text-muted-foreground text-sm">
-                        Completed on{' '}
-                        {new Date(completed.completedAt).toLocaleDateString()}
-                      </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Button onClick={() => toggleCompleted(completed.title)}>
-                      <CircleIcon className="w-5 h-5" />
-                    </Button>
                     <Link
-                      href={`/docs/${completed.title
+                      href={`/docs/${completed.topic.toLowerCase()}/${completed.title
                         .toLowerCase()
                         .replace(/\s+/g, '-')}`}
                     >
-                      <Button size="sm">View Problem</Button>
+                      <Button color="outline" size="sm">
+                        <ExternalLinkIcon className="mr-2 w-4 h-4" />
+                        View
+                      </Button>
                     </Link>
+                    <Button
+                      onClick={() => toggleCompletedMutation.mutate({ title: completed.title, topic: completed.topic, isCompleted: true })}
+                      color="outline"
+                      size="sm"
+                      disabled={toggleCompletedMutation.isPending}
+                    >
+                      {toggleCompletedMutation.isPending ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Trash2Icon className="w-4 h-4" />
+                      )}
+                    </Button>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )
+              ))}
+            </div>
+          )}
+        </>
       ) : (
-        // Problem Sets Tab
-        completedProblemSets.length === 0 ? (
-          <div className="py-12 text-center">
-            <BookOpen className="mx-auto mb-4 w-12 h-12 text-muted-foreground" />
-            <h3 className="mb-2 font-semibold text-lg">
-              No completed problem sets yet
-            </h3>
-            <p className="mb-4 text-muted-foreground">
-              Start creating and completing problem sets!
-            </p>
-            <Link href={routes.problemGenerator}>
-              <Button>Create Problem Set</Button>
-            </Link>
-          </div>
-        ) : (
-          <div className="gap-4 grid">
-            {completedProblemSets.map((problemSet) => (
-              <div
-                key={problemSet.id}
-                className="hover:bg-accent/50 p-4 border rounded-lg transition-colors"
+        <>
+          {/* Category Filter for Problem Sets */}
+          <div className="flex justify-between items-center mb-6">
+            <div className="flex items-center gap-4">
+              <Button
+                onClick={() => setShowCategoryFilter(!showCategoryFilter)}
+                color="outline"
+                size="sm"
               >
-                <div className="flex justify-between items-center">
-                  <div>
-                    <h3 className="font-semibold text-lg">{problemSet.name}</h3>
+                <Filter className="mr-2 w-4 h-4" />
+                Filter by Category
+              </Button>
+              {selectedCategory !== 'All' && (
+                <Badge variant="secondary">{selectedCategory}</Badge>
+              )}
+            </div>
+            {filteredProblemSets.length > 0 && (
+              <Button
+                onClick={handleRemoveAllProblemSets}
+                color="primary"
+                size="sm"
+              >
+                <Trash2Icon className="mr-2 w-4 h-4" />
+                Remove All
+              </Button>
+            )}
+          </div>
+
+          {/* Category Dropdown for Problem Sets */}
+          {showCategoryFilter && (
+            <div className="bg-muted/50 mb-6 p-4 border rounded-lg">
+              <div className="gap-2 grid grid-cols-2 md:grid-cols-4">
+                {problemSetCategories.map((category) => (
+                  <Button
+                    key={category}
+                    onClick={() => {
+                      setSelectedCategory(category);
+                      setShowCategoryFilter(false);
+                    }}
+                    color={selectedCategory === category ? 'primary' : 'outline'}
+                    size="sm"
+                    className="justify-start"
+                  >
+                    {category}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Problem Sets List */}
+          {filteredProblemSets.length === 0 ? (
+            <div className="py-12 text-center">
+              <p className="mb-4 text-muted-foreground">
+                {selectedCategory === 'All'
+                  ? 'No completed problem sets yet. Start solving problem sets!'
+                  : `No completed problem sets in the "${selectedCategory}" category.`}
+              </p>
+              <Link href={routes.problemSets}>
+                <Button>
+                  <ArrowRightIcon className="mr-2 w-4 h-4" />
+                  Browse Problem Sets
+                </Button>
+              </Link>
+            </div>
+          ) : (
+            <div className="gap-4 grid">
+              {filteredProblemSets.map((problemSet) => (
+                <div
+                  key={problemSet.id}
+                  className="flex justify-between items-center hover:bg-muted/50 p-4 border rounded-lg transition-colors"
+                >
+                  <div className="flex-1">
+                    <h3 className="font-medium">{problemSet.name}</h3>
+                    <div className="flex items-center gap-2 mt-1">
+                      {problemSet.topic && (
+                        <Badge variant="outline">{problemSet.topic}</Badge>
+                      )}
+                      {problemSet.difficulty && (
+                        <Badge variant="outline">{problemSet.difficulty}</Badge>
+                      )}
+                      <span className="text-muted-foreground text-sm">
+                        {problemSet.problems.length} problems
+                      </span>
+                      <span className="text-muted-foreground text-sm">
+                        Created {new Date(problemSet.created_at).toLocaleDateString()}
+                      </span>
+                    </div>
                     {problemSet.description && (
-                      <p className="mt-1 text-muted-foreground text-sm">
+                      <p className="mt-2 text-muted-foreground text-sm">
                         {problemSet.description}
                       </p>
                     )}
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="bg-green-100 px-2 py-1 rounded-full text-green-800 text-xs">
-                        {problemSet.problems.length} problems
-                      </span>
-                      <p className="text-muted-foreground text-sm">
-                        Completed on {new Date(problemSet.completed_at).toLocaleDateString()}
-                      </p>
-                    </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Button 
-                      size="sm" 
-                      color="outline"
-                      onClick={() => handleShareProblemSet(problemSet)}
-                    >
-                      <Share className="w-4 h-4" />
-                    </Button>
-                    <Button 
-                      onClick={() => handleRemoveProblemSet(problemSet)}
-                      color="outline"
-                      size="sm"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                    <Link href={routes.problemSets}>
-                      <Button size="sm">View Problem Set</Button>
+                    <Link href={`/problem-sets/${problemSet.id}`}>
+                      <Button color="outline" size="sm">
+                        <ExternalLinkIcon className="mr-2 w-4 h-4" />
+                        View
+                      </Button>
                     </Link>
+                    <AddToFavoriteProblemSetBtn
+                      problemSetId={problemSet.id}
+                      problemSetName={problemSet.name}
+                      problems={problemSet.problems}
+                      variant="just-icon"
+                    />
+                    <CompletedProblemSetBtn
+                      problemSetId={problemSet.id}
+                      problemSetName={problemSet.name}
+                      problems={problemSet.problems}
+                      variant="just-icon"
+                    />
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )
+              ))}
+            </div>
+          )}
+        </>
       )}
     </div>
   );

@@ -1,96 +1,43 @@
 'use client';
 
-import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import { useFavorites, useToggleFavorite } from '@/lib/hooks';
+import { createContext, ReactNode, useContext } from 'react';
 
 interface FavoritesContextType {
-  favorites: Set<string>;
+  favorites: string[];
   addFavorite: (title: string) => void;
   removeFavorite: (title: string) => void;
   isFavorite: (title: string) => boolean;
   toggleFavorite: (title: string) => void;
   isLoaded: boolean;
+  isLoading: boolean;
 }
 
 const FavoritesContext = createContext<FavoritesContextType | null>(null);
 
 export function FavoritesProvider({ children }: { children: ReactNode }) {
-  const [favorites, setFavorites] = useState<Set<string>>(new Set());
-  const [isLoaded, setIsLoaded] = useState(false);
+  const { data: favorites = [], isLoading, error } = useFavorites();
+  const toggleFavoriteMutation = useToggleFavorite();
 
-  // Load favorites from API on mount
-  useEffect(() => {
-    const loadFavorites = async () => {
-      try {
-        const response = await fetch('/api/favorites');
-        if (response.ok) {
-          const favoritesArray = await response.json();
-          setFavorites(new Set(favoritesArray));
-        } else if (response.status === 401) {
-          // User is not authenticated, set empty favorites
-          setFavorites(new Set());
-        }
-      } catch (error) {
-        console.error('Failed to load favorites from API:', error);
-      } finally {
-        setIsLoaded(true);
-      }
-    };
-
-    loadFavorites();
-  }, []);
-
-  const addFavorite = async (title: string) => {
-    try {
-      const response = await fetch('/api/favorites', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, topic: 'General' })
-      });
-      
-      if (response.ok) {
-        setFavorites(prev => new Set([...prev, title]));
-      } else if (response.status === 401) {
-        // User is not authenticated, show auth dialog or redirect
-        console.log('User needs to authenticate to add favorites');
-      }
-    } catch (error) {
-      console.error('Failed to add favorite via API:', error);
-    }
+  const addFavorite = (title: string) => {
+    toggleFavoriteMutation.mutate({ title, topic: 'General', isFavorite: false });
   };
 
-  const removeFavorite = async (title: string) => {
-    try {
-      const response = await fetch('/api/favorites', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title })
-      });
-      
-      if (response.ok) {
-        setFavorites(prev => {
-          const newSet = new Set(prev);
-          newSet.delete(title);
-          return newSet;
-        });
-      } else if (response.status === 401) {
-        // User is not authenticated, show auth dialog or redirect
-        console.log('User needs to authenticate to remove favorites');
-      }
-    } catch (error) {
-      console.error('Failed to remove favorite via API:', error);
-    }
+  const removeFavorite = (title: string) => {
+    toggleFavoriteMutation.mutate({ title, topic: 'General', isFavorite: true });
   };
 
   const isFavorite = (title: string) => {
-    return favorites.has(title);
+    return favorites.includes(title);
   };
 
-  const toggleFavorite = async (title: string) => {
-    if (isFavorite(title)) {
-      await removeFavorite(title);
-    } else {
-      await addFavorite(title);
-    }
+  const toggleFavorite = (title: string) => {
+    const currentlyFavorite = isFavorite(title);
+    toggleFavoriteMutation.mutate({ 
+      title, 
+      topic: 'General', 
+      isFavorite: currentlyFavorite 
+    });
   };
 
   return (
@@ -101,7 +48,8 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
         removeFavorite, 
         isFavorite, 
         toggleFavorite,
-        isLoaded
+        isLoaded: !isLoading && !error,
+        isLoading
       }}
     >
       {children}
@@ -109,10 +57,10 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function useFavorites() {
+export function useFavoritesContext() {
   const context = useContext(FavoritesContext);
   if (!context) {
-    throw new Error('useFavorites must be used within a FavoritesProvider');
+    throw new Error('useFavoritesContext must be used within a FavoritesProvider');
   }
   return context;
 } 

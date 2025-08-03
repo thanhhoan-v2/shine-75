@@ -1,8 +1,8 @@
 'use client';
 
-import { useCompleted } from '@/components/layout/sidebar/completed-context';
 import { Button } from '@/components/ui/button';
-import { CheckCircleIcon, CircleIcon } from 'lucide-react';
+import { useCompletedStatus, useToggleCompletedProblem } from '@/lib/hooks';
+import { CheckCircleIcon, CircleIcon, Loader2 } from 'lucide-react';
 
 interface CompletedBtnProps {
   problemTitle: string;
@@ -17,8 +17,8 @@ const CompletedBtn = ({
   variant, 
   onAuthRequired 
 }: CompletedBtnProps) => {
-  const { isCompleted, toggleCompleted, isLoaded } = useCompleted();
-  const isProblemCompleted = isCompleted(problemTitle);
+  const { data: isCompleted = false, isLoading: statusLoading } = useCompletedStatus(problemTitle);
+  const toggleCompletedMutation = useToggleCompletedProblem();
 
   const handleToggleCompleted = () => {
     // Temporarily disable authentication check for testing
@@ -27,18 +27,33 @@ const CompletedBtn = ({
     //   return; // Authentication dialog was shown, don't proceed
     // }
     
-    toggleCompleted(problemTitle);
+    toggleCompletedMutation.mutate({ 
+      title: problemTitle, 
+      topic: topic || 'General', 
+      isCompleted 
+    });
   };
 
-  // Don't render until the context is loaded to prevent hydration mismatches
-  if (!isLoaded) {
-    return null;
+  // Don't render until the status is loaded to prevent hydration mismatches
+  if (statusLoading) {
+    return (
+      <Button color="outline" size="sm" disabled>
+        <Loader2 className="w-4 h-4 animate-spin" />
+      </Button>
+    );
   }
 
   if (variant === 'just-icon') {
     return (
-      <Button onClick={handleToggleCompleted} color="outline" size="sm">
-        {isProblemCompleted ? (
+      <Button 
+        onClick={handleToggleCompleted} 
+        color="outline" 
+        size="sm"
+        disabled={toggleCompletedMutation.isPending}
+      >
+        {toggleCompletedMutation.isPending ? (
+          <Loader2 className="w-4 h-4 animate-spin" />
+        ) : isCompleted ? (
           <CheckCircleIcon className="w-4 h-4 text-green-600" />
         ) : (
           <CircleIcon className="w-4 h-4 text-gray-400" />
@@ -53,8 +68,14 @@ const CompletedBtn = ({
       color="outline"
       size="sm"
       className="gap-2 px-2 py-3 w-[200px]"
+      disabled={toggleCompletedMutation.isPending}
     >
-      {isProblemCompleted ? (
+      {toggleCompletedMutation.isPending ? (
+        <>
+          <Loader2 className="w-4 h-4 animate-spin" />
+          <div>Updating...</div>
+        </>
+      ) : isCompleted ? (
         <>
           <CheckCircleIcon className="w-4 h-4 text-green-600" />
           <div>Mark as incomplete</div>
