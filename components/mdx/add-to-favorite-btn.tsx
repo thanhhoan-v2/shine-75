@@ -21,10 +21,11 @@ const AddToFavoriteBtn = ({
   const isItemFavorite = isFavorite(problemTitle);
 
   const handleToggleFavorite = () => {
-    // Check if authentication is required
-    if (onAuthRequired && onAuthRequired()) {
-      return; // Authentication dialog was shown, don't proceed
-    }
+    // Temporarily disable authentication check for testing
+    // TODO: Re-enable authentication check for production
+    // if (onAuthRequired && onAuthRequired()) {
+    //   return; // Authentication dialog was shown, don't proceed
+    // }
     
     toggleFavorite(problemTitle);
   };

@@ -5,8 +5,8 @@ const sql = neon(process.env.DATABASE_URL!);
 
 export async function GET() {
   try {
-    const result = await sql`SELECT title FROM favorites ORDER BY added_at DESC`;
-    return NextResponse.json(result.map(row => row.title));
+    const result = await sql`SELECT problem_title FROM favorites ORDER BY created_at DESC`;
+    return NextResponse.json(result.map(row => row.problem_title));
   } catch (error) {
     console.error('Error fetching favorites:', error);
     return NextResponse.json({ error: 'Failed to fetch favorites' }, { status: 500 });
@@ -16,7 +16,9 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const { title, topic } = await request.json();
-    await sql`INSERT INTO favorites (title, topic) VALUES (${title}, ${topic}) ON CONFLICT (title) DO NOTHING`;
+    // For now, using a default user_id. In a real app, this would come from authentication
+    const userId = 'default-user';
+    await sql`INSERT INTO favorites (problem_title, user_id) VALUES (${title}, ${userId}) ON CONFLICT (problem_title, user_id) DO NOTHING`;
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error adding favorite:', error);
@@ -27,7 +29,8 @@ export async function POST(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
     const { title } = await request.json();
-    await sql`DELETE FROM favorites WHERE title = ${title}`;
+    const userId = 'default-user';
+    await sql`DELETE FROM favorites WHERE problem_title = ${title} AND user_id = ${userId}`;
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error removing favorite:', error);

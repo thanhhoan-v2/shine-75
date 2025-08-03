@@ -5,7 +5,7 @@ const sql = neon(process.env.DATABASE_URL!);
 
 export async function GET() {
   try {
-    const result = await sql`SELECT id, name, description, problems, topic, difficulty, created_at FROM problem_sets ORDER BY created_at DESC`;
+    const result = await sql`SELECT id, name, description, problems, topic, difficulty, created_at FROM all_problem_sets ORDER BY created_at DESC`;
     return NextResponse.json(result.map(row => ({
       id: row.id,
       name: row.name,
@@ -24,7 +24,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const { name, description, problems, topic, difficulty } = await request.json();
-    const result = await sql`INSERT INTO problem_sets (name, description, problems, topic, difficulty) VALUES (${name}, ${description}, ${JSON.stringify(problems)}, ${topic}, ${difficulty}) RETURNING id`;
+    const result = await sql`INSERT INTO all_problem_sets (name, description, problems, topic, difficulty) VALUES (${name}, ${description}, ${JSON.stringify(problems)}, ${topic}, ${difficulty}) RETURNING id`;
     return NextResponse.json({ id: result[0]?.id || 0 });
   } catch (error) {
     console.error('Error creating problem set:', error);

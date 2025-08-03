@@ -16,7 +16,9 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const { title } = await request.json();
-    await sql`INSERT INTO completed_problems (title) VALUES (${title}) ON CONFLICT (title) DO NOTHING`;
+    // Since user_id is nullable and there's a unique constraint on (title, user_id),
+    // we need to handle the case where user_id is NULL
+    await sql`INSERT INTO completed_problems (title, user_id) VALUES (${title}, NULL) ON CONFLICT (title, user_id) DO NOTHING`;
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error adding completed problem:', error);
@@ -27,7 +29,7 @@ export async function POST(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
     const { title } = await request.json();
-    await sql`DELETE FROM completed_problems WHERE title = ${title}`;
+    await sql`DELETE FROM completed_problems WHERE title = ${title} AND user_id IS NULL`;
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error removing completed problem:', error);

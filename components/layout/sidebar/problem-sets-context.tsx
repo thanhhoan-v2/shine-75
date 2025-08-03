@@ -1,5 +1,6 @@
 'use client';
 
+import { studyPlan } from '@/lib/data/patterns';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 
 interface Problem {
@@ -32,6 +33,17 @@ interface ProblemSetsContextType {
 
 const ProblemSetsContext = createContext<ProblemSetsContextType | null>(null);
 
+// Helper function to find the actual difficulty of a problem
+const findProblemDifficulty = (problemTitle: string): string => {
+  for (const pattern of Object.values(studyPlan)) {
+    const problem = pattern.problems.find(p => p.name === problemTitle);
+    if (problem) {
+      return problem.difficulty;
+    }
+  }
+  return 'Medium'; // Fallback if problem not found
+};
+
 export function ProblemSetsProvider({ children }: { children: ReactNode }) {
   const [problemSets, setProblemSets] = useState<ProblemSet[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -44,10 +56,10 @@ export function ProblemSetsProvider({ children }: { children: ReactNode }) {
         if (response.ok) {
           const dbProblemSets = await response.json();
           const formattedProblemSets: ProblemSet[] = dbProblemSets.map((dbSet: any) => {
-            // Reconstruct Problem objects from stored data
+            // Reconstruct Problem objects from stored data with actual difficulties
             const problems: Problem[] = (dbSet.problems || []).map((problemTitle: string) => ({
               title: problemTitle,
-              difficulty: 'Medium', // Default difficulty since we only store titles
+              difficulty: findProblemDifficulty(problemTitle), // Use actual difficulty
               description: '',
               timeLimit: '',
               week: 1,

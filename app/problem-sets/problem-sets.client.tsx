@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
+import { toast } from 'sonner';
 
 export default function ProblemSetsClient() {
   const { problemSets, removeProblemSet, isLoaded } = useProblemSets();
@@ -97,12 +98,12 @@ export default function ProblemSetsClient() {
       <div className="mx-auto px-4 py-8 container">
         <div className="flex flex-col gap-6">
           <div className="mb-8">
-                      <Link href={routes.docs}>
-            <Button color="ghost" size="sm" className="gap-2">
-              <ArrowLeft className="w-4 h-4" />
-              Back to Problems
-            </Button>
-          </Link>
+            <Link href={routes.docs}>
+              <Button color="ghost" size="sm" className="gap-2">
+                <ArrowLeft className="w-4 h-4" />
+                Back to Problems
+              </Button>
+            </Link>
           </div>
           <div className="flex flex-col gap-4">
             <div className="flex justify-between items-center">
@@ -191,8 +192,13 @@ export default function ProblemSetsClient() {
                         size="sm"
                         color="outline"
                         onClick={() => {
-                          const url = `/?topic=${problemSet.topic || 'all'}&difficulty=${problemSet.difficulty || 'all'}`;
-                          navigator.clipboard.writeText(window.location.origin + url);
+                          const url = `/?topic=${
+                            problemSet.topic || 'all'
+                          }&difficulty=${problemSet.difficulty || 'all'}`;
+                          navigator.clipboard.writeText(
+                            window.location.origin + url
+                          );
+                          toast.success('Link copied to clipboard');
                         }}
                       >
                         <Share className="w-4 h-4" />
@@ -318,4 +324,4 @@ export default function ProblemSetsClient() {
       </div>
     </>
   );
-} 
+}

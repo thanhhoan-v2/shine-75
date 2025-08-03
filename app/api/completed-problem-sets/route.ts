@@ -28,9 +28,10 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const { problem_set_id, name, description, problems, user_id } = await request.json();
+    
     await sql`
       INSERT INTO completed_problem_sets (problem_set_id, name, description, problems, user_id) 
-      VALUES (${problem_set_id}, ${name}, ${description}, ${problems}, ${user_id}) 
+      VALUES (${problem_set_id}, ${name}, ${description}, ${JSON.stringify(problems)}, ${user_id}) 
       ON CONFLICT (problem_set_id, user_id) DO NOTHING
     `;
     return NextResponse.json({ success: true });
